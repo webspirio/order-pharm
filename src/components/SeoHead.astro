@@ -1,0 +1,122 @@
+---
+import { type Locale, locales, defaultLocale, htmlLang, localizedPath, t } from "@/i18n";
+import { site } from "@/config/site";
+
+interface Props {
+  locale: Locale;
+  /** Default-locale-root path of this page, e.g. "/" or "/imprint/". */
+  path?: string;
+  /**
+   * Skip the cross-locale hreflang loop and self-reference only. For pages
+   * that exist as exactly one physical file regardless of locale — currently
+   * just 404.astro, which Astro/Cloudflare special-case to a single flat
+   * dist/404.html. Without this, the generic alternates loop below would
+   * declare e.g. "/ua/404.html" as this locale's alternate even though no
+   * such file is ever built (there is no per-locale 404), which
+   * verify-dist.mjs's hreflang-reciprocity check correctly rejects.
+   */
+  selfOnly?: boolean;
+}
+
+const { locale, path = "/", selfOnly = false } = Astro.props;
+const d = t(locale);
+
+const canonicalHref = new URL(localizedPath(locale, path), site.domain).href;
+const alternates = selfOnly
+  ? [{ hreflang: htmlLang[locale], href: canonicalHref }]
+  : locales.map((l) => ({
+      hreflang: htmlLang[l],
+      href: new URL(localizedPath(l, path), site.domain).href,
+    }));
+const xDefault = new URL(localizedPath(defaultLocale, path), site.domain).href;
+const canonical = canonicalHref;
+const ogImage = new URL(site.ogImage, site.domain).href;
+
+/**
+ * Recursively drop empty values so a site without an address, VAT id or
+ * opening hours emits valid JSON-LD instead of a tree full of nulls.
+ * Objects reduced to nothing but an `@type` are dropped entirely.
+ */
+function compact(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    const items = value.map(compact).filter((v) => v !== undefined);
+    return items.length ? items : undefined;
+  }
+  if (value && typeof value === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [key, raw] of Object.entries(value)) {
+      const cleaned = compact(raw);
+      if (cleaned !== undefined) out[key] = cleaned;
+    }
+    const meaningful = Object.keys(out).filter((k) => k !== "@type");
+    return meaningful.length ? out : undefined;
+  }
+  if (value === null || value === "" || value === undefined) return undefined;
+  return value;
+}
+
+const hasAddress = Boolean(site.addressStreet && site.addressCountryCode);
+
+const jsonLd = compact({
+  "@context": "https://schema.org",
+  "@type": site.schemaType,
+  "@id": `${site.domain}/#business`,
+  name: site.name,
+  legalName: site.legalName,
+  founder: site.owner,
+  url: site.domain,
+  image: ogImage,
+  email: site.email,
+  telephone: site.phoneDisplay,
+  vatID: site.vatId,
+  priceRange: site.priceRange,
+  sameAs: site.sameAs,
+  knowsLanguage: locales.map((l) => htmlLang[l]),
+  address: hasAddress
+    ? {
+        "@type": "PostalAddress",
+        streetAddress: site.addressStreet,
+        postalCode: site.addressPostal,
+        addressLocality: site.addressLocality,
+        addressRegion: site.addressRegion,
+        addressCountry: site.addressCountryCode,
+      }
+    : undefined,
+  geo:
+    site.geoLat !== undefined && site.geoLng !== undefined
+      ? { "@type": "GeoCoordinates", latitude: site.geoLat, longitude: site.geoLng }
+      : undefined,
+  areaServed: site.areaServed
+    ? { "@type": "Place", name: site.areaServed }
+    : undefined,
+  openingHoursSpecification: site.openingHours
+    ? {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: site.openingHours.days,
+        opens: site.openingHours.opens,
+        closes: site.openingHours.closes,
+      }
+    : undefined,
+  hasOfferCatalog: {
+    "@type": "OfferCatalog",
+    name: d.services.title,
+    itemListElement: d.services.items.map((s) => ({
+      "@type": "Offer",
+      itemOffered: { "@type": "Service", name: s.title, description: s.desc },
+    })),
+  },
+});
+---
+
+<link rel="canonical" href={canonical} />
+{alternates.map((a) => <link rel="alternate" hreflang={a.hreflang} href={a.href} />)}
+<link rel="alternate" hreflang="x-default" href={xDefault} />
+<meta property="og:url" content={canonical} />
+<meta property="og:site_name" content={site.name} />
+<meta property="og:image" content={ogImage} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content={site.name} />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content={ogImage} />
+<script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />

@@ -1,0 +1,39 @@
+---
+import { type Locale, t } from "@/i18n";
+import { site } from "@/config/site";
+import { Phone } from "lucide-react";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const d = t(locale);
+---
+
+{
+  /* Neutral page-tint wash (same class as Über mich/Dienste/Kontakt's
+     <main>) rather than the fixed dark brand-800 band used elsewhere
+     (Hero scrim, Contact backdrop, Footer) — with those three already dark,
+     a fourth dark block back-to-back with Contact/Footer read as too much
+     repetition. This is the one homepage section that breaks the pattern
+     on purpose. */
+  site.phoneHref && (
+    <section class="page-tint border-b border-border/60 py-12 sm:py-14">
+      <div class="mx-auto max-w-2xl px-4 text-center sm:px-6">
+        <p class="mb-3 text-xs font-bold uppercase leading-relaxed tracking-[0.28em] text-brand-700 dark:text-brand-400">
+          {d.phoneCta.kicker}
+        </p>
+        <h2 class="text-3xl sm:text-4xl">{d.phoneCta.title}</h2>
+        <p class="mt-3 text-base text-muted-foreground sm:text-lg">{d.phoneCta.lead}</p>
+        <a
+          href={site.phoneHref}
+          class="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3.5 font-semibold"
+        >
+          <Phone className="size-5" />
+          {d.phoneCta.cta}: {site.phoneDisplay}
+        </a>
+      </div>
+    </section>
+  )
+}

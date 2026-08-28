@@ -1,0 +1,156 @@
+---
+import {
+  type Locale,
+  t,
+  locales,
+  localizedPath,
+  unlocalizedPath,
+  localeName,
+  htmlLang,
+  localeSegment,
+} from "@/i18n";
+import { site } from "@/config/site";
+import ThemeToggle from "@/components/islands/ThemeToggle.tsx";
+import LanguageSwitcher from "@/components/islands/LanguageSwitcher.tsx";
+import PaletteSwitcher from "@/components/islands/PaletteSwitcher.tsx";
+import MobileMenu from "@/components/islands/MobileMenu.tsx";
+import { Scale } from "lucide-react";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const d = t(locale);
+
+const home = localizedPath(locale, "/");
+const navLinks = [
+  { label: d.nav.services, href: localizedPath(locale, "/dienste/") },
+  { label: d.nav.about, href: localizedPath(locale, "/ueber-mich/") },
+  { label: d.nav.contact, href: localizedPath(locale, "/kontakt/") },
+];
+
+// Recover this page's default-locale path so every language link stays on it.
+const currentPath = unlocalizedPath(Astro.url.pathname);
+const langOptions = locales.map((l) => ({
+  code: htmlLang[l],
+  name: localeName[l],
+  href: localizedPath(l, currentPath),
+}));
+
+// Shown on the switcher trigger itself — e.g. "UA", matching the site's own
+// /ua/ URL segment convention, not "UK" (Ukrainian's BCP-47 code, used below
+// for `current` instead since that's what has to match langOptions' codes).
+// The default locale's segment is "" (it serves from the root), so it falls
+// back to its BCP-47 code.
+const currentLabel = (localeSegment[locale] || htmlLang[locale]).toUpperCase();
+
+// On the Kontakt page itself, a CTA that re-links to /kontakt/ is dead
+// weight — swap it for a direct call action instead.
+const onKontakt = currentPath === "/kontakt/";
+const ctaHref = onKontakt ? site.phoneHref || localizedPath(locale, "/kontakt/") : localizedPath(locale, "/kontakt/");
+const ctaLabel = onKontakt ? d.hero.ctaSecondary : d.nav.cta;
+---
+
+<header
+  class="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+>
+  <div class="relative mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
+    <a href={home} class="flex items-center gap-2.5 leading-none">
+      {/* Icon sized to the combined height of both text rows (not just the
+          name row) and placed beside the whole two-row stack, rather than
+          just the top row — reads as one balanced lockup instead of the
+          icon looking undersized next to a two-line wordmark. */}
+      <Scale className="size-10 shrink-0 text-brand-500" />
+      <span class="flex flex-col gap-1">
+        <span class="font-heading text-2xl tracking-tight text-foreground">{site.shortName}</span>
+        {/* Split into characters inside a justify-between row, rather than
+            plain text with letter-spacing: a flex row's own natural width
+            (before it's stretched to match its sibling) is just its
+            packed-together letters, so once the flex-col parent resolves
+            its width to the wider name row above and stretches this row to
+            match (align-items: stretch, the default), justify-between
+            redistributes the letters across exactly that width — the two
+            rows start and end at precisely the same points, not just
+            visually close via a fixed tracking value. */}
+        <span class="flex justify-between text-[0.6rem] font-bold uppercase text-brand-700 dark:text-brand-400">
+          {d.hero.logoTitle.split("").map((char) => (
+            <span>{char === " " ? " " : char}</span>
+          ))}
+        </span>
+      </span>
+    </a>
+
+    {/* Absolutely centred on the header rather than just sitting in the
+        middle flex slot between logo and utility icons — those two sides
+        aren't the same width, so relying on justify-between/flex-1 would
+        leave the nav visibly off-centre (skewed toward whichever side is
+        narrower). The primary CTA joins the same divide-x row as the nav
+        links — sharing their underline hover animation and divider
+        rhythm — rather than living apart as a separate pill button; bold,
+        brand-coloured text (instead of a filled background) is what still
+        marks it as the primary action among them. */}
+    <nav
+      aria-label={d.a11y.primaryNav}
+      class="absolute left-[54%] top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center divide-x divide-border text-sm font-medium text-foreground/70 md:flex"
+    >
+      {navLinks.map((link) => (
+        <a href={link.href} class="nav-link relative px-4 py-2 transition-colors hover:text-foreground">
+          {link.label}
+        </a>
+      ))}
+      <a
+        href={ctaHref}
+        class="nav-link relative px-4 py-2 font-semibold text-brand-700 transition-colors hover:text-brand-800 dark:text-brand-400 dark:hover:text-brand-300"
+      >
+        {ctaLabel}
+      </a>
+    </nav>
+
+    <div class="flex items-center gap-2">
+      {locales.length > 1 && (
+        <LanguageSwitcher
+          client:load
+          current={htmlLang[locale]}
+          currentLabel={currentLabel}
+          options={langOptions}
+          label={d.a11y.langNav}
+        />
+      )}
+      <PaletteSwitcher client:load label={d.palette.label} options={d.palette.options} />
+      <ThemeToggle client:idle label={d.nav.toggleTheme} />
+      <MobileMenu
+        client:idle
+        links={navLinks}
+        primaryHref={ctaHref}
+        primaryLabel={ctaLabel}
+        secondaryHref={!onKontakt && site.phoneHref ? site.phoneHref : undefined}
+        secondaryLabel={!onKontakt && site.phoneHref ? d.hero.ctaSecondary : undefined}
+        menuLabel={d.a11y.openMenu}
+        navLabel={d.a11y.primaryNav}
+        closeLabel={d.a11y.close}
+      />
+    </div>
+  </div>
+</header>
+
+<style>
+  /* A thin underline that grows in from the left on hover, rather than just
+     the plain colour change every other link on the site gets — the primary
+     nav is the one place a little extra motion earns its keep. */
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    right: 1rem;
+    bottom: 0.1rem;
+    left: 1rem;
+    height: 1px;
+    background: var(--color-brand-500);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.25s ease;
+  }
+  .nav-link:hover::after {
+    transform: scaleX(1);
+  }
+</style>

@@ -1,0 +1,41 @@
+---
+import { type Locale, t } from "@/i18n";
+import Layout from "@/layouts/Layout.astro";
+import SeoHead from "@/components/SeoHead.astro";
+import Header from "@/components/sections/Header.astro";
+import Footer from "@/components/sections/Footer.astro";
+
+interface Props {
+  locale: Locale;
+  doc: "imprint" | "privacy";
+}
+
+const { locale, doc } = Astro.props;
+const d = t(locale);
+
+const content = d.legal[doc];
+const meta = d.meta[doc];
+const path = `/${doc}/`;
+---
+
+<Layout locale={locale} title={meta.title} description={meta.description}>
+  <SeoHead slot="head" locale={locale} path={path} />
+  <Header locale={locale} />
+  <main id="main" tabindex="-1" class="page-tint outline-none">
+    <div class="mx-auto max-w-3xl px-4 py-20 sm:px-6 sm:py-24">
+      <h1 class="text-3xl sm:text-4xl">{content.title}</h1>
+      <p class="mt-4 text-sm leading-relaxed text-muted-foreground">{content.intro}</p>
+      <div class="mt-10 flex flex-col gap-8">
+        {content.sections.map((section) => (
+          <section>
+            <h2 class="subhead">{section.heading}</h2>
+            <p class="mt-2.5 whitespace-pre-line leading-relaxed text-muted-foreground">
+              {section.body}
+            </p>
+          </section>
+        ))}
+      </div>
+    </div>
+  </main>
+  <Footer locale={locale} />
+</Layout>

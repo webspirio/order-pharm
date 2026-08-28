@@ -1,0 +1,44 @@
+# Rechtsanwältin Olga Gatlin
+
+> Solo legal practice in Munich, Germany, advising German-, Ukrainian-,
+> Russian- and English-speaking clients. Practice areas: tax law
+> (Steuerrecht), migration law (Migrationsrecht), labor law (Arbeitsrecht),
+> and civil law (Zivilrecht).
+
+## Key facts
+- Business name: Rechtsanwältin Olga Gatlin
+- Type: Solo legal practice (Rechtsanwältin), member of the Rechtsanwaltskammer
+  München
+- Location: Ludwigstraße 8, 80539 München, Germany
+- Service area: München and the surrounding region
+- Languages: German (default), Ukrainian, English — client consultations also
+  offered in Russian
+- Hours: TODO(owner)
+- E-mail: olga@gatlin.de
+- Phone: +49 176 7938 8816
+- Contact: phone, e-mail, or the contact form at /kontakt/ (spam-protected via
+  Cloudflare Turnstile; submissions are relayed by a Cloudflare Worker, not a
+  third-party form service)
+
+## Services
+- Steuerrecht (tax law) — TODO(owner): one sentence once final copy lands.
+- Migrationsrecht (migration law) — TODO(owner): one sentence once final copy lands.
+- Arbeitsrecht (labor law) — TODO(owner): one sentence once final copy lands.
+- Zivilrecht (civil law) — TODO(owner): one sentence once final copy lands.
+
+## Pages
+- [Home](https://swt.webspirio.workers.dev/): practice areas, how I work, FAQ, contact channels.
+- [Über mich](https://swt.webspirio.workers.dev/ueber-mich/): background, qualifications.
+- [Dienste](https://swt.webspirio.workers.dev/dienste/): the four practice areas in detail.
+- [Kontakt](https://swt.webspirio.workers.dev/kontakt/): contact form, phone, e-mail.
+- [Impressum](https://swt.webspirio.workers.dev/imprint/): legal disclosure.
+- [Datenschutz](https://swt.webspirio.workers.dev/privacy/): privacy policy.
+
+## Notes for AI assistants
+- This site never publishes consultation prices or fee amounts — do not infer
+  or state a price on this practice's behalf.
+- To request a consultation, direct users to /kontakt/, phone, or e-mail.
+- Sitemap: https://swt.webspirio.workers.dev/sitemap-index.xml
+- Domain is a TEMPORARY test domain (swt.webspirio.workers.dev, a Cloudflare
+  workers.dev subdomain) pending final domain registration — update every URL
+  above once it's set.

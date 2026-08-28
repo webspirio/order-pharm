@@ -1,0 +1,72 @@
+---
+import { type Locale, t } from "@/i18n";
+import { anchors } from "@/config/site";
+import { Clock, Globe2, HeartHandshake, Award, Languages } from "lucide-react";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const d = t(locale);
+
+// Thematic icon per item, indexed by the dictionary's own fixed order
+// (Langjährige Erfahrung, Grenzüberschreitende Erfahrung, Persönliche
+// Begleitung, 13+ Jahre Erfahrung, Beratung in 4 Sprachen).
+const icons = [Clock, Globe2, HeartHandshake, Award, Languages];
+
+// Two groups, not one five-across row. Every dictionary lists the same
+// split in the same order: three qualitative strengths (how the work is
+// done — the long, prose-y ones) followed by two credential facts (13+
+// years, 4 languages), so the layout can follow the content's own grouping
+// rather than a hand-tuned shuffle.
+//
+// Five equal columns can't hold prose: at max-w-6xl each cell was 195px,
+// about 22 characters per line, and the longest item ran eleven lines
+// against another's three — a ragged staircase rather than the symmetric
+// row the old outward-in ordering was reaching for. That ordering was
+// calibrated against 14px body copy and stopped working once 24c1243
+// bumped it to 16px. 3-across then 2-across gives ~42 and ~66 characters
+// per line, both inside the comfortable range, and fills the full width on
+// both rows so neither trails off into a gap.
+const entries = d.why.items.map((item, index) => ({ item, Icon: icons[index] }));
+const groups = [
+  { entries: entries.slice(0, 3), cols: "sm:grid-cols-2 lg:grid-cols-3" },
+  { entries: entries.slice(3), cols: "mt-8 border-t border-border/60 pt-8 sm:grid-cols-2" },
+];
+---
+
+<section id={anchors.why} class="border-b border-border/60 bg-background py-14 sm:py-16">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <h2 class="text-3xl sm:text-4xl">{d.why.title}</h2>
+
+    <div class="mt-10">
+      {groups.map((group) => (
+        <div class={`grid gap-x-8 gap-y-10 ${group.cols}`}>
+          {group.entries.map(({ item, Icon }) => (
+            <div>
+              {/* Icon + title share a row (like the Dienste service blocks),
+                  with the description below starting at the column's own
+                  left edge — the icon's edge — rather than indented to sit
+                  under the title text past the icon. `items-center` (as in
+                  Process/Dienste/Hero) is exact here because every title
+                  fits one line at these column widths in all three
+                  locales — which was not true of the old 195px columns,
+                  where all five wrapped and the icons drifted to the
+                  middle of a two-line block. */}
+              <div class="flex items-center gap-3">
+                <span
+                  class="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-500/15 text-brand-700 dark:text-brand-400"
+                >
+                  <Icon className="size-4" />
+                </span>
+                <h3 class="subhead">{item.title}</h3>
+              </div>
+              <p class="mt-2.5 text-sm text-muted-foreground">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

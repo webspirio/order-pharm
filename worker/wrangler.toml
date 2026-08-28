@@ -1,0 +1,48 @@
+# Sidecar Cloudflare Worker for the /kontakt/ contact form. Deployed and
+# versioned independently from the static site (see ../wrangler.jsonc) — the
+# Astro build stays fully static, this is the one piece of real backend the
+# site has, per docs/superpowers or README's "Adding a contact form" note.
+#
+# Deploy: `wrangler deploy` from this directory, to the free workers.dev
+# subdomain for now. Requires `wrangler login` once per machine. Also deployed
+# via the Cloudflare "gatlin" Workers Builds project (Git-connected, root
+# directory left blank, deploy command `npx wrangler deploy --config
+# worker/wrangler.toml`, watch path `worker/**`) — either path works.
+
+name = "gatlin"
+main = "src/index.ts"
+compatibility_date = "2026-07-31"
+
+# Workers Email API binding — lets this Worker call env.EMAIL.send().
+# https://developers.cloudflare.com/email-service/api/send-emails/workers-api/
+[[send_email]]
+name = "EMAIL"
+
+[vars]
+# --- TEMPORARY test config: real domain not chosen yet. --------------------
+# TEMPORARY: redirected to the developer's own inbox for testing — swap back
+# to "olga@gatlin.de" before the real launch, or every test send goes to the
+# client instead of the tester.
+CONTACT_TO_EMAIL = "bohdan.webspirio@gmail.com"
+# MUST be on a domain onboarded to Cloudflare Email Service (Compute > Email
+# Service > Email Sending > Onboard Domain) — unlike a workers.dev subdomain,
+# chorno.us is a real domain and CAN be onboarded, so this will actually work
+# once that dashboard step is done. Still fails with E_SENDER_NOT_VERIFIED
+# until then. Swap for the real domain's address once it's live. Deliberately
+# a *different* domain than ALLOWED_ORIGIN below — the site serves from a
+# workers.dev subdomain (which can't be onboarded for sending), so site
+# origin and mail-sending domain are two separate test domains right now.
+CONTACT_FROM_EMAIL = "kontakt@chorno.us"
+# Must equal the site's real serving origin, no trailing slash — used for the
+# CORS allow-origin header. A mismatch here silently breaks the contact form
+# with no server-side error (the browser just blocks the response). Matches
+# `site.domain` in ../src/config/site.ts and `wrangler.jsonc`'s `name`. Swap
+# to the real domain's origin once it's live.
+ALLOWED_ORIGIN = "https://swt.webspirio.workers.dev"
+
+# TURNSTILE_SECRET_KEY is NOT set here — it's a secret, not a var. Set it
+# with `wrangler secret put TURNSTILE_SECRET_KEY`, or, for the
+# Cloudflare-dashboard "gatlin" Workers Builds project, as a Secret under
+# Settings -> Variables and Secrets. For local testing before the real
+# Turnstile widget exists, Cloudflare publishes a permanent always-passes
+# test secret key: 1x0000000000000000000000000000000AA

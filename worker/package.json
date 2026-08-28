@@ -1,0 +1,14 @@
+{
+  "name": "gatlin",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "types": "wrangler types"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "latest",
+    "typescript": "^6.0.3",
+    "wrangler": "latest"
+  }
+}

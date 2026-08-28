@@ -1,0 +1,55 @@
+---
+import { type Locale, t } from "@/i18n";
+import { anchors } from "@/config/site";
+import { getImage } from "astro:assets";
+import { galleryItems } from "@/data/gallery";
+import GalleryGrid from "@/components/islands/GalleryGrid.tsx";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const d = t(locale);
+
+const WIDTH = 800;
+
+const images = await Promise.all(
+  galleryItems.map(async (item) => {
+    const height = Math.round(WIDTH * (item.src.height / item.src.width));
+    const optimized = await getImage({
+      src: item.src,
+      width: WIDTH,
+      height,
+      format: "webp",
+    });
+    return {
+      src: optimized.src,
+      width: WIDTH,
+      height,
+      alt: item.alt,
+      category: item.category,
+    };
+  }),
+);
+
+const categories = [
+  { key: "office", label: d.gallery.categories.office },
+  { key: "certificates", label: d.gallery.categories.certificates },
+  { key: "other", label: d.gallery.categories.other },
+];
+---
+
+<section id={anchors.gallery} class="border-b border-border/60 bg-background py-20 sm:py-24">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <h2 class="text-3xl sm:text-4xl">{d.gallery.title}</h2>
+    <p class="mb-10 mt-3 max-w-2xl text-muted-foreground">{d.gallery.subtitle}</p>
+
+    <GalleryGrid
+      client:visible
+      items={images}
+      categories={categories}
+      allLabel={d.gallery.all}
+    />
+  </div>
+</section>

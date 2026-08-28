@@ -1,0 +1,27 @@
+# Allow every crawler full access, including AI answer engines.
+User-agent: *
+Allow: /
+
+# Explicit allows for AI search / retrieval and on-demand user-fetch agents.
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+Sitemap: https://swt.webspirio.workers.dev/sitemap-index.xml

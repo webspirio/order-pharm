@@ -1,0 +1,23 @@
+{
+  "name": "Rechtsanwältin Olga Gatlin",
+  "short_name": "Gatlin",
+  "description": "Rechtsanwältin für Steuerrecht, Migrationsrecht, Arbeitsrecht und Zivilrecht in München. Beratung auf Deutsch, Ukrainisch, Russisch und Englisch.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#171717",
+  "icons": [
+    {
+      "src": "/web-app-manifest-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/web-app-manifest-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

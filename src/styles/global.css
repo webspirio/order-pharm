@@ -1,0 +1,513 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource/gilda-display";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-heading: "Gilda Display", Georgia, "Times New Roman", serif;
+
+  /* ---------------------------------------------------------------
+     Brand ramp — three switchable palettes (see PaletteSwitcher.tsx),
+     selected at runtime via a `data-palette` attribute on <html> (mirrors
+     how `.dark` switches light/dark — see the no-flash script in
+     Layout.astro). This @theme block declares the *default* palette,
+     "original" (warm taupe/bronze, the site's initial ship colour);
+     `[data-palette="blue"]` and `[data-palette="emerald"]` below
+     redeclare the same custom properties with a more specific selector,
+     which wins the cascade for elements under that attribute — plain CSS
+     variable overriding, nothing Tailwind-specific. Same ramp in both
+     light/dark themes within a given palette; low-opacity tints
+     (brand-500/15 etc.) are what tints icon chips, so 500 itself must
+     stay mid-light to read against a dark page too.
+     brand-600 is tuned per palette so brand-50 text on it clears
+     ~4.5:1+ as a flat solid-button surface (see .bg-primary below, the
+     one CTA style shared by all three palettes). brand-800 is a fixed
+     (non-theme-flipping) deep shade, for the rare full-bleed "accent
+     band" sections (Contact backdrop, Footer) that want to read as a
+     dark, branded surface in both light and dark mode rather than
+     inverting with the page.
+
+     glow-* is a second, deliberately minor hue per palette — used only
+     as the far stop of the site's one signature gradient (see
+     .hero-scrim below), echoed quietly in card edges and the page-tint
+     corner wash. It is not a second set of semantic tokens — no
+     background/border/muted-* anywhere is glow-based, and glow never
+     carries small text or meaningful icons on its own (a light glow tint
+     directly on the page background can fall under the 3:1 floor for
+     graphical/UI contrast) — so the UI itself stays calmly one colour
+     and the duotone reads as one considered, restrained accent, not
+     decoration everywhere.
+
+     Static assets that can't respond to a runtime attribute — favicons,
+     og-image.jpg, the /kontakt/ office-map pin — are generated once
+     (`pnpm icons` / `pnpm office-map`) against this default "original"
+     palette; switching palettes in the browser doesn't regenerate them.
+     --------------------------------------------------------------- */
+  --color-brand-50: #f6f1e9;
+  --color-brand-300: #d9c7ae;
+  --color-brand-400: #bea88c;
+  --color-brand-500: #a38f75;
+  --color-brand-600: #7e6a54;
+  --color-brand-700: #6e5d4a;
+  --color-brand-800: #43362a;
+  --color-brand-foreground: #2c3e50;
+
+  --color-glow-300: #e8d6b0;
+  --color-glow-500: #c4a35a;
+  --color-glow-700: #7c5d27;
+}
+
+/* Palette: blue (sky blue + light lavender glow). */
+:root[data-palette="blue"] {
+  --color-brand-50: #eef6fc;
+  --color-brand-300: #b7d9ef;
+  --color-brand-400: #8ec3e4;
+  --color-brand-500: #5aa2d6;
+  --color-brand-600: #326f9f;
+  --color-brand-700: #21567c;
+  --color-brand-800: #133a56;
+  --color-brand-foreground: #0d2740;
+
+  --color-glow-300: #dcd0f2;
+  --color-glow-500: #ab8fdb;
+  --color-glow-700: #573f89;
+}
+
+/* Palette: emerald (deep emerald + gold glow). */
+:root[data-palette="emerald"] {
+  --color-brand-50: #f3f7f6;
+  --color-brand-300: #bcd7d4;
+  --color-brand-400: #88bfb7;
+  --color-brand-500: #37867b;
+  --color-brand-600: #25554e;
+  --color-brand-700: #194841;
+  --color-brand-800: #103c36;
+  --color-brand-foreground: #0f2924;
+
+  --color-glow-300: #e8d6b0;
+  --color-glow-500: #c4a35a;
+  --color-glow-700: #7c5d27;
+}
+/* Note: the radius scale is NOT declared here. `@theme inline` below derives
+   --radius-sm/md/lg/xl/2xl/3xl from the single `--radius` token in :root, so a
+   --radius-lg here would be silently overridden and become dead config sitting
+   inside the block whose comment tells maintainers everything in it is live. */
+
+@theme inline {
+  --font-heading: "Gilda Display", Georgia, "Times New Roman", serif;
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+}
+
+:root {
+  /* "Reserved trend" warm palette — the default "original" palette (see
+     the @theme brand-ramp comment above for how palette switching
+     works). Clotted-cream background, slate-blue ink, taupe/bronze
+     accent. Cards sit on a soft beige one step down from the page so
+     they read as distinct surfaces via colour, not just a border.
+     --primary/--primary-foreground are pinned to brand-600/brand-50 —
+     the same pair .bg-primary renders below — rather than brand-500, so
+     the semantic tokens actually match what a "primary" surface looks
+     like on screen. */
+  --background: #fdfcfb;
+  --foreground: #2c3e50;
+  --card: #f4f1ea;
+  --card-foreground: #2c3e50;
+  --popover: #fdfcfb;
+  --popover-foreground: #2c3e50;
+  --primary: #7e6a54;
+  --primary-foreground: #f6f1e9;
+  --secondary: #f4f1ea;
+  --secondary-foreground: #2c3e50;
+  --muted: #f4f1ea;
+  /* Body prose is set in this token almost everywhere (service copy, FAQ
+     answers, section leads), so it is a reading colour, not just a "muted"
+     one. The previous #78716c cleared AA on --background (4.68:1) but only
+     managed 4.25:1 on --card, i.e. every paragraph inside a card failed.
+     Darkened to hold >=5:1 on the card surface and 5.5:1 on the page. */
+  --muted-foreground: #6c6661;
+  --accent: #efe8da;
+  --accent-foreground: #2c3e50;
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: #e8e1d3;
+  --input: #ded4c0;
+  --ring: #7e6a54;
+  --radius: 0.375rem;
+}
+
+.dark {
+  /* Same warm family, inverted: deep roasted-coffee background instead of
+     pure black, so the accent and card surfaces keep their temperature
+     rather than turning cold/neutral gray. */
+  --background: #211d1a;
+  --foreground: #f4efe8;
+  --card: #2a2521;
+  --card-foreground: #f4efe8;
+  --popover: #2a2521;
+  --popover-foreground: #f4efe8;
+  --primary: #7e6a54;
+  --primary-foreground: #f6f1e9;
+  --secondary: #332c26;
+  --secondary-foreground: #f4efe8;
+  --muted: #332c26;
+  --muted-foreground: #b8afa3;
+  --accent: #3a3229;
+  --accent-foreground: #f4efe8;
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: #7e6a54;
+}
+
+/* Palette: blue — near-white blue background, deep-navy ink. */
+:root[data-palette="blue"] {
+  --background: #f6fafd;
+  --foreground: #0d2740;
+  --card: #e8f1f9;
+  --card-foreground: #0d2740;
+  --popover: #f6fafd;
+  --popover-foreground: #0d2740;
+  --primary: #326f9f;
+  --primary-foreground: #eef6fc;
+  --secondary: #e8f1f9;
+  --secondary-foreground: #0d2740;
+  --muted: #e8f1f9;
+  /* See the original palette's note — held to >=5:1 on --card too. */
+  --muted-foreground: #4d6987;
+  --accent: #d9ebf6;
+  --accent-foreground: #0d2740;
+  --border: #cfe3f2;
+  --input: #aed2ea;
+  --ring: #326f9f;
+}
+.dark[data-palette="blue"] {
+  --background: #0d2233;
+  --foreground: #eaf3fa;
+  --card: #142c40;
+  --card-foreground: #eaf3fa;
+  --popover: #142c40;
+  --popover-foreground: #eaf3fa;
+  --primary: #326f9f;
+  --primary-foreground: #eef6fc;
+  --secondary: #193347;
+  --secondary-foreground: #eaf3fa;
+  --muted: #193347;
+  --muted-foreground: #a7c1d8;
+  --accent: #1c3c54;
+  --accent-foreground: #eaf3fa;
+  --ring: #326f9f;
+}
+
+/* Palette: emerald — flat neutral background/ink (not brand-tinted), per
+   the "solid, confident, detail-focused" brief this palette was built
+   for; colour lives in the accents (buttons, links, icons, the Hero
+   gradient), not diffused into every surface. */
+:root[data-palette="emerald"] {
+  --background: #f5f6f4;
+  --foreground: #303030;
+  --card: #eceeeb;
+  --card-foreground: #303030;
+  --popover: #f5f6f4;
+  --popover-foreground: #303030;
+  --primary: #25554e;
+  --primary-foreground: #f3f7f6;
+  --secondary: #eceeeb;
+  --secondary-foreground: #303030;
+  --muted: #eceeeb;
+  /* See the original palette's note — held to >=5:1 on --card too. */
+  --muted-foreground: #616662;
+  --accent: #e6ece8;
+  --accent-foreground: #303030;
+  --border: #dde2dd;
+  --input: #c9d0c9;
+  --ring: #25554e;
+}
+.dark[data-palette="emerald"] {
+  --background: #152420;
+  --foreground: #edefec;
+  --card: #1f2e29;
+  --card-foreground: #edefec;
+  --popover: #1f2e29;
+  --popover-foreground: #edefec;
+  --primary: #25554e;
+  --primary-foreground: #f3f7f6;
+  --secondary: #1f2e29;
+  --secondary-foreground: #edefec;
+  --muted: #1f2e29;
+  --muted-foreground: #a9b4ae;
+  --accent: #253a33;
+  --accent-foreground: #edefec;
+  --ring: #25554e;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+    scroll-behavior: smooth;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+  /* Softer reading rhythm than the browser default, per the "airier, less
+     aggressive contrast" direction. Only touches elements with no explicit
+     Tailwind `leading-*` utility already set on them — utilities live in a
+     higher-priority layer, so e.g. `leading-relaxed`/`leading-none` callers
+     are untouched. */
+  p,
+  li,
+  dd {
+    line-height: 1.6;
+  }
+  /* In-page anchor targets sit beneath a `sticky top-0` header that is h-16
+     (4rem) tall. Without this, clicking a nav link scrolls the section's
+     heading underneath the header. Scoped to `section[id]` so sections added
+     later by /add-section inherit it automatically. */
+  section[id] {
+    scroll-margin-top: 5rem;
+  }
+  /* Gilda Display ships regular (400) weight only — a bold/extrabold utility
+     or the browser's default h1-h6 UA-stylesheet bold would both trigger
+     synthetic/faux-bold, which looks noticeably worse on a serif display face
+     than just using its own regular weight (the reference build does the
+     same: h1-h4 { font-weight: 400 }). */
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-heading);
+    font-weight: 400;
+  }
+  /* Tailwind v4 preflight dropped v3's `button { cursor: pointer }` reset, so
+     bare <button>s (theme toggle, language switcher, shadcn Button, etc.)
+     fall back to the browser's native `cursor: default` instead of signalling
+     interactivity the way `<a href>` already does natively. */
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+@layer components {
+  /* The sub-heading level: card/column titles, FAQ questions, the small
+     section headings on the legal and Über-mich pages.
+
+     Deliberately NOT the Gilda Display serif that h1/h2 use. Gilda ships
+     400 only, and it is a high-contrast display face — its stems are
+     *thinner* than the system sans at the same size. At the 16–18px these
+     headings sit at, a Gilda sub-head therefore carries less ink than the
+     16px sans paragraph underneath it, so it reads as quieter than the text
+     it is supposed to introduce. (This is why headings "weren't
+     noticeable": the body copy was bumped 14px → 16px in 24c1243 without
+     re-scaling the headings above it, leaving sub-heads at, or below, the
+     size of their own body text.)
+
+     The rule this encodes: the display serif is used at 24px and up, where
+     it has the size to carry the brand voice; below that the sans carries
+     headings, using weight — which the serif cannot supply — to hold the
+     level at any column width. Size and weight together, so the hierarchy
+     survives independently of colour.
+
+     Lives in the `components` layer so a caller can still override any
+     single property with a utility (`text-xl` on the Dienste headings,
+     `text-brand-50` on the dark Hero/Contact bands). */
+  .subhead {
+    font-family: var(--font-sans);
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+  }
+}
+
+/* -----------------------------------------------------------------------
+   "Bring the template to life" pass — deliberately UNLAYERED (not inside
+   any @layer), so these rules win over the same-named Tailwind utility
+   classes already sitting in component markup regardless of source order:
+   CSS cascade layers rank an explicit layer below the implicit "no layer"
+   bucket no matter its specificity. That lets every visual tweak below live
+   entirely in this stylesheet, with zero edits to .astro/.tsx markup.
+   ----------------------------------------------------------------------- */
+
+/* More air inside every top-level page section. `.py-20`/`.sm:py-24` are
+   used exclusively for this one purpose across the codebase (verified via
+   grep) — never for anything smaller like a card or a chip — so widening
+   them here is safe and section-scoped without needing a new selector. */
+.py-20 {
+  padding-block: 6rem;
+}
+@media (min-width: 40rem) {
+  .sm\:py-24 {
+    padding-block: 7.5rem;
+  }
+}
+
+/* Body copy at the Tailwind `text-sm` default (14px) reads small on
+   content-heavy pages (FAQ answers, service descriptions, legal intro) —
+   bumped to the browser's 16px base. Scoped to `p`/`li` specifically so
+   UI chrome that intentionally stays smaller (buttons, form labels, nav
+   links, badges, the cookie banner's actions) is untouched — only actual
+   prose picks this up. */
+p.text-sm,
+li.text-sm {
+  font-size: 1rem;
+  /* `line-height` has to move with the font-size. Tailwind's `text-sm` sets
+     the two as a matched pair (14px / 20px); bumping only the font-size left
+     every one of these paragraphs at 20px leading on 16px text — a 1.43
+     ratio, under the 1.5 WCAG 1.4.12 expects content to support and well
+     under what 16px prose wants. 1.6 matches the bare `p, li` rule in
+     @layer base, so all body copy now shares one rhythm. */
+  line-height: 1.6;
+}
+
+/* More air inside every card-style surface (`bg-card`), whatever padding
+   utility it individually carries (p-4 through p-6/p-8). A soft diagonal
+   gradient of the card colour (still translucent + blurred, so it reads as
+   glass, not a flat block) replaces the hairline border for definition —
+   `border: none` beats every component's own `border border-border`
+   classes the same way (unlayered wins regardless of source order). The
+   far stop mixes in glow-300 rather than brand-300 — a quiet, barely-there
+   echo of the site's signature dusk gradient (see .hero-scrim/.bg-primary)
+   in every card's glass. */
+.bg-card {
+  padding: 1.75rem;
+  border: none;
+  background: linear-gradient(
+    155deg,
+    color-mix(in oklab, var(--card) 82%, transparent),
+    color-mix(in oklab, var(--card) 60%, transparent) 60%,
+    color-mix(in oklab, var(--color-glow-300) 35%, var(--card))
+  );
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+@media (min-width: 40rem) {
+  .bg-card {
+    padding: 2.25rem;
+  }
+}
+
+/* Pill/tag/button shapes (rounded-full paired with horizontal padding —
+   the attribute check excludes plain rounded-full icon circles like
+   size-8/size-11 badges, which have no px-* class and should stay round)
+   get a softer, less "capsule" corner instead of a full pill. */
+.rounded-full[class*="px-"] {
+  border-radius: var(--radius-lg);
+}
+
+/* Smooth, deliberate motion everywhere something can move or recolour. */
+a,
+button,
+.bg-card {
+  transition: all 0.3s ease;
+}
+
+/* Interactive cards (the channel/service links, not the static info boxes)
+   lift slightly on hover — the anchor/button scoping keeps a plain `<div
+   class="bg-card">` info box inert. */
+a.bg-card:hover,
+button.bg-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Primary buttons: flat brand-600, borderless, the same in all three
+   palettes — the brand-800→glow-700 gradient stays a Hero-only moment
+   (see the scrim comment in Hero.astro) rather than repeating on every
+   button, so it reads as one deliberate accent instead of a texture
+   plastered everywhere. Each palette's brand-600 is tuned so brand-50
+   text clears ~4.5:1+ on it (see the @theme comment above). Hover deepens
+   to brand-700, instead of the opacity trick (which over a light page
+   would visually lighten a mid-tone accent rather than darken it). */
+.bg-primary {
+  border: none;
+  background: var(--color-brand-600);
+  color: var(--color-brand-50);
+}
+.bg-primary:hover {
+  background: var(--color-brand-700);
+  color: var(--color-brand-50);
+}
+
+/* Heavy black drop shadows replaced with a barely-there tint of the ink
+   colour — enough to separate the portrait/panel from the page, not enough
+   to read as a "shadow". color-mix against --foreground (not a hardcoded
+   rgba) so the tint stays correct across all three palettes instead of
+   silently keeping one palette's ink colour after a switch. */
+.shadow-lg,
+.shadow-xl,
+.shadow-2xl {
+  box-shadow: 0 12px 32px color-mix(in oklab, var(--foreground) 4%, transparent);
+}
+
+/* Brand-tinted wash for inner (non-home) pages — Über mich, Dienste,
+   Kontakt, Impressum/Datenschutz, 404 — so they read as belonging to this
+   site's brand rather than a flat, undecorated white/near-black body
+   background the way the homepage's own photos/sections already avoid. A
+   uniform low-percentage background-color tint carries the "not just
+   white" base across the whole page, with two soft corner blobs layered on
+   top for depth — top-right brand, bottom-left glow, the same pairing as
+   Hero's scrim (whichever palette is active), just diffused into a much
+   quieter ambient wash here rather than a directional sweep. Applied via a
+   `page-tint` class on each page's <main> rather than globally on <body>,
+   so the homepage's own Hero/Contact photos and dark Footer band aren't
+   affected — PhoneCta.astro is the one homepage section that also opts
+   into it directly (a deliberate neutral break between the dark
+   Contact/Footer bands). */
+.page-tint {
+  background-color: color-mix(in oklab, var(--color-brand-300) 9%, var(--background));
+  background-image:
+    radial-gradient(
+      ellipse 70% 60% at 100% 0%,
+      color-mix(in oklab, var(--color-brand-300) 38%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 60% 50% at 0% 100%,
+      color-mix(in oklab, var(--color-glow-500) 24%, transparent),
+      transparent 70%
+    );
+}
+.dark .page-tint {
+  background-color: color-mix(in oklab, var(--color-brand-700) 16%, var(--background));
+  background-image:
+    radial-gradient(
+      ellipse 70% 60% at 100% 0%,
+      color-mix(in oklab, var(--color-brand-700) 45%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 60% 50% at 0% 100%,
+      color-mix(in oklab, var(--color-glow-500) 22%, transparent),
+      transparent 70%
+    );
+}

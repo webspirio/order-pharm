@@ -1,0 +1,7 @@
+# direnv config. Copy to .envrc (gitignored) and fill in.
+#   cp .envrc.example .envrc && direnv allow
+export REACTBITS_LICENSE_KEY=""
+
+# See .env.example / worker/README.md for what these are.
+export PUBLIC_CONTACT_WORKER_URL=""
+export PUBLIC_TURNSTILE_SITE_KEY=""

@@ -1,0 +1,63 @@
+---
+import "@/styles/global.css";
+import { type Locale, htmlLang, defaultLocale, t } from "@/i18n";
+
+interface Props {
+  locale?: Locale;
+  title: string;
+  description: string;
+}
+
+const { locale = defaultLocale, title, description } = Astro.props;
+const d = t(locale);
+---
+
+<!doctype html>
+<html lang={htmlLang[locale]}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <slot name="head" />
+    <script is:inline>
+      (() => {
+        try {
+          const stored = localStorage.getItem("theme");
+          const dark = stored
+            ? stored === "dark"
+            : window.matchMedia("(prefers-color-scheme: dark)").matches;
+          document.documentElement.classList.toggle("dark", dark);
+
+          // Same no-flash approach as the dark-mode toggle above, for the
+          // colour-palette switcher (PaletteSwitcher.tsx) — a `data-palette`
+          // attribute rather than a class since there are three options, not
+          // two. No stored value means the default "original" palette, which
+          // is just the CSS with no attribute selector match, so nothing to
+          // set here in that case.
+          const storedPalette = localStorage.getItem("palette");
+          if (storedPalette) document.documentElement.dataset.palette = storedPalette;
+        } catch (_) {
+          /* localStorage unavailable — fall back to the defaults. */
+        }
+      })();
+    </script>
+  </head>
+  <body class="min-h-dvh bg-background text-foreground antialiased">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:font-bold focus:text-primary-foreground focus:shadow-lg"
+      >{d.a11y.skip}</a
+    >
+    <slot />
+  </body>
+</html>

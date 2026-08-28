@@ -1,0 +1,42 @@
+# build output
+dist/
+# generated types
+.astro/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+pnpm-debug.log*
+
+# environment variables & secrets
+.env
+.env.*
+!.env.example
+.envrc
+!.envrc.example
+
+# Cloudflare / Wrangler
+.wrangler/
+
+# macOS
+.DS_Store
+
+# editors
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+
+# Claude personal overrides
+.claude/settings.local.json
+
+# Superpowers brainstorm sessions
+.superpowers/
+
+# Local design inputs (source photos, mockups) — kept out of the repo
+.input/
+
+# Meeting transcripts and client notes — not part of the site.
+meeting-*.md

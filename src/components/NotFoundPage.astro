@@ -1,0 +1,52 @@
+---
+import { type Locale, t, localizedPath } from "@/i18n";
+import Layout from "@/layouts/Layout.astro";
+import SeoHead from "@/components/SeoHead.astro";
+import Header from "@/components/sections/Header.astro";
+import Footer from "@/components/sections/Footer.astro";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const d = t(locale);
+const meta = d.meta.notFound;
+const home = localizedPath(locale, "/");
+---
+
+<Layout locale={locale} title={meta.title} description={meta.description}>
+  {
+    /*
+      path="/404.html", not the usual "/imprint/"-style default-locale path:
+      Astro special-cases src/pages/404.astro to always build a single flat
+      dist/404.html — ignoring `trailingSlash` — because that is the filename
+      hosting platforms (Cloudflare Pages included) look for. Pointing SeoHead
+      at that literal path makes canonical and this locale's hreflang
+      self-reference the page's own real, built route.
+      selfOnly: there is exactly one physical 404 file for the whole site,
+      regardless of which locale a visitor was on — Cloudflare Pages has no
+      per-locale 404 routing, and Astro doesn't treat a nested
+      src/pages/<locale>/404.astro as a special error page the way it does the
+      root one. So this page must NOT declare cross-locale hreflang alternates
+      (there is nothing for e.g. "/ua/404.html" to reciprocate, since that file
+      is never built) — selfOnly restricts SeoHead to a single self-referencing
+      alternate instead of looping every locale.
+    */
+  }
+  <SeoHead slot="head" locale={locale} path="/404.html" selfOnly />
+  <Header locale={locale} />
+  <main id="main" tabindex="-1" class="page-tint outline-none">
+    <div class="mx-auto max-w-3xl px-4 py-24 text-center sm:px-6 sm:py-32">
+      <h1 class="text-3xl sm:text-4xl">{d.notFound.title}</h1>
+      <p class="mt-4 text-muted-foreground">{d.notFound.body}</p>
+      <a
+        href={home}
+        class="mt-8 inline-flex rounded-full bg-primary px-5 py-3 font-semibold text-primary-foreground"
+      >
+        {d.notFound.backHome}
+      </a>
+    </div>
+  </main>
+  <Footer locale={locale} />
+</Layout>
