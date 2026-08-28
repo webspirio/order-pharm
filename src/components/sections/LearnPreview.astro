@@ -1,0 +1,88 @@
+---
+/**
+ * Three article cards on the homepage.
+ *
+ * Reads the first three entries of `d.learn.articles`, which is the same array
+ * /learn/ paginates and each article page renders from — so a card cannot
+ * advertise a title or read-time the article itself does not have.
+ *
+ * Thumbnails are matched by index rather than named per article, because the
+ * images are editorial rather than illustrative; a filename in the dictionary
+ * would make the copy own an asset decision.
+ */
+import { type Locale, t, localizedPath } from "@/i18n";
+import { anchors } from "@/config/site";
+import { Image } from "astro:assets";
+import learn01 from "@/assets/learn-01.jpg";
+import learn02 from "@/assets/learn-02.jpg";
+import learn03 from "@/assets/learn-03.jpg";
+import { ArrowRight } from "lucide-react";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const d = t(locale);
+
+const thumbs = [learn01, learn02, learn03];
+
+const cards = d.learn.articles.slice(0, 3).map((article, index) => ({
+  ...article,
+  image: thumbs[index % thumbs.length],
+  href: localizedPath(locale, `/learn/${article.slug}/`),
+}));
+---
+
+<section id={anchors.learn} class="border-b border-border/70 bg-card py-16 sm:py-20">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <div class="flex flex-wrap items-end justify-between gap-6">
+      <div class="max-w-2xl">
+        <p class="label text-brand-700 dark:text-brand-400">{d.home.learn.eyebrow}</p>
+        <h2 class="display-2 mt-4">{d.home.learn.title}</h2>
+        <p class="lead mt-4">{d.home.learn.lead}</p>
+      </div>
+      <a
+        href={localizedPath(locale, "/learn/")}
+        class="inline-flex items-center gap-2 text-sm font-semibold text-brand-700 dark:text-brand-400"
+      >
+        {d.home.learn.cta}
+        <ArrowRight className="size-4" />
+      </a>
+    </div>
+
+    <ul class="mt-12 grid gap-6 md:grid-cols-3 lg:gap-8">
+      {
+        cards.map((card) => (
+          <li>
+            <a href={card.href} class="panel group flex h-full flex-col overflow-hidden bg-background">
+              <div class="aspect-[16/10] overflow-hidden">
+                <Image
+                  src={card.image}
+                  alt=""
+                  widths={[400, 640, 800]}
+                  sizes="(min-width: 768px) 22rem, 100vw"
+                  class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                  loading="lazy"
+                />
+              </div>
+              <div class="flex flex-1 flex-col p-6">
+                <p class="label flex items-center gap-3 text-muted-foreground">
+                  <span class="text-brand-700 dark:text-brand-400">{card.category}</span>
+                  <span aria-hidden="true">·</span>
+                  <span class="figure font-normal tracking-normal">
+                    {card.readMinutes} {d.home.learn.readTime}
+                  </span>
+                </p>
+                <h3 class="subhead mt-3 text-[1.0625rem]">{card.title}</h3>
+                <p class="mt-2.5 flex-1 text-sm leading-relaxed text-muted-foreground">
+                  {card.dek}
+                </p>
+              </div>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

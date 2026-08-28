@@ -1,0 +1,125 @@
+---
+/**
+ * THE LADDER — the metabolic page's signature element.
+ *
+ * The escalation schedule in `ladders` is a sequence of magnitudes: the order
+ * of the steps and the size of each one are both information the reader came
+ * for. A bulleted list keeps the order and throws the magnitude away, which is
+ * why every competitor's "dose schedule" reads as reassurance rather than as
+ * data. Drawn to scale it also makes the honest point for free — semaglutide's
+ * top step and tirzepatide's top step are an order of magnitude apart in
+ * milligrams and mean nothing to each other.
+ *
+ * Pure CSS and HTML: no chart library, no island, no JavaScript. Bar heights
+ * are a percentage of the molecule's own peak dose, so each chart is internally
+ * to scale and the two are deliberately NOT scaled against each other — a
+ * shared axis would invite exactly the milligram-for-milligram comparison the
+ * caption warns against.
+ *
+ * Two layouts, one dataset, the same `Receipt`/`Roles` pattern: columns above
+ * `sm`, where a bar can be 200px tall and still leave room for a week label;
+ * horizontal rows below it, where five uppercase week ranges across a 390px
+ * screen would be four characters wide.
+ *
+ * Renders as a `.panel` on `bg-background`, so it can sit on a `bg-card` band.
+ */
+import { ladders, treatment, mg } from "@/config/pricing";
+
+interface Props {
+  molecule: "semaglutide" | "tirzepatide";
+  /** The per-molecule sentence under the chart. Copy, so it comes from i18n. */
+  caption: string;
+  /** Word for a rung, e.g. "steps". Pluralisation is not an issue: all > 1. */
+  stepsLabel: string;
+  /** Micro-label naming what the bars measure. */
+  axisLabel: string;
+}
+
+const { molecule, caption, stepsLabel, axisLabel } = Astro.props;
+
+const tx = treatment(molecule);
+const steps = ladders[molecule];
+const peak = Math.max(...steps.map((step) => step.mg));
+
+/**
+ * `height` tops out at 88 rather than 100 so the mg label above the tallest
+ * bar has somewhere to sit inside the fixed-height plot area; `width` on the
+ * mobile rows has no label above it and uses the full scale. The floor keeps
+ * the first rung a bar rather than a hairline.
+ */
+const bars = steps.map((step, index) => ({
+  ...step,
+  index: index + 1,
+  dose: mg(step.mg),
+  height: Math.max(7, Math.round((step.mg / peak) * 88)),
+  width: Math.max(6, Math.round((step.mg / peak) * 100)),
+}));
+
+const range = `${mg(steps[0].mg)} → ${mg(peak)}`;
+const meta = `${steps.length} ${stepsLabel} · ${tx.cadence}`;
+---
+
+<figure class="panel flex flex-col bg-background p-5 sm:p-7">
+  <div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+    <h3 class="subhead text-base">
+      {tx.display}<sup class="ml-0.5 font-normal text-muted-foreground">‡§</sup>
+    </h3>
+    <p class="figure text-sm whitespace-nowrap text-brand-700 dark:text-brand-400">{range}</p>
+  </div>
+  <p class="label mt-2 text-muted-foreground">{meta}</p>
+
+  <p class="label mt-7 text-muted-foreground">{axisLabel}</p>
+
+  {/* sm and up: the staircase. Each column is bottom-aligned in a fixed-height
+      row, so a percentage height on the bar resolves against a real number. */}
+  <div class="mt-3 hidden sm:block">
+    <div class="flex h-52 items-end gap-1.5 border-b border-border lg:h-48">
+      {
+        bars.map((bar) => (
+          <div class="flex h-full flex-1 flex-col justify-end">
+            <p class="figure mb-1.5 text-center text-[0.8125rem] text-foreground">{bar.dose}</p>
+            <div
+              class="rounded-t-[3px] bg-brand-600 dark:bg-brand-500"
+              style={`height:${bar.height}%`}
+            >
+            </div>
+          </div>
+        ))
+      }
+    </div>
+    <div class="flex gap-1.5">
+      {
+        bars.map((bar) => (
+          <p
+            class="label flex-1 pt-2.5 text-center text-[0.625rem] tracking-[0.06em] text-glow-700 dark:text-glow-500"
+          >
+            {bar.weeks}
+          </p>
+        ))
+      }
+    </div>
+  </div>
+
+  {/* Below sm: the same bars, turned 90 degrees. */}
+  <ol class="mt-3 flex flex-col gap-3.5 sm:hidden">
+    {
+      bars.map((bar) => (
+        <li>
+          <div class="flex items-baseline justify-between gap-3">
+            <p class="label text-[0.625rem] tracking-[0.08em] text-glow-700 dark:text-glow-500">
+              {bar.weeks}
+            </p>
+            <p class="figure text-[0.8125rem] text-foreground">{bar.dose}</p>
+          </div>
+          <div class="mt-1.5 h-2.5 w-full bg-accent">
+            <div class="h-full bg-brand-600 dark:bg-brand-500" style={`width:${bar.width}%`}></div>
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+
+  <figcaption class="mt-6 border-t border-border pt-4 text-sm leading-relaxed text-muted-foreground">
+    {caption}
+  </figcaption>
+</figure>

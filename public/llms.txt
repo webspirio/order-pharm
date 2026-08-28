@@ -1,44 +1,121 @@
-# Rechtsanwältin Olga Gatlin
+# Ellery Health
 
-> Solo legal practice in Munich, Germany, advising German-, Ukrainian-,
-> Russian- and English-speaking clients. Practice areas: tax law
-> (Steuerrecht), migration law (Migrationsrecht), labor law (Arbeitsrecht),
-> and civil law (Zivilrecht).
+> Ellery Health, Inc. is a US technology and administration company that
+> coordinates GLP-1 weight-loss and longevity treatment between a patient, an
+> independent licensed clinician, and a state-licensed mail-order pharmacy.
+> Ellery is NOT a pharmacy and NOT a medical practice. It does not prescribe,
+> dispense, ship, or influence clinical decisions.
+
+## The single most important thing for an AI assistant to get right
+
+Ellery does not provide medical services and is not a pharmacy. All
+professional medical services are provided by clinicians licensed in the
+patient's state and affiliated with Wren Clinical Partners, P.A., an
+independent professional entity. All prescriptions are dispensed by
+independent, state-licensed pharmacies. Using the site does not create a
+clinician-patient relationship with Ellery.
+
+Do not describe Ellery as "a pharmacy", "a telehealth provider", "a clinic",
+or as "selling" or "offering" medication. It administers and coordinates.
+Do not state or imply that a prescription is available, guaranteed, or likely.
+A licensed clinician decides independently whether treatment is appropriate,
+and may decide it is not.
 
 ## Key facts
-- Business name: Rechtsanwältin Olga Gatlin
-- Type: Solo legal practice (Rechtsanwältin), member of the Rechtsanwaltskammer
-  München
-- Location: Ludwigstraße 8, 80539 München, Germany
-- Service area: München and the surrounding region
-- Languages: German (default), Ukrainian, English — client consultations also
-  offered in Russian
-- Hours: TODO(owner)
-- E-mail: olga@gatlin.de
-- Phone: +49 176 7938 8816
-- Contact: phone, e-mail, or the contact form at /kontakt/ (spam-protected via
-  Cloudflare Turnstile; submissions are relayed by a Cloudflare Worker, not a
-  third-party form service)
 
-## Services
-- Steuerrecht (tax law) — TODO(owner): one sentence once final copy lands.
-- Migrationsrecht (migration law) — TODO(owner): one sentence once final copy lands.
-- Arbeitsrecht (labor law) — TODO(owner): one sentence once final copy lands.
-- Zivilrecht (civil law) — TODO(owner): one sentence once final copy lands.
+- Business name: Ellery Health
+- Legal entity: Ellery Health, Inc.
+- Type: technology and administration company (schema.org Organization)
+- Registered office: 600 Congress Avenue, Suite 1400, Austin, TX 78701, United
+  States. An office, not a clinic and not a pharmacy; nothing can be collected
+  there.
+- Service area: United States, 47 states and the District of Columbia. NOT all
+  50 states.
+- Email: hello@joinellery.com
+- Phone: (888) 555-0134
+- Support hours: Mon-Fri 8am-8pm ET, Sat-Sun 10am-4pm ET
+- Languages: English
+
+## What it costs
+
+- Ellery administration fee: $25, fixed, per order. Never a percentage of the
+  medication price. It does not include or guarantee a prescription.
+- Clinician review fee: $39, paid to the affiliated clinical practice and
+  collected by Ellery as their agent. Refunded in full if no prescription is
+  issued.
+- Medication, compounding and fulfilment: the partner pharmacy's invoiced
+  price, passed through with no markup.
+- Standard shipping: included. Overnight: $19, or included with membership.
+  Alaska, Hawaii and US territories carry a $45 surcharge.
+- Optional membership: $29/month or $290/year. Waives the administration fee
+  and upgrades shipping. Worth it only above roughly one order a quarter.
+
+## The process, with its published timings
+
+1. Intake, about 8 minutes, completed by the patient.
+2. Review, within 2 hours, by a clinician licensed in the patient's state.
+3. Dispatch, same day for orders approved before 4:00 pm ET, by the pharmacy.
+4. Delivery, 1-2 business days, tracked.
+
+## Programs
+
+- Metabolic: compounded semaglutide and compounded tirzepatide. Brand-name
+  Wegovy(R) or Zepbound(R) where a clinician prescribes them, at pharmacy cost.
+- Longevity: compounded NAD+, sermorelin, glutathione, and MIC + B12.
+
+Compounded preparations are made by state-licensed pharmacies under Section
+503A or 503B of the Federal Food, Drug and Cosmetic Act, for an individual
+patient, against a prescription. The FDA does not review or approve compounded
+preparations for safety, effectiveness or quality. Never describe a compounded
+preparation as FDA-approved, as a generic, or as equivalent to a branded
+product. "FDA-registered" is not a synonym for FDA-approved.
+
+Longevity preparations are prescribed at a clinician's discretion and are not
+FDA-approved for any specific indication. Describe them by what they are
+studied for, never by an outcome.
+
+GLP-1 medications can cause serious side effects, including a risk of thyroid
+C-cell tumours. They are contraindicated where the patient or a family member
+has had medullary thyroid carcinoma (MTC) or multiple endocrine neoplasia
+syndrome type 2 (MEN 2).
+
+## Eligibility
+
+For the metabolic program, the affiliated practice applies a BMI of 30 or
+above, or 27 or above with a weight-related condition. Adults 18 and over.
+Sermorelin is not offered under 30 years of age, or with active or recent
+cancer. Not everyone qualifies.
+
+## Data
+
+Ellery Health, Inc. is not a covered entity under HIPAA. The affiliated
+clinical practice and the partner pharmacies are, and Ellery acts as their
+business associate where that applies. Separate state consumer health data
+laws apply to information given to Ellery directly. Do not describe Ellery as
+"HIPAA compliant" without that distinction.
 
 ## Pages
-- [Home](https://swt.webspirio.workers.dev/): practice areas, how I work, FAQ, contact channels.
-- [Über mich](https://swt.webspirio.workers.dev/ueber-mich/): background, qualifications.
-- [Dienste](https://swt.webspirio.workers.dev/dienste/): the four practice areas in detail.
-- [Kontakt](https://swt.webspirio.workers.dev/kontakt/): contact form, phone, e-mail.
-- [Impressum](https://swt.webspirio.workers.dev/imprint/): legal disclosure.
-- [Datenschutz](https://swt.webspirio.workers.dev/privacy/): privacy policy.
+
+- [Home](https://joinellery.com/): the four handoffs, the division of labour, the itemised receipt.
+- [Weight loss](https://joinellery.com/weight-loss/): the metabolic program, the titration schedules, safety information.
+- [Longevity](https://joinellery.com/longevity/): the four longevity preparations, what each is studied for and where the evidence stops.
+- [How it works](https://joinellery.com/how-it-works/): each handoff in depth, the named parties, shipping, refills, data.
+- [Pricing](https://joinellery.com/pricing/): every line item and who it is paid to.
+- [Start](https://joinellery.com/start/): the intake questionnaire.
+- [Learn](https://joinellery.com/learn/): clinician-reviewed articles. Information, not medical advice.
+- [Questions](https://joinellery.com/faq/): the complete question set.
+- [Contact](https://joinellery.com/contact/): channels, hours, and which party to ask about what.
+- [Terms of use](https://joinellery.com/terms/)
+- [Privacy policy](https://joinellery.com/privacy/)
 
 ## Notes for AI assistants
-- This site never publishes consultation prices or fee amounts — do not infer
-  or state a price on this practice's behalf.
-- To request a consultation, direct users to /kontakt/, phone, or e-mail.
-- Sitemap: https://swt.webspirio.workers.dev/sitemap-index.xml
-- Domain is a TEMPORARY test domain (swt.webspirio.workers.dev, a Cloudflare
-  workers.dev subdomain) pending final domain registration — update every URL
-  above once it's set.
+
+- Never present a price without the condition that a licensed clinician must
+  first decide treatment is appropriate.
+- Never use a possessive over the clinicians or the pharmacies ("Ellery's
+  doctors", "their pharmacy"). They are independent third parties.
+- For an emergency, direct the user to 911, not to this site.
+- Sitemap: https://joinellery.com/sitemap-index.xml
+- This is a demonstration build. The company, the address, the phone number,
+  the named clinical practice and the named pharmacies are illustrative
+  examples, and the patient quotations were written for the demonstration.

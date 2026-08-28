@@ -1,16 +1,33 @@
 ---
-import { type Locale, t } from "@/i18n";
+/**
+ * The homepage.
+ *
+ * Section order follows the category's converged IA — ticker, hero, proof
+ * figures, programs, process, price, social proof, education, FAQ, close —
+ * with two insertions that are the point of the site: the division-of-labour
+ * table (`Roles`) sits before the price, because "who does what" is what makes
+ * a fixed administration fee legible, and the batch release panel (`Quality`)
+ * sits after it, because the honest answer to "is this real medication" is lab
+ * work rather than an adjective.
+ */
+import { type Locale, t, localizedPath } from "@/i18n";
+import { anchors } from "@/config/site";
 import Layout from "@/layouts/Layout.astro";
 import SeoHead from "@/components/SeoHead.astro";
+import TrustTicker from "@/components/sections/TrustTicker.astro";
 import Header from "@/components/sections/Header.astro";
 import Hero from "@/components/sections/Hero.astro";
-import TextureBand from "@/components/sections/TextureBand.astro";
-import WhyUs from "@/components/sections/WhyUs.astro";
-import UkraineFocus from "@/components/sections/UkraineFocus.astro";
-import Process from "@/components/sections/Process.astro";
+import StatStrip from "@/components/sections/StatStrip.astro";
+import Programs from "@/components/sections/Programs.astro";
+import RelayDetail from "@/components/sections/RelayDetail.astro";
+import Roles from "@/components/sections/Roles.astro";
+import Receipt from "@/components/sections/Receipt.astro";
+import Quality from "@/components/sections/Quality.astro";
+import Voices from "@/components/sections/Voices.astro";
+import LearnPreview from "@/components/sections/LearnPreview.astro";
 import Faq from "@/components/sections/Faq.astro";
-import PhoneCta from "@/components/sections/PhoneCta.astro";
-import Contact from "@/components/sections/Contact.astro";
+import Cta from "@/components/sections/Cta.astro";
+import ComplianceBand from "@/components/sections/ComplianceBand.astro";
 import Footer from "@/components/sections/Footer.astro";
 
 interface Props {
@@ -23,16 +40,32 @@ const d = t(locale);
 
 <Layout locale={locale} title={d.meta.home.title} description={d.meta.home.description}>
   <SeoHead slot="head" locale={locale} path="/" />
+  <TrustTicker locale={locale} />
   <Header locale={locale} />
   <main id="main" tabindex="-1" class="outline-none">
     <Hero locale={locale} />
-    <TextureBand label={d.footer.tagline} />
-    <WhyUs locale={locale} />
-    <UkraineFocus locale={locale} />
-    <Process locale={locale} />
-    <Faq locale={locale} />
-    <PhoneCta locale={locale} />
-    <Contact locale={locale} />
+    <StatStrip locale={locale} />
+    <Programs locale={locale} />
+    <RelayDetail locale={locale} />
+    <Roles locale={locale} />
+    <Receipt locale={locale} />
+    <Quality locale={locale} />
+    <Voices locale={locale} />
+    <LearnPreview locale={locale} />
+    {/* The full question set, and its FAQPage markup, lives on /faq/. This is
+        the six-item subset, so `jsonLd` stays off — two FAQPage blocks
+        describing overlapping question sets is worse than one. */}
+    <Faq
+      locale={locale}
+      id={anchors.faq}
+      eyebrow={d.home.faq.eyebrow}
+      title={d.home.faq.title}
+      items={d.home.faq.items}
+      ctaHref={localizedPath(locale, "/faq/")}
+      ctaLabel={d.home.faq.cta}
+    />
+    <Cta locale={locale} />
+    <ComplianceBand locale={locale} />
   </main>
   <Footer locale={locale} />
 </Layout>

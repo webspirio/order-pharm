@@ -1,0 +1,113 @@
+---
+/**
+ * THE RECEIPT — pricing as an itemised bill with a destination column.
+ *
+ * The category standard is one bundled price and an asterisk. Two of the three
+ * reference sites publish a "no membership" marquee above a page that charges
+ * a membership fee. Showing every line and who receives it is both the honest
+ * form and the only way the fixed-administration-fee model reads as
+ * defensible rather than as a hidden markup.
+ *
+ * Amounts come from `fees` and `shipping`; the dictionary supplies the line
+ * name and the destination sentence.
+ */
+import { type Locale, t, localizedPath } from "@/i18n";
+import { anchors } from "@/config/site";
+import { fees, shipping, usd, usdMonthly } from "@/config/pricing";
+import { ArrowRight } from "lucide-react";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const d = t(locale);
+
+/**
+ * Positionally matched to `d.home.receipt.rows`. `at cost` and `included` are
+ * deliberately words, not numbers: the pharmacy sets one and the other is
+ * zero, and writing "$0" for something included reads as a trick.
+ */
+const amounts = [
+  usd(fees.visit),
+  d.home.receipt.atCost,
+  shipping.standardCost === 0 ? d.home.receipt.included : usd(shipping.standardCost),
+  usd(fees.admin),
+];
+const symbols = ["", "‡", "", "†"];
+
+const rows = d.home.receipt.rows.map((row, index) => ({
+  ...row,
+  amount: amounts[index],
+  symbol: symbols[index],
+}));
+---
+
+<section id={anchors.pricing} class="border-b border-border/70 bg-background py-16 sm:py-20">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <div class="grid gap-10 lg:grid-cols-[1fr_20rem] lg:gap-14">
+      <div>
+        <p class="label text-brand-700 dark:text-brand-400">{d.home.receipt.eyebrow}</p>
+        <h2 class="display-2 mt-4">{d.home.receipt.title}</h2>
+        <p class="lead mt-4">{d.home.receipt.lead}</p>
+
+        <table class="mt-10 w-full border-collapse text-left">
+          <thead>
+            <tr class="border-y border-border">
+              <th scope="col" class="label py-3 pr-4 text-muted-foreground">
+                {d.home.receipt.header.item}
+              </th>
+              <th scope="col" class="label py-3 pr-4 text-right text-muted-foreground sm:pr-8">
+                {d.home.receipt.header.amount}
+              </th>
+              <th scope="col" class="label hidden py-3 text-muted-foreground sm:table-cell">
+                {d.home.receipt.header.dest}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              rows.map((row) => (
+                <tr class="border-b border-border align-top">
+                  <th scope="row" class="py-5 pr-4 font-normal">
+                    <span class="subhead">{row.item}</span>
+                    {/* Below sm the destination column is dropped, so the
+                        sentence rides under the line name instead of being
+                        lost. */}
+                    <span class="mt-1.5 block text-sm leading-relaxed text-muted-foreground sm:hidden">
+                      {row.dest}
+                    </span>
+                  </th>
+                  <td class="figure py-5 pr-4 text-right text-base whitespace-nowrap sm:pr-8">
+                    {row.amount}
+                    {row.symbol && <sup class="ml-0.5 text-muted-foreground">{row.symbol}</sup>}
+                  </td>
+                  <td class="hidden py-5 text-sm leading-relaxed text-muted-foreground sm:table-cell">
+                    {row.dest}
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+
+        <a
+          href={localizedPath(locale, "/pricing/")}
+          class="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-brand-700 dark:text-brand-400"
+        >
+          {d.home.receipt.cta}
+          <ArrowRight className="size-4" />
+        </a>
+      </div>
+
+      <aside class="panel h-fit p-6 lg:sticky lg:top-24">
+        <p class="label text-muted-foreground">{d.home.receipt.optionalLabel}</p>
+        <h3 class="subhead mt-3 text-lg">{d.home.receipt.membership.title}</h3>
+        <p class="figure mt-4 text-2xl text-foreground">{usdMonthly(fees.membershipMonthly)}</p>
+        <p class="mt-4 text-sm leading-relaxed text-muted-foreground">
+          {d.home.receipt.membership.body}
+        </p>
+      </aside>
+    </div>
+  </div>
+</section>

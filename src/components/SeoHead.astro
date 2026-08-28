@@ -97,12 +97,26 @@ const jsonLd = compact({
         closes: site.openingHours.closes,
       }
     : undefined,
+  /**
+   * The two programs, described with the same words the visible cards use —
+   * `src/i18n/en/programs.ts` is the single source for both, so the
+   * structured data cannot promise something the page does not say.
+   *
+   * `Service`, not `Drug` or `MedicalTherapy`: what Ellery offers is
+   * coordination. Marking these up as drugs would assert in machine-readable
+   * form the exact claim every page on this site disclaims.
+   */
   hasOfferCatalog: {
     "@type": "OfferCatalog",
-    name: d.services.title,
-    itemListElement: d.services.items.map((s) => ({
+    name: d.programs.title,
+    itemListElement: d.programs.items.map((program) => ({
       "@type": "Offer",
-      itemOffered: { "@type": "Service", name: s.title, description: s.desc },
+      itemOffered: {
+        "@type": "Service",
+        name: program.title,
+        description: program.desc,
+        provider: { "@id": `${site.domain}/#business` },
+      },
     })),
   },
 });

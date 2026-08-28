@@ -1,16 +1,22 @@
 /**
- * Generate the favicon set, PWA icons and social share image: the brand
- * scales-of-justice mark (matching the header logo, src/components/sections/
- * Header.astro) on the site's Hero-scrim gradient (matching
- * src/components/sections/Hero.astro) — fixed brand colours, not the
- * generic hue-parameterised mark the base template ships.
+ * Generate the favicon set, PWA icons and the social share image.
  *
- * This site has three runtime-switchable colour palettes
- * (PaletteSwitcher.tsx) — favicons/og-image can't respond to that switch
- * (they're static files picked once at build time), so they're generated
- * against the *default* palette, "original", regardless of which palette a
- * given visitor has selected. Re-run after changing the default palette's
- * brand-800/glow-700 values in src/styles/global.css.
+ * THE MARK: four rising steps drawn as one unbroken stroke. It is the same
+ * idea the site is built on, reduced to a glyph — a sequence where both the
+ * order and the size of each step carry information (the custody handoffs on
+ * the homepage, the titration schedule on /weight-loss/). One continuous line
+ * because nothing in the chain is meant to be a separate box.
+ *
+ * It survives 16px: four strokes, no counters, no fine detail. The same path
+ * data is rendered in the header and footer by src/components/Mark.astro, so
+ * the tab icon and the logotype are literally the same drawing rather than a
+ * borrowed icon that nearly matches.
+ *
+ * Colours are the default palette's ("saline"). The site has three
+ * runtime-switchable palettes (PaletteSwitcher.tsx); static files picked once
+ * at build time cannot respond to that, so they are generated against the
+ * default regardless of a visitor's choice. Re-run after changing the default
+ * palette's brand-800 / glow-700 / brand-50 in src/styles/global.css.
  *
  * Usage: pnpm icons
  */
@@ -21,34 +27,34 @@ import sharp from "sharp";
 
 const OUT_DIR = fileURLToPath(new URL("../public/", import.meta.url));
 
-// Same stops as the Hero scrim's default-palette ("original") sweep
-// (src/components/sections/Hero.astro) — buttons stay flat brand-600.
-const GRADIENT_FROM = "#43362a"; // brand-800
-const GRADIENT_TO = "#7c5d27"; // glow-700
+/* Default palette, "saline". Keep in sync with src/styles/global.css.
+   The sweep runs brand-800 -> brand-600, i.e. entirely within the petrol
+   ramp. An earlier version ran brand-800 -> glow-700 (amber) to reuse the
+   "one signature gradient" idea, and the two hues mixed through olive: the
+   midpoint of a desaturated teal and a warm brown is mud, and it read as a
+   printing error rather than a brand. Amber survives as ACCENT only — the
+   rule under the wordmark here, the ticks on the Relay — which is also what
+   keeps it legible as this site's colour for "clock". */
+const GRADIENT_FROM = "#0b2a31"; // brand-800
+const GRADIENT_TO = "#25626f"; // brand-600
+const STROKE = "#ebf4f6"; // brand-50
+const ACCENT = "#d89c3e"; // glow-500
 
-// lucide-react's Scale icon (24x24 viewBox), scaled ~1.67x and centred in
-// the 64x64 canvas — see lucide.dev/icons/scale. Copied as static path data
-// rather than rendered via react-dom/server so this script has no React
-// dependency.
-const scalePaths = [
-  "M12 3v18",
-  "m19 8 3 8a5 5 0 0 1-6 0zV7",
-  "M3 7h1a17 17 0 0 0 8-2 17 17 0 0 0 8 2h1",
-  "m5 8 3 8a5 5 0 0 1-6 0zV7",
-  "M7 21h10",
-];
+/**
+ * The step path, in a 64x64 box with 14px of optical padding. Kept identical
+ * to Mark.astro — if one changes, change both.
+ */
+const STEP_PATH = "M14 48H25V37H36V26H47V15";
 
 const markSvg = (size) => `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 64 64">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="g" x1="0" y1="1" x2="1" y2="0">
       <stop offset="0%" stop-color="${GRADIENT_FROM}"/>
       <stop offset="100%" stop-color="${GRADIENT_TO}"/>
     </linearGradient>
   </defs>
-  <rect width="64" height="64" rx="14" fill="url(#g)"/>
-  <g transform="translate(12,12) scale(1.667)" fill="none" stroke="#f6f1e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    ${scalePaths.map((d) => `<path d="${d}"/>`).join("\n    ")}
-  </g>
+  <rect width="64" height="64" rx="13" fill="url(#g)"/>
+  <path d="${STEP_PATH}" fill="none" stroke="${STROKE}" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>`;
 
 /** Wrap a PNG buffer in a single-image ICO container. */
@@ -75,14 +81,11 @@ async function png(size) {
   return sharp(Buffer.from(markSvg(size))).resize(size, size).png().toBuffer();
 }
 
-// `public/` may not exist yet on a fresh checkout, and `/new-site` runs this
-// script — so create it rather than assuming it. Mirrors make-placeholders.mjs.
 await mkdir(OUT_DIR, { recursive: true });
 
-// Scalable favicon.
 await writeFile(path.join(OUT_DIR, "favicon.svg"), markSvg(64));
+console.log("wrote favicon.svg");
 
-// Raster favicons and PWA icons.
 const targets = [
   ["favicon-96x96.png", 96],
   ["apple-touch-icon.png", 180],
@@ -97,25 +100,34 @@ for (const [name, size] of targets) {
 await writeFile(path.join(OUT_DIR, "favicon.ico"), pngToIco(await png(32), 32));
 console.log("wrote favicon.ico");
 
-// 1200x630 social share image: a deeper version of the same gradient
-// (matching Hero's scrim, src/components/sections/Hero.astro) with the
-// mark centred.
-const ogBackground = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630">
+/**
+ * 1200x630 share image. The mark sits left of centre on the same gradient,
+ * with the wordmark rendered as vector text — no font file is loaded, so the
+ * letterforms are drawn from a generic serif stack by librsvg. That is
+ * deliberate: embedding Fraunces here would mean shipping a font into a build
+ * script for one raster, and at 630px the difference is not visible.
+ */
+const OG_W = 1200;
+const OG_H = 630;
+
+const ogSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${OG_W}" height="${OG_H}">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <linearGradient id="bg" x1="0" y1="1" x2="1" y2="0">
       <stop offset="0%" stop-color="${GRADIENT_FROM}"/>
       <stop offset="100%" stop-color="${GRADIENT_TO}"/>
     </linearGradient>
   </defs>
-  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="${OG_W}" height="${OG_H}" fill="url(#bg)"/>
+  <g transform="translate(100,150) scale(3.0)">
+    <path d="${STEP_PATH}" fill="none" stroke="${STROKE}" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" transform="translate(-14,-15)"/>
+  </g>
+  <text x="100" y="418" fill="${STROKE}" font-family="Georgia, 'Times New Roman', serif" font-size="88" letter-spacing="-2.5">Ellery Health</text>
+  <rect x="102" y="452" width="60" height="3" fill="${ACCENT}"/>
+  <text x="100" y="510" fill="${STROKE}" fill-opacity="0.7" font-family="monospace" font-size="22" letter-spacing="3.2">LICENSED CLINICIANS. INDEPENDENT PHARMACIES.</text>
 </svg>`;
 
-const ogMark = await sharp(Buffer.from(markSvg(64))).resize(240, 240).png().toBuffer();
-const og = await sharp(Buffer.from(ogBackground))
-  .composite([{ input: ogMark, gravity: "centre" }])
-  .jpeg({ quality: 86, mozjpeg: true })
-  .toBuffer();
+const og = await sharp(Buffer.from(ogSvg)).jpeg({ quality: 88, mozjpeg: true }).toBuffer();
 await writeFile(path.join(OUT_DIR, "og-image.jpg"), og);
 console.log("wrote og-image.jpg");
 
-console.log("\nIcons generated from the scales-of-justice mark.");
+console.log("\nIcons generated from the four-step mark, default 'saline' palette.");

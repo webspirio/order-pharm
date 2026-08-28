@@ -1,41 +1,572 @@
 ---
-import { type Locale, t } from "@/i18n";
+/**
+ * Both legal documents, from one component: `doc="terms"` and `doc="privacy"`
+ * render `d.legal.terms` and `d.legal.privacy` through the same layout.
+ *
+ * WHY IT IS BUILT THIS WAY. A legal page in this category is where design
+ * gives up — 4,000 words of 13px grey, no navigation, an all-caps arbitration
+ * wall, and a "last updated" line nobody maintains. Everything here is aimed
+ * at the opposite: a numbered document with a sticky contents rail so a
+ * reader can get to section six directly, real `<table>`s where the content is
+ * rows of pairs (the fee schedule, the HIPAA buckets, the transmission list),
+ * and the two clauses that matter most — arbitration and the class-action
+ * waiver — set as a highlighted panel in ordinary sentences rather than
+ * shouted in capitals. Conspicuousness is a design property; capitals stopped
+ * supplying it decades ago.
+ *
+ * THE DICTIONARY IS TOKENISED. Every `{token}` in `src/i18n/en/legal.ts` is
+ * substituted here from `src/config/pricing.ts` and `src/config/site.ts`, and
+ * a figure token is wrapped in `.figure` so a fee quoted in the Terms is the
+ * same glyphs as the same fee on /pricing/. An unknown token throws at build
+ * time rather than rendering a brace to a visitor, and a footnote token is
+ * looked up in `d.compliance.notes` so a symbol that the compliance band does
+ * not define cannot ship.
+ *
+ * The sales `Cta` is deliberately absent. A page whose job is to disclose
+ * should not close with a button.
+ */
+import { type Locale, t, localizedPath } from "@/i18n";
+import { site } from "@/config/site";
+import {
+  fees,
+  shipping,
+  coverage,
+  eligibility,
+  partners,
+  usd,
+  usdMonthly,
+} from "@/config/pricing";
 import Layout from "@/layouts/Layout.astro";
 import SeoHead from "@/components/SeoHead.astro";
+import TrustTicker from "@/components/sections/TrustTicker.astro";
 import Header from "@/components/sections/Header.astro";
+import ComplianceBand from "@/components/sections/ComplianceBand.astro";
 import Footer from "@/components/sections/Footer.astro";
+import { ArrowRight, ChevronDown, TriangleAlert } from "lucide-react";
 
 interface Props {
   locale: Locale;
-  doc: "imprint" | "privacy";
+  doc: "terms" | "privacy";
 }
 
 const { locale, doc } = Astro.props;
 const d = t(locale);
 
-const content = d.legal[doc];
-const meta = d.meta[doc];
-const path = `/${doc}/`;
+/**
+ * DOCUMENT PARAMETERS. Every business figure on this site comes from
+ * `src/config/pricing.ts`, and none of these are business figures — they are
+ * parameters of the documents themselves (the effective date, the notice
+ * periods, the retention schedule). They are declared once, here, so the two
+ * documents cannot disagree with each other, and they are rendered through
+ * the same mono figure treatment as a price.
+ *
+ * Before launch they belong in `src/config/` beside the rest of the site's
+ * data, set by whoever's counsel signs the documents off; that file is shared
+ * and outside this task, so the values live here for now.
+ */
+const docParams = {
+  /** ISO, deliberately: an unambiguous date on a document that has legal force. */
+  effective: "2026-07-01",
+  renewalNotice: "3 days",
+  changeNotice: "30 days",
+  informalWindow: "30 days",
+  optOutWindow: "30 days",
+  liabilityWindow: "12 months",
+  rightsDays: "45 days",
+  accountRetention: "3 years",
+  clinicalRetention: "7 to 10 years",
+  dispensingRetention: "5 to 10 years",
+  taxRetention: "7 years",
+  logRetention: "90 days",
+  supportRetention: "3 years",
+} as const;
+
+/* ------------------------------------------------------------------ */
+/* Token substitution                                                  */
+/* ------------------------------------------------------------------ */
+
+const escapeHtml = (value: string) =>
+  value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+/** Any number the reader is meant to trust, in the site's data face. */
+const figure = (value: string) => `<span class="figure">${escapeHtml(value)}</span>`;
+
+/**
+ * A duration in prose: the numeral in the data face, the unit in the sans,
+ * joined by a non-breaking space. Setting "30 days" wholly in a monospace
+ * inside a running sentence reads as a double space; setting only the figure
+ * is also what the type system asks for — mono is for the number, and the
+ * unit beside it is a word.
+ */
+const duration = (value: string) => {
+  const parts = value.match(/^([\d.,]+(?:\s+to\s+[\d.,]+)?)\s+(.+)$/);
+  if (!parts) return figure(value);
+  return `${figure(parts[1])}\u00a0${escapeHtml(parts[2])}`;
+};
+
+const link = (href: string, label: string, mono = false) =>
+  `<a href="${href}" class="${
+    mono ? "figure " : ""
+  }font-medium text-brand-700 underline decoration-border decoration-1 underline-offset-4 hover:decoration-brand-500 dark:text-brand-400">${escapeHtml(
+    label,
+  )}</a>`;
+
+/**
+ * A footnote reference, verified against the compliance band. A symbol that
+ * resolves nowhere is the category's signature defect, so referencing one that
+ * `common.ts` does not define fails the build instead of shipping.
+ */
+const verifySymbol = (symbol: string) => {
+  const defined = d.compliance.notes.some((note) => note.symbol === symbol);
+  if (!defined) {
+    throw new Error(
+      `LegalPage: footnote "${symbol}" is not defined in common.ts's compliance.notes.`,
+    );
+  }
+  return symbol;
+};
+
+const footnote = (symbol: string) =>
+  `<sup class="ml-0.5 text-glow-700 dark:text-glow-500">${verifySymbol(symbol)}</sup>`;
+
+const pharmacyNames = partners.pharmacies.map((pharmacy) => pharmacy.name);
+const officeLine = `${site.addressStreet}, ${site.addressLocality}, ${site.addressRegion} ${site.addressPostal}`;
+
+const tokens: Record<string, string> = {
+  /* Parties and contact */
+  legalName: escapeHtml(site.legalName),
+  practice: escapeHtml(partners.practice),
+  pharmacies: escapeHtml(
+    `${pharmacyNames.slice(0, -1).join(", ")} and ${pharmacyNames[pharmacyNames.length - 1]}`,
+  ),
+  office: escapeHtml(officeLine),
+  email: link(site.mailHref, site.email),
+  phone: link(site.phoneHref, site.phoneDisplay, true),
+  supportHours: figure(d.footer.supportHours),
+
+  /* Money and thresholds — from pricing.ts, never typed */
+  visit: figure(usd(fees.visit)),
+  admin: figure(usd(fees.admin)),
+  overnight: figure(usd(shipping.overnightCost)),
+  remote: figure(usd(shipping.remoteSurcharge)),
+  memberMonthly: figure(usdMonthly(fees.membershipMonthly)),
+  memberYearly: figure(usd(fees.membershipYearly)),
+  minAge: figure(String(eligibility.minAge)),
+  minAgeSermorelin: figure(String(eligibility.minAgeSermorelin)),
+  states: `${figure(String(coverage.states))} states${
+    coverage.includesDC ? " and the District of Columbia" : ""
+  }`,
+
+  /* Document parameters */
+  effective: figure(docParams.effective),
+  renewalNotice: duration(docParams.renewalNotice),
+  changeNotice: duration(docParams.changeNotice),
+  informalWindow: duration(docParams.informalWindow),
+  optOutWindow: duration(docParams.optOutWindow),
+  liabilityWindow: duration(docParams.liabilityWindow),
+  rightsDays: duration(docParams.rightsDays),
+  accountRetention: duration(docParams.accountRetention),
+  clinicalRetention: duration(docParams.clinicalRetention),
+  dispensingRetention: duration(docParams.dispensingRetention),
+  taxRetention: duration(docParams.taxRetention),
+  logRetention: duration(docParams.logRetention),
+  supportRetention: duration(docParams.supportRetention),
+
+  /* The gating sentence, borrowed rather than rewritten */
+  gatingLong: escapeHtml(d.gating.long),
+  gatingShort: escapeHtml(d.gating.short),
+
+  /* Footnotes, resolved by the compliance band at the foot of the page */
+  n_provider: footnote("*"),
+  n_fee: footnote("†"),
+  n_compound: footnote("‡"),
+  n_glp1: footnote("§"),
+  n_longevity: footnote("¶"),
+  n_hipaa: footnote("◆"),
+  n_marks: footnote("‖"),
+  n_demo: footnote("◇"),
+};
+
+/** Escape first, then substitute, so a token's own markup survives. */
+const render = (value: string) =>
+  escapeHtml(value).replace(/\{(\w+)\}/g, (_match, key: string) => {
+    const replacement = tokens[key];
+    if (replacement === undefined) {
+      throw new Error(`LegalPage: unknown token {${key}} in the legal dictionary.`);
+    }
+    return replacement;
+  });
+
+const paragraphs = (value: string) => render(value).split("\n\n");
+
+/**
+ * List items are written "Term — explanation". The term is promoted to bold
+ * foreground text, which is what turns an enumerated legal list into something
+ * a reader can skim for the one line they came for.
+ */
+const listItem = (value: string) => {
+  const split = value.indexOf(" — ");
+  if (split === -1) return render(value);
+  return `<strong class="font-semibold text-foreground">${render(
+    value.slice(0, split),
+  )}</strong> — ${render(value.slice(split + 3))}`;
+};
+
+/* ------------------------------------------------------------------ */
+/* The document                                                        */
+/* ------------------------------------------------------------------ */
+
+interface TableBlock {
+  label: string;
+  head: string[];
+  rows: string[][];
+  note?: string;
+}
+
+interface PanelBlock {
+  label: string;
+  title: string;
+  body: string;
+}
+
+/** A block renders whichever of these it carries, in this order. */
+interface Block {
+  subheading?: string;
+  text?: string;
+  items?: string[];
+  table?: TableBlock;
+  panel?: PanelBlock;
+  /** Small print under the block — the gating sentence, a caveat. */
+  note?: string;
+}
+
+interface Section {
+  id: string;
+  heading: string;
+  /** Footnote symbols the whole section carries. */
+  symbols?: string[];
+  blocks: Block[];
+}
+
+const docData = doc === "terms" ? d.legal.terms : d.legal.privacy;
+const sections: Section[] = docData.sections;
+const meta = doc === "terms" ? d.meta.terms : d.meta.privacy;
+const path = doc === "terms" ? "/terms/" : "/privacy/";
+
+const index = (position: number) => String(position + 1).padStart(2, "0");
+
+/** The other document first, then the pages a reader of this one asks for. */
+const related = [
+  doc === "terms"
+    ? { label: d.footer.privacy, href: localizedPath(locale, "/privacy/") }
+    : { label: d.footer.terms, href: localizedPath(locale, "/terms/") },
+  { label: d.nav.contact, href: localizedPath(locale, "/contact/") },
+  { label: d.nav.pricing, href: localizedPath(locale, "/pricing/") },
+  { label: d.nav.faq, href: localizedPath(locale, "/faq/") },
+];
 ---
 
 <Layout locale={locale} title={meta.title} description={meta.description}>
   <SeoHead slot="head" locale={locale} path={path} />
+  <TrustTicker locale={locale} />
   <Header locale={locale} />
-  <main id="main" tabindex="-1" class="page-tint outline-none">
-    <div class="mx-auto max-w-3xl px-4 py-20 sm:px-6 sm:py-24">
-      <h1 class="text-3xl sm:text-4xl">{content.title}</h1>
-      <p class="mt-4 text-sm leading-relaxed text-muted-foreground">{content.intro}</p>
-      <div class="mt-10 flex flex-col gap-8">
-        {content.sections.map((section) => (
-          <section>
-            <h2 class="subhead">{section.heading}</h2>
-            <p class="mt-2.5 whitespace-pre-line leading-relaxed text-muted-foreground">
-              {section.body}
-            </p>
-          </section>
-        ))}
+  <main id="main" tabindex="-1" class="outline-none">
+    {/* Masthead. The effective date is mono because it is a figure with legal
+        force, and it is repeated at the foot of the document, which is where
+        the text itself refers to it. */}
+    <section class="border-b border-border/70 bg-card pb-14 pt-14 sm:pb-16 sm:pt-16">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <p class="label text-brand-700 dark:text-brand-400">{docData.eyebrow}</p>
+        <h1 class="display-1 mt-5 max-w-4xl">{docData.title}</h1>
+        <p class="lead mt-6 text-lg" set:html={render(docData.lead)} />
+
+        <div
+          class="mt-9 flex flex-wrap items-center gap-x-8 gap-y-3 border-t border-border pt-6"
+        >
+          <p class="label text-muted-foreground">
+            {d.legal.effectiveLabel}
+            {" "}
+            <span class="figure text-xs tracking-normal text-foreground normal-case">
+              {docParams.effective}
+            </span>
+          </p>
+          <a
+            href={related[0].href}
+            class="inline-flex items-center gap-2 text-sm font-semibold text-brand-700 dark:text-brand-400"
+          >
+            {related[0].label}
+            <ArrowRight className="size-4" />
+          </a>
+        </div>
+
+        {/* The document's status, once, designed. Not a marker sprinkled
+            through the body: a reader either knows this before they start or
+            the notice has failed. */}
+        <div class="panel mt-8 max-w-3xl border-l-2 border-l-brand-500 bg-background p-5 sm:p-6">
+          <div class="flex gap-3.5">
+            <TriangleAlert className="mt-0.5 size-4 shrink-0 text-glow-700 dark:text-glow-500" />
+            <div>
+              <p class="label text-glow-700 dark:text-glow-500">{d.legal.notice.label}</p>
+              <p class="subhead mt-2.5">{d.legal.notice.title}</p>
+              <p
+                class="mt-2 text-[0.875rem] leading-relaxed text-muted-foreground"
+                set:html={render(d.legal.notice.body)}
+              />
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
+
+    <section class="bg-background py-14 sm:py-16">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <div class="grid gap-10 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-14">
+          {/* The contents rail. A 4,000-word document without one is a
+              document you are expected not to read. */}
+          <nav aria-labelledby="toc-label" class="hidden lg:sticky lg:top-24 lg:block lg:self-start">
+            <p id="toc-label" class="label text-muted-foreground">{d.legal.tocLabel}</p>
+            <ol class="mt-4 flex flex-col">
+              {
+                sections.map((section, position) => (
+                  <li class="border-t border-border">
+                    <a
+                      href={`#${section.id}`}
+                      class="flex gap-3 py-2.5 text-[0.8125rem] leading-snug text-muted-foreground hover:text-brand-700 dark:hover:text-brand-400"
+                    >
+                      <span class="figure shrink-0 text-[0.6875rem] leading-5">
+                        {index(position)}
+                      </span>
+                      <span>{section.heading}</span>
+                    </a>
+                  </li>
+                ))
+              }
+            </ol>
+          </nav>
+
+          <article class="max-w-3xl">
+            {/* Same contents, collapsed, below lg. */}
+            <details class="panel group mb-12 p-4 lg:hidden">
+              <summary
+                class="label flex cursor-pointer list-none items-center justify-between gap-4 text-muted-foreground marker:hidden"
+              >
+                {d.legal.tocMobileLabel}
+                <ChevronDown className="size-4 transition-transform group-open:rotate-180" />
+              </summary>
+              <ol class="mt-2 flex flex-col">
+                {
+                  sections.map((section, position) => (
+                    <li class="border-t border-border">
+                      <a
+                        href={`#${section.id}`}
+                        class="flex gap-3 py-2.5 text-[0.8125rem] leading-snug text-muted-foreground"
+                      >
+                        <span class="figure shrink-0 text-[0.6875rem] leading-5">
+                          {index(position)}
+                        </span>
+                        <span>{section.heading}</span>
+                      </a>
+                    </li>
+                  ))
+                }
+              </ol>
+            </details>
+
+            <div class="flex flex-col gap-14">
+              {
+                sections.map((section, position) => (
+                  <section id={section.id} class="border-t border-border pt-9">
+                    <div class="flex items-baseline gap-4">
+                      <span
+                        aria-hidden="true"
+                        class="figure shrink-0 text-sm text-glow-700 dark:text-glow-500"
+                      >
+                        {index(position)}
+                      </span>
+                      <h2 class="display-3">
+                        <span class="sr-only">{`${d.legal.sectionLabel} ${position + 1}. `}</span>
+                        {section.heading}
+                        {section.symbols?.map((symbol) => (
+                          <sup class="ml-1 align-super text-[0.4em] text-glow-700 dark:text-glow-500">
+                            {verifySymbol(symbol)}
+                          </sup>
+                        ))}
+                      </h2>
+                    </div>
+
+                    {
+                      section.blocks.map((block) => (
+                        <div>
+                          {block.subheading && (
+                            <h3 class="subhead mt-8 text-foreground">{block.subheading}</h3>
+                          )}
+
+                          {block.text &&
+                            paragraphs(block.text).map((paragraph) => (
+                              <p
+                                class="mt-5 whitespace-pre-line text-[0.9375rem] leading-[1.72] text-muted-foreground"
+                                set:html={paragraph}
+                              />
+                            ))}
+
+                          {block.items && (
+                            <ul class="mt-6 flex flex-col">
+                              {block.items.map((item, itemIndex) => (
+                                <li class="flex gap-4 border-t border-border py-3.5 last:border-b">
+                                  <span
+                                    aria-hidden="true"
+                                    class="figure mt-[0.15rem] shrink-0 text-[0.6875rem] text-muted-foreground"
+                                  >
+                                    {index(itemIndex)}
+                                  </span>
+                                  <p
+                                    class="text-[0.9375rem] leading-[1.72] text-muted-foreground"
+                                    set:html={listItem(item)}
+                                  />
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+
+                          {block.table && (
+                            <div class="mt-7">
+                              {/* sm and up: a real table. Below it, the same
+                                  pairs as a definition list — a four-column
+                                  table at 360px produces unreadable columns. */}
+                              <div class="hidden overflow-x-auto sm:block">
+                                <table class="w-full border-collapse text-left">
+                                  <caption class="label pb-3 text-left text-muted-foreground">
+                                    {block.table.label}
+                                  </caption>
+                                  <thead>
+                                    <tr class="border-y border-border">
+                                      {block.table.head.map((heading) => (
+                                        <th
+                                          scope="col"
+                                          class="label py-3 pr-4 align-bottom text-muted-foreground last:pr-0"
+                                        >
+                                          {heading}
+                                        </th>
+                                      ))}
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {block.table.rows.map((row) => (
+                                      <tr class="border-b border-border align-top">
+                                        {row.map((cell, cellIndex) =>
+                                          cellIndex === 0 ? (
+                                            <th
+                                              scope="row"
+                                              class="py-4 pr-4 text-[0.875rem] font-semibold leading-snug text-foreground"
+                                              set:html={render(cell)}
+                                            />
+                                          ) : (
+                                            <td
+                                              class="py-4 pr-4 text-[0.8125rem] leading-relaxed text-muted-foreground last:pr-0"
+                                              set:html={render(cell)}
+                                            />
+                                          ),
+                                        )}
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </div>
+
+                              <div class="sm:hidden">
+                                <p class="label text-muted-foreground">{block.table.label}</p>
+                                <dl class="mt-2 flex flex-col">
+                                  {block.table.rows.map((row) => (
+                                    <div class="border-t border-border py-4 last:border-b">
+                                      <dt
+                                        class="text-[0.9375rem] font-semibold leading-snug text-foreground"
+                                        set:html={render(row[0])}
+                                      />
+                                      {row.slice(1).map((cell, cellIndex) => (
+                                        <dd class="mt-3">
+                                          <span class="label block text-muted-foreground">
+                                            {block.table?.head[cellIndex + 1]}
+                                          </span>
+                                          <span
+                                            class="mt-1 block text-[0.8125rem] leading-relaxed text-muted-foreground"
+                                            set:html={render(cell)}
+                                          />
+                                        </dd>
+                                      ))}
+                                    </div>
+                                  ))}
+                                </dl>
+                              </div>
+
+                              {block.table.note && (
+                                <p
+                                  class="mt-3.5 text-[0.8125rem] leading-relaxed text-muted-foreground"
+                                  set:html={render(block.table.note)}
+                                />
+                              )}
+                            </div>
+                          )}
+
+                          {block.panel && (
+                            <div
+                              class="panel mt-8 border-l-2 border-l-brand-500 bg-card p-5 sm:p-7"
+                            >
+                              <p class="label text-brand-700 dark:text-brand-400">
+                                {block.panel.label}
+                              </p>
+                              <h3 class="subhead mt-3 text-lg">{block.panel.title}</h3>
+                              {paragraphs(block.panel.body).map((paragraph) => (
+                                <p
+                                  class="mt-4 whitespace-pre-line text-[0.9375rem] leading-[1.72] text-muted-foreground"
+                                  set:html={paragraph}
+                                />
+                              ))}
+                            </div>
+                          )}
+
+                          {block.note && (
+                            <p
+                              class="mt-6 border-l-2 border-border pl-4 text-[0.8125rem] leading-relaxed text-muted-foreground"
+                              set:html={render(block.note)}
+                            />
+                          )}
+                        </div>
+                      ))
+                    }
+                  </section>
+                ))
+              }
+            </div>
+
+            <p
+              class="mt-14 border-t border-border pt-6 text-[0.8125rem] leading-relaxed text-muted-foreground"
+              set:html={render(d.legal.effectiveNote)}
+            />
+
+            <div class="mt-12">
+              <p class="label text-muted-foreground">{d.legal.relatedLabel}</p>
+              <ul class="mt-4 grid gap-x-8 sm:grid-cols-2">
+                {
+                  related.map((item) => (
+                    <li class="border-b border-border">
+                      <a
+                        href={item.href}
+                        class="group flex items-center justify-between gap-4 py-3 text-[0.9375rem] font-medium"
+                      >
+                        {item.label}
+                        <ArrowRight className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1" />
+                      </a>
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <ComplianceBand locale={locale} />
   </main>
   <Footer locale={locale} />
 </Layout>

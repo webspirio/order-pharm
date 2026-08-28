@@ -1,0 +1,32 @@
+---
+/**
+ * The brand mark: four rising steps as one unbroken stroke.
+ *
+ * The path data is identical to `scripts/make-icons.mjs`'s STEP_PATH, so the
+ * logotype in the header and the icon in the browser tab are the same drawing
+ * rather than a lucide glyph that nearly matches. If one changes, change both.
+ *
+ * Rendered as inline SVG (not an <img>) so it inherits `currentColor` and can
+ * therefore sit on the light page, the dark page and the fixed-dark footer
+ * band without three variants.
+ */
+interface Props {
+  /** Tailwind size utility, e.g. "size-9". */
+  class?: string;
+}
+
+const { class: className = "size-9" } = Astro.props;
+---
+
+<svg
+  viewBox="0 0 64 64"
+  fill="none"
+  aria-hidden="true"
+  class={className}
+  stroke="currentColor"
+  stroke-width="5"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M14 48H25V37H36V26H47V15"></path>
+</svg>

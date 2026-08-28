@@ -1,0 +1,790 @@
+---
+/**
+ * /how-it-works/ — the process page, and the page the site's thesis points at.
+ *
+ * Three structural decisions worth stating:
+ *
+ * 1. The Relay opens the page at `variant="full"`, inside the header block
+ *    rather than in a section of its own. The four handoffs and their
+ *    durations ARE the answer to the question the page title asks, so they sit
+ *    above the fold instead of after an introduction to themselves.
+ *
+ * 2. Each handoff then gets a two-column subsection whose last element is a
+ *    FAILURE panel — "what can go wrong" beside "what happens then", with the
+ *    resolution stated as a figure. That pairing is the page's differentiator:
+ *    no competitor publishes the unhappy path, and a process page that
+ *    describes only the good day is a brochure.
+ *
+ * 3. The data band is fixed-dark and sits at the two-thirds mark, which is
+ *    both the page's rhythm break and the right weight for the one section
+ *    that says plainly what HIPAA does and does not cover here.
+ *
+ * Every figure on this page is imported. The only exception is `rxMaxDays`,
+ * declared below, which has nowhere to live in `src/config/pricing.ts` yet.
+ */
+import { type Locale, t, localizedPath } from "@/i18n";
+import { site } from "@/config/site";
+import {
+  fees,
+  shipping,
+  sla,
+  coverage,
+  eligibility,
+  partners,
+  usd,
+} from "@/config/pricing";
+import Layout from "@/layouts/Layout.astro";
+import SeoHead from "@/components/SeoHead.astro";
+import TrustTicker from "@/components/sections/TrustTicker.astro";
+import Header from "@/components/sections/Header.astro";
+import Relay from "@/components/sections/Relay.astro";
+import Cta from "@/components/sections/Cta.astro";
+import ComplianceBand from "@/components/sections/ComplianceBand.astro";
+import Footer from "@/components/sections/Footer.astro";
+import { Image } from "astro:assets";
+import consult from "@/assets/consult.jpg";
+import packing from "@/assets/packing.jpg";
+import fulfillment from "@/assets/fulfillment.jpg";
+import { ArrowRight, Check, X } from "lucide-react";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const d = t(locale);
+const c = d.howItWorks;
+
+/**
+ * The ceiling on a single prescription, in days. This belongs in
+ * `src/config/pricing.ts` beside `sla` and is flagged as a needed shared
+ * change; that file is locked for this pass. Declared once here so the figure
+ * appears exactly one time on the page and cannot drift within it.
+ */
+const rxMaxDays = 90;
+
+/**
+ * The same four durations `Relay.astro` and `RelayDetail.astro` render, from
+ * the same constants. A second hand-typed copy is exactly how the reference
+ * sites ended up quoting two review windows on one screen.
+ */
+const durations = [
+  `~${sla.intakeMinutes} min`,
+  `≤ ${sla.reviewHours} hrs`,
+  "Same day",
+  sla.deliveryDays,
+];
+
+/** Media for each handoff. Step one gets figures instead of a photograph. */
+const media = [
+  null,
+  { image: consult, alt: c.steps.images.clinician, caption: c.steps.images.clinicianCaption },
+  { image: packing, alt: c.steps.images.pharmacy, caption: "" },
+  { image: fulfillment, alt: c.steps.images.courier, caption: "" },
+];
+
+/**
+ * The bottom line of each failure panel: the one thing the reader wants to
+ * know, as a figure. Amber only on step one, where the resolution genuinely
+ * measures time; money and contact details stay in the foreground colour.
+ */
+const resolutions = [
+  {
+    key: c.steps.resolutionLabels.clock,
+    value: c.steps.clockPaused,
+    cls: "text-glow-700 dark:text-glow-500",
+    href: "",
+    sub: "",
+  },
+  {
+    key: c.steps.resolutionLabels.refunded,
+    value: usd(fees.visit),
+    cls: "text-foreground",
+    href: "",
+    sub: "",
+  },
+  {
+    key: c.steps.resolutionLabels.extra,
+    value: usd(0),
+    cls: "text-foreground",
+    href: "",
+    sub: "",
+  },
+  {
+    key: c.steps.resolutionLabels.support,
+    value: site.phoneDisplay,
+    cls: "text-foreground",
+    href: site.phoneHref,
+    sub: d.footer.supportHours,
+  },
+];
+
+const steps = c.steps.items.map((step, index) => ({
+  ...step,
+  who: step.who.replace("{practice}", partners.practice),
+  index: index + 1,
+  duration: durations[index],
+  media: media[index],
+  resolution: resolutions[index],
+  /** Alternates the photograph left and right down the page. */
+  mediaLeft: index % 2 === 1,
+}));
+
+/** The thresholds the intake computes, positionally matched to the copy. */
+const intakeValues = [
+  `${coverage.states}${coverage.includesDC ? " + DC" : ""}`,
+  `≥ ${eligibility.bmiAlone}`,
+  `≥ ${eligibility.bmiWithCondition}`,
+  `${eligibility.minAge}+`,
+  `${eligibility.minAgeSermorelin}+`,
+];
+/** Sermorelin is a compounded longevity preparation, so its row carries ¶. */
+const intakeSymbols = ["", "", "", "", "¶"];
+const intakeRows = c.steps.intake.rows.map((row, index) => ({
+  ...row,
+  value: intakeValues[index],
+  symbol: intakeSymbols[index],
+}));
+
+/** Cost and window per shipping option, from `shipping`. */
+const shippingValues = [
+  { cost: c.shipping.included, window: shipping.standardDays },
+  { cost: usd(shipping.overnightCost), window: shipping.overnightDays },
+  { cost: `+${usd(shipping.remoteSurcharge)}`, window: shipping.remoteDays },
+];
+const shippingRows = c.shipping.rows.map((row, index) => ({
+  ...row,
+  ...shippingValues[index],
+}));
+
+/** Only the cutoff is a figure; the other three details are prose. */
+const detailValues = [sla.dispatchCutoff, "", "", ""];
+const details = c.shipping.details.map((detail, index) => ({
+  ...detail,
+  value: detailValues[index],
+}));
+---
+
+<Layout
+  locale={locale}
+  title={d.meta.howItWorks.title}
+  description={d.meta.howItWorks.description}
+>
+  <SeoHead slot="head" locale={locale} path="/how-it-works/" />
+  <TrustTicker locale={locale} />
+  <Header locale={locale} />
+  <main id="main" tabindex="-1" class="outline-none">
+    {/* ---------------------------------------------------------------
+        HEADER + THE RELAY, at full strength. The clock is the first
+        thing on the page, not a reward for reading an introduction.
+        --------------------------------------------------------------- */}
+    <section class="border-b border-border/70 bg-background pb-14 pt-14 sm:pb-16 sm:pt-16">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <p class="label text-brand-700 dark:text-brand-400">{c.header.eyebrow}</p>
+        <h1 class="display-1 mt-5 max-w-4xl">{c.header.title}</h1>
+        <p class="lead mt-6 text-lg">{c.header.lead}</p>
+
+        <h2 class="label mt-14 text-muted-foreground">{c.header.clockLabel}</h2>
+        <div class="mt-6">
+          <Relay locale={locale} variant="full" onLight />
+        </div>
+        <p class="mt-8 max-w-2xl text-sm text-muted-foreground">{c.header.clockNote}</p>
+      </div>
+    </section>
+
+    {/* ---------------------------------------------------------------
+        THE FOUR HANDOFFS, IN DEPTH. Text column and media column swap
+        sides per step; the failure panel closes every one of them.
+        --------------------------------------------------------------- */}
+    <section class="border-b border-border/70 bg-card py-16 sm:py-20">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <div class="max-w-3xl">
+          <p class="label text-brand-700 dark:text-brand-400">{c.steps.eyebrow}</p>
+          <h2 class="display-2 mt-4">{c.steps.title}</h2>
+          <p class="lead mt-4">{c.steps.lead}</p>
+        </div>
+
+        <div class="mt-12 flex flex-col gap-12 sm:mt-14 sm:gap-16">
+          {
+            steps.map((step) => (
+              <article class="border-t border-border pt-8 lg:pt-10">
+                {/* Text and media alternate sides down the page; the failure
+                    panel below spans both, because it is the row the reader
+                    came for and two cramped cells would bury it. */}
+                <div
+                  class:list={[
+                    "grid items-start gap-8 lg:gap-12",
+                    step.mediaLeft ? "lg:grid-cols-[1fr_1.4fr]" : "lg:grid-cols-[1.4fr_1fr]",
+                  ]}
+                >
+                  <div class:list={[step.mediaLeft && "lg:order-2"]}>
+                    <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+                      <p class="label text-muted-foreground">
+                        <span class="text-brand-700 dark:text-brand-400">
+                          {String(step.index).padStart(2, "0")}
+                        </span>
+                        {" · "}
+                        {step.actor}
+                      </p>
+                      <p class="figure text-sm text-glow-700 dark:text-glow-500">{step.duration}</p>
+                    </div>
+                    <h3 class="display-3 mt-2">{step.action}</h3>
+
+                    <dl class="mt-7 grid gap-x-10 gap-y-6 sm:grid-cols-2">
+                      <div class="border-t border-border pt-3.5">
+                        <dt class="label text-muted-foreground">{c.steps.labels.what}</dt>
+                        <dd class="mt-2 text-[0.9375rem] leading-relaxed">{step.what}</dd>
+                      </div>
+                      <div class="border-t border-border pt-3.5">
+                        <dt class="label text-muted-foreground">{c.steps.labels.who}</dt>
+                        <dd class="mt-2 text-[0.9375rem] leading-relaxed">{step.who}</dd>
+                      </div>
+                      <div class="border-t border-border pt-3.5">
+                        <dt class="label text-muted-foreground">{c.steps.labels.takes}</dt>
+                        <dd class="mt-2 text-[0.9375rem] leading-relaxed text-muted-foreground">
+                          {step.takesNote}
+                        </dd>
+                      </div>
+                      <div class="border-t border-border pt-3.5">
+                        <dt class="label text-muted-foreground">{c.steps.labels.receive}</dt>
+                        <dd class="mt-2 text-[0.9375rem] leading-relaxed text-muted-foreground">
+                          {step.receive}
+                        </dd>
+                      </div>
+                    </dl>
+                  </div>
+
+                  {/* Media column: a photograph, or for the intake step the
+                      thresholds the form actually checks. */}
+                  <div class:list={["flex flex-col gap-6", step.mediaLeft && "lg:order-1"]}>
+                    {step.media ? (
+                      <figure class="m-0">
+                        <div class="aspect-[4/3] overflow-hidden rounded-lg border border-border">
+                          <Image
+                            src={step.media.image}
+                            alt={step.media.alt}
+                            widths={[420, 640, 900]}
+                            sizes="(min-width: 1024px) 26rem, 100vw"
+                            class="h-full w-full object-cover"
+                            loading="lazy"
+                          />
+                        </div>
+                        {step.media.caption && (
+                          <figcaption class="mt-3 text-xs leading-relaxed text-muted-foreground">
+                            {step.media.caption}
+                          </figcaption>
+                        )}
+                      </figure>
+                    ) : (
+                      <div class="panel bg-background p-6">
+                        <h4 class="label text-muted-foreground">{c.steps.intake.label}</h4>
+                        <dl class="mt-4 flex flex-col divide-y divide-border">
+                          {intakeRows.map((row) => (
+                            <div class="flex items-baseline justify-between gap-4 py-2.5 first:pt-0 last:pb-0">
+                              <dt class="text-sm">
+                                {row.label}
+                                {row.symbol && <sup class="ml-0.5">{row.symbol}</sup>}
+                              </dt>
+                              <dd class="figure shrink-0 text-sm text-foreground">{row.value}</dd>
+                            </div>
+                          ))}
+                        </dl>
+                        <p class="mt-4 border-t border-border pt-4 text-sm leading-relaxed text-muted-foreground">
+                          {c.steps.intake.note}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* The failure panel. Two cells, so "what goes wrong" and
+                    "what happens then" read as the pair they are, with the
+                    resolution as a figure on the rule beneath. */}
+                <div class="panel mt-7 bg-background p-5 sm:p-6">
+                  <div class="grid gap-5 sm:grid-cols-2 sm:gap-8">
+                    <div>
+                      <p class="label text-muted-foreground">{c.steps.labels.risk}</p>
+                      <p class="subhead mt-2.5">{step.failure.trigger}</p>
+                    </div>
+                    <div>
+                      <p class="label text-brand-700 dark:text-brand-400">
+                        {c.steps.labels.then}
+                      </p>
+                      <p class="mt-2.5 text-sm leading-relaxed text-muted-foreground">
+                        {step.failure.response}
+                      </p>
+                    </div>
+                  </div>
+
+                  <p
+                    class="mt-5 flex flex-wrap items-baseline gap-x-3 gap-y-1 border-t border-border pt-4"
+                  >
+                    <span class="label text-muted-foreground">{step.resolution.key}</span>
+                    {step.resolution.href ? (
+                      <a
+                        href={step.resolution.href}
+                        class:list={["figure text-base font-medium", step.resolution.cls]}
+                      >
+                        {step.resolution.value}
+                      </a>
+                    ) : (
+                      <span class:list={["figure text-base", step.resolution.cls]}>
+                        {step.resolution.value}
+                      </span>
+                    )}
+                    {step.resolution.sub && (
+                      <span class="figure text-xs text-muted-foreground">
+                        {step.resolution.sub}
+                      </span>
+                    )}
+                  </p>
+                </div>
+              </article>
+            ))
+          }
+        </div>
+
+        <p class="mt-12 max-w-3xl border-t border-border pt-6 text-sm text-muted-foreground">
+          {d.gating.long}
+        </p>
+      </div>
+    </section>
+
+    {/* ---------------------------------------------------------------
+        THE THREE PARTIES, NAMED — plus what 503A and 503B actually
+        mean, and how one pharmacy out of three gets an order.
+        --------------------------------------------------------------- */}
+    <section class="border-b border-border/70 bg-background py-16 sm:py-20">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <div class="max-w-3xl">
+          <p class="label text-brand-700 dark:text-brand-400">{c.parties.eyebrow}</p>
+          <h2 class="display-2 mt-4">{c.parties.title}</h2>
+          <p class="lead mt-4">{c.parties.lead}</p>
+        </div>
+
+        <div class="mt-11 grid gap-10 lg:grid-cols-[1.15fr_1fr] lg:gap-14">
+          <div>
+            <div class="panel p-6">
+              <p class="label text-muted-foreground">{c.parties.practice.label}</p>
+              <p class="display-3 mt-3">{partners.practice}</p>
+              <p class="mt-4 text-[0.9375rem] leading-relaxed text-muted-foreground">
+                {c.parties.practice.role}
+              </p>
+              <p class="mt-4 border-t border-border pt-4 text-sm leading-relaxed">
+                {c.parties.practice.note}
+              </p>
+            </div>
+
+            <h3 class="label mt-10 text-muted-foreground">{c.parties.pharmaciesLabel}</h3>
+            <table class="mt-4 w-full border-collapse text-left">
+              <thead>
+                <tr class="border-y border-border">
+                  <th scope="col" class="label py-3 pr-4 text-muted-foreground">
+                    {c.parties.header.name}
+                  </th>
+                  <th scope="col" class="label py-3 pr-4 text-muted-foreground">
+                    {c.parties.header.kind}
+                  </th>
+                  <th scope="col" class="label py-3 text-right text-muted-foreground">
+                    {c.parties.header.state}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {
+                  partners.pharmacies.map((pharmacy) => (
+                    <tr class="border-b border-border align-baseline">
+                      <th scope="row" class="py-3.5 pr-4 text-[0.9375rem] font-medium">
+                        {pharmacy.name}
+                      </th>
+                      <td class="figure py-3.5 pr-4 text-xs text-muted-foreground">
+                        {pharmacy.kind}
+                      </td>
+                      <td class="figure py-3.5 text-right text-xs text-muted-foreground">
+                        {pharmacy.state}
+                      </td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+          </div>
+
+          <div class="flex flex-col gap-6">
+            {
+              c.parties.sections.map((item) => (
+                <div class="panel p-6">
+                  <p class="figure text-sm text-brand-700 dark:text-brand-400">{item.term}</p>
+                  <h3 class="subhead mt-2 text-lg">{item.title}</h3>
+                  <p class="mt-3 text-[0.9375rem] leading-relaxed text-muted-foreground">
+                    {item.body}
+                  </p>
+                </div>
+              ))
+            }
+            <div class="border-t border-border pt-5">
+              <h3 class="subhead">
+                {c.parties.notFdaTitle}
+                <sup class="ml-0.5 text-muted-foreground">‡</sup>
+              </h3>
+              <p class="mt-2.5 text-[0.9375rem] leading-relaxed text-muted-foreground">
+                {c.parties.notFda}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-14 border-t border-border pt-10">
+          <div class="max-w-3xl">
+            <h3 class="display-3">{c.parties.choiceLabel}</h3>
+            <p class="mt-3 text-[1.0625rem] leading-relaxed text-muted-foreground">
+              {c.parties.choiceLead}
+            </p>
+          </div>
+          <ol class="mt-8 grid gap-8 sm:grid-cols-3 sm:gap-10">
+            {
+              c.parties.choices.map((choice, index) => (
+                <li class="relay-step relay-on-light">
+                  <p class="figure text-xs text-glow-700 dark:text-glow-500">
+                    {String(index + 1).padStart(2, "0")}
+                  </p>
+                  <h4 class="subhead mt-2">{choice.title}</h4>
+                  <p class="mt-2 text-sm leading-relaxed text-muted-foreground">{choice.body}</p>
+                </li>
+              ))
+            }
+          </ol>
+          <p class="mt-8 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+            {c.parties.choiceNote}
+          </p>
+        </div>
+      </div>
+    </section>
+
+    {/* ---------------------------------------------------------------
+        SHIPPING — a real table, because cost and window per lane is
+        row-of-pairs content, with the definition-list fallback below sm.
+        --------------------------------------------------------------- */}
+    <section class="border-b border-border/70 bg-card py-16 sm:py-20">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <div class="max-w-3xl">
+          <p class="label text-brand-700 dark:text-brand-400">{c.shipping.eyebrow}</p>
+          <h2 class="display-2 mt-4">{c.shipping.title}</h2>
+          <p class="lead mt-4">{c.shipping.lead}</p>
+        </div>
+
+        <div class="mt-10 hidden sm:block">
+          <table class="w-full border-collapse text-left">
+            <thead>
+              <tr class="border-y border-border">
+                <th scope="col" class="label w-[26%] py-3 pr-4 text-muted-foreground">
+                  {c.shipping.header.option}
+                </th>
+                <th scope="col" class="label py-3 pr-4 text-right text-muted-foreground">
+                  {c.shipping.header.cost}
+                </th>
+                <th scope="col" class="label py-3 pr-4 text-muted-foreground">
+                  {c.shipping.header.window}
+                </th>
+                <th scope="col" class="label py-3 text-muted-foreground">
+                  {c.shipping.header.note}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                shippingRows.map((row) => (
+                  <tr class="border-b border-border align-top">
+                    <th scope="row" class="py-5 pr-4 font-normal">
+                      <span class="subhead">{row.option}</span>
+                    </th>
+                    <td class="figure py-5 pr-4 text-right text-base whitespace-nowrap">
+                      {row.cost}
+                    </td>
+                    <td class="figure py-5 pr-4 text-sm whitespace-nowrap text-muted-foreground">
+                      {row.window}
+                    </td>
+                    <td class="py-5 text-sm leading-relaxed text-muted-foreground">{row.note}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <dl class="mt-10 flex flex-col sm:hidden">
+          {
+            shippingRows.map((row) => (
+              <div class="border-t border-border py-5">
+                <dt class="subhead">{row.option}</dt>
+                <dd class="mt-2 flex flex-wrap items-baseline gap-x-4">
+                  <span class="figure text-base">{row.cost}</span>
+                  <span class="figure text-sm text-muted-foreground">{row.window}</span>
+                </dd>
+                <dd class="mt-2 text-sm leading-relaxed text-muted-foreground">{row.note}</dd>
+              </div>
+            ))
+          }
+        </dl>
+
+        <p class="mt-6 max-w-3xl text-sm text-muted-foreground">{d.gating.short}</p>
+
+        <dl class="mt-12 grid gap-x-12 gap-y-9 sm:grid-cols-2">
+          {
+            details.map((detail) => (
+              <div class="border-t border-border pt-4">
+                <dt class="flex flex-wrap items-baseline gap-x-4">
+                  <span class="subhead">{detail.label}</span>
+                  {detail.value && (
+                    <span class="figure text-base text-glow-700 dark:text-glow-500">
+                      {detail.value}
+                    </span>
+                  )}
+                </dt>
+                <dd class="mt-2.5 text-[0.9375rem] leading-relaxed text-muted-foreground">
+                  {detail.body}
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+
+        <p class="panel mt-10 max-w-3xl bg-background p-5 text-sm leading-relaxed">
+          {c.shipping.notShipping}
+        </p>
+      </div>
+    </section>
+
+    {/* ---------------------------------------------------------------
+        REFILLS — the sticky-column layout, so the ceiling on a
+        prescription stays on screen beside the table of triggers.
+        --------------------------------------------------------------- */}
+    <section class="border-b border-border/70 bg-background py-16 sm:py-20">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <div class="grid gap-10 lg:grid-cols-[23rem_1fr] lg:gap-16">
+          <div class="lg:sticky lg:top-24 lg:self-start">
+            <p class="label text-brand-700 dark:text-brand-400">{c.refills.eyebrow}</p>
+            <h2 class="display-2 mt-4">{c.refills.title}</h2>
+            <p class="lead mt-4 max-w-none">{c.refills.lead}</p>
+
+            <div class="mt-8 border-t border-border pt-5">
+              <p class="figure text-3xl text-glow-700 dark:text-glow-500">{rxMaxDays} days</p>
+              <p class="label mt-2.5 text-muted-foreground">{c.refills.maxLabel}</p>
+              <p class="mt-3 text-sm leading-relaxed text-muted-foreground">{c.refills.maxNote}</p>
+            </div>
+          </div>
+
+          <div>
+            <div class="hidden sm:block">
+              <table class="w-full border-collapse text-left">
+                <thead>
+                  <tr class="border-y border-border">
+                    <th scope="col" class="label w-[34%] py-3 pr-6 text-muted-foreground">
+                      {c.refills.header.event}
+                    </th>
+                    <th scope="col" class="label py-3 text-muted-foreground">
+                      {c.refills.header.consequence}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {
+                    c.refills.rows.map((row) => (
+                      <tr class="border-b border-border align-top">
+                        <th scope="row" class="py-5 pr-6 font-normal">
+                          <span class="subhead">{row.event}</span>
+                        </th>
+                        <td class="py-5 text-[0.9375rem] leading-relaxed text-muted-foreground">
+                          {row.consequence}
+                        </td>
+                      </tr>
+                    ))
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            <dl class="flex flex-col sm:hidden">
+              {
+                c.refills.rows.map((row) => (
+                  <div class="border-t border-border py-5">
+                    <dt class="subhead">{row.event}</dt>
+                    <dd class="mt-2 text-sm leading-relaxed text-muted-foreground">
+                      {row.consequence}
+                    </dd>
+                  </div>
+                ))
+              }
+            </dl>
+
+            <div class="panel mt-9 p-6">
+              <h3 class="subhead text-lg">{c.refills.stopTitle}</h3>
+              <p class="mt-3 text-[0.9375rem] leading-relaxed text-muted-foreground">
+                {c.refills.stopBody}
+              </p>
+            </div>
+
+            <p class="mt-7 text-[0.9375rem] leading-relaxed">{c.refills.concession}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {/* ---------------------------------------------------------------
+        DATA — the one fixed-dark band on the page. Ellery is not a
+        covered entity, and this says so before saying anything else.
+        --------------------------------------------------------------- */}
+    <section class="border-b border-brand-50/10 bg-brand-800 py-16 text-brand-50 sm:py-20">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <div class="max-w-3xl">
+          <p class="label text-brand-300">{c.data.eyebrow}</p>
+          <h2 class="display-2 mt-4 text-brand-50">
+            {c.data.title}
+            <sup class="ml-1 text-[0.4em] text-glow-500">◆</sup>
+          </h2>
+          <p class="mt-4 text-[1.0625rem] leading-relaxed text-brand-50/65">{c.data.lead}</p>
+        </div>
+
+        <div class="mt-11 hidden sm:block">
+          <table class="w-full border-collapse text-left">
+            <thead>
+              <tr class="border-y border-brand-50/15">
+                <th scope="col" class="label w-[26%] py-3 pr-6 text-brand-50/40">
+                  {c.data.header.what}
+                </th>
+                <th scope="col" class="label w-[22%] py-3 pr-6 text-brand-50/40">
+                  {c.data.header.who}
+                </th>
+                <th scope="col" class="label py-3 text-brand-50/40">{c.data.header.law}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                c.data.rows.map((row) => (
+                  <tr class="border-b border-brand-50/12 align-top">
+                    <th scope="row" class="py-5 pr-6 font-normal">
+                      <span class="subhead inline text-brand-50">{row.what}</span>
+                    </th>
+                    <td class="py-5 pr-6 text-[0.9375rem] leading-relaxed text-brand-50/75">
+                      {row.who}
+                    </td>
+                    <td class="py-5 text-[0.9375rem] leading-relaxed text-brand-50/60">
+                      {row.law}
+                    </td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <dl class="mt-10 flex flex-col sm:hidden">
+          {
+            c.data.rows.map((row) => (
+              <div class="border-t border-brand-50/12 py-5">
+                <dt class="subhead text-brand-50">{row.what}</dt>
+                <dd class="mt-2 text-sm leading-relaxed text-brand-50/75">{row.who}</dd>
+                <dd class="mt-1.5 text-sm leading-relaxed text-brand-50/60">{row.law}</dd>
+              </div>
+            ))
+          }
+        </dl>
+
+        <div class="mt-12 grid gap-8 border-t border-brand-50/12 pt-9 lg:grid-cols-[1fr_16rem] lg:gap-14">
+          <div>
+            <h3 class="label text-brand-300">{c.data.notTitle}</h3>
+            <ul class="mt-4 grid gap-2.5 sm:grid-cols-2 sm:gap-x-10">
+              {
+                c.data.notItems.map((item) => (
+                  <li class="flex gap-3 text-[0.9375rem] leading-relaxed text-brand-50/75">
+                    <X className="mt-1 size-3.5 shrink-0 text-brand-300" />
+                    <span>{item}</span>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+          <a
+            href={localizedPath(locale, "/privacy/")}
+            class="inline-flex h-fit items-center gap-2 text-sm font-semibold text-brand-300 hover:text-brand-50"
+          >
+            {c.data.cta}
+            <ArrowRight className="size-4" />
+          </a>
+        </div>
+      </div>
+    </section>
+
+    {/* ---------------------------------------------------------------
+        WHAT ELLERY IS NOT — the restatement, and the two exits.
+        --------------------------------------------------------------- */}
+    <section class="border-b border-border/70 bg-card py-16 sm:py-20">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <div class="max-w-3xl">
+          <p class="label text-brand-700 dark:text-brand-400">{c.isNot.eyebrow}</p>
+          <h2 class="display-2 mt-4">{c.isNot.title}</h2>
+          <p class="lead mt-4">{c.isNot.lead}</p>
+        </div>
+
+        <div class="mt-10 grid gap-6 md:grid-cols-2 lg:gap-8">
+          <div class="panel bg-background p-6 sm:p-7">
+            <h3 class="label text-brand-700 dark:text-brand-400">{c.isNot.isTitle}</h3>
+            <ul class="mt-5 flex flex-col gap-3.5">
+              {
+                c.isNot.isItems.map((item) => (
+                  <li class="flex gap-3 text-[0.9375rem] leading-relaxed">
+                    <Check className="mt-1 size-3.5 shrink-0 text-brand-600 dark:text-brand-400" />
+                    <span>{item}</span>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+
+          <div class="panel bg-background p-6 sm:p-7">
+            <h3 class="label text-muted-foreground">{c.isNot.isNotTitle}</h3>
+            <ul class="mt-5 flex flex-col gap-3.5">
+              {
+                c.isNot.isNotItems.map((item) => (
+                  <li class="flex gap-3 text-[0.9375rem] leading-relaxed text-muted-foreground">
+                    <X className="mt-1 size-3.5 shrink-0 text-muted-foreground" />
+                    <span>{item}</span>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+        </div>
+
+        <p class="mt-9 max-w-3xl text-[1.0625rem] leading-relaxed">
+          {c.isNot.close}
+          <sup class="ml-0.5 text-muted-foreground">*</sup>
+        </p>
+
+        {/* Text links rather than the button pair: the closing CTA band sits
+            directly below this section, and two identical button rows 400px
+            apart read as a template rather than a decision. */}
+        <div class="mt-8 flex flex-wrap items-center gap-x-8 gap-y-3">
+          <a
+            href={localizedPath(locale, "/pricing/")}
+            class="inline-flex items-center gap-2 text-sm font-semibold text-brand-700 dark:text-brand-400"
+          >
+            {c.isNot.ctaPricing}
+            <ArrowRight className="size-4" />
+          </a>
+          <a
+            href={localizedPath(locale, "/start/")}
+            class="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground"
+          >
+            {c.isNot.ctaStart}
+            <ArrowRight className="size-4" />
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <Cta locale={locale} />
+    <ComplianceBand locale={locale} />
+  </main>
+  <Footer locale={locale} />
+</Layout>

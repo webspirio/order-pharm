@@ -1,0 +1,112 @@
+---
+/**
+ * The two program cards.
+ *
+ * Prices are the lowest monthly equivalent from `treatmentsIn(program)`, so a
+ * card cannot advertise a number the program page then contradicts, and adding
+ * a cheaper treatment updates the card by itself. The "from" price always
+ * carries the † and ‡ symbols, which resolve in the compliance band — an
+ * asterisk that resolves nowhere is the cheapest-looking thing a site in this
+ * category can do, and two of the three reference sites do it.
+ */
+import { type Locale, t, localizedPath } from "@/i18n";
+import { anchors } from "@/config/site";
+import { treatmentsIn, usdMonthly, type ProgramId } from "@/config/pricing";
+import { Image } from "astro:assets";
+import metabolicImg from "@/assets/program-metabolic.jpg";
+import longevityImg from "@/assets/program-longevity.jpg";
+import { ArrowRight, Check } from "lucide-react";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const d = t(locale);
+
+const images: Record<string, ImageMetadata> = {
+  metabolic: metabolicImg,
+  longevity: longevityImg,
+};
+const hrefs: Record<string, string> = {
+  metabolic: localizedPath(locale, "/weight-loss/"),
+  longevity: localizedPath(locale, "/longevity/"),
+};
+
+const cards = d.programs.items.map((program) => {
+  const cheapest = Math.min(...treatmentsIn(program.id as ProgramId).map((tx) => tx.fromMonthly));
+  return {
+    ...program,
+    from: usdMonthly(cheapest),
+    image: images[program.id],
+    href: hrefs[program.id],
+  };
+});
+---
+
+<section id={anchors.programs} class="border-b border-border/70 bg-card py-16 sm:py-20">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <div class="max-w-3xl">
+      <h2 class="display-2">{d.programs.title}</h2>
+      <p class="lead mt-4">{d.programs.lead}</p>
+    </div>
+
+    <div class="mt-12 grid gap-6 lg:grid-cols-2 lg:gap-8">
+      {
+        cards.map((card) => (
+          <a href={card.href} class="panel group flex flex-col overflow-hidden bg-background">
+            <div class="relative aspect-[16/9] overflow-hidden">
+              <Image
+                src={card.image}
+                alt=""
+                widths={[480, 768, 1024]}
+                sizes="(min-width: 1024px) 34rem, 100vw"
+                class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                loading="lazy"
+              />
+              <span
+                class="label absolute left-4 top-4 bg-brand-800/85 px-2.5 py-1.5 text-brand-50 backdrop-blur-sm"
+                style="border-radius:3px"
+              >
+                {card.eyebrow}
+              </span>
+            </div>
+
+            <div class="flex flex-1 flex-col p-6 sm:p-7">
+              <h3 class="display-3">{card.title}</h3>
+
+              <div class="mt-4 flex items-baseline gap-2 border-y border-border py-3">
+                <span class="label text-muted-foreground">From</span>
+                <span class="figure text-xl text-foreground">{card.from}</span>
+                <span class="label text-muted-foreground">
+                  all in
+                  <sup class="ml-0.5 tracking-normal">†‡</sup>
+                </span>
+              </div>
+
+              <p class="mt-4 text-[0.9375rem] leading-relaxed text-muted-foreground">{card.desc}</p>
+
+              <ul class="mt-5 flex flex-col gap-2.5">
+                {card.points.map((point) => (
+                  <li class="flex gap-2.5 text-sm text-muted-foreground">
+                    <Check className="mt-1 size-3.5 shrink-0 text-brand-600 dark:text-brand-400" />
+                    <span>{point}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <span
+                class="mt-6 inline-flex items-center gap-2 pt-1 text-sm font-semibold text-brand-700 dark:text-brand-400"
+              >
+                {card.cta}
+                <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+              </span>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+
+    <p class="mt-8 max-w-3xl text-sm text-muted-foreground">{d.gating.long}</p>
+  </div>
+</section>

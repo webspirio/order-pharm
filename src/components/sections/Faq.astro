@@ -1,21 +1,55 @@
 ---
-import { type Locale, t } from "@/i18n";
-import { anchors, site } from "@/config/site";
+/**
+ * FAQ, reusable: the homepage passes its six-item subset, /faq/ passes the
+ * full set. Only the page that shows the FULL set emits `FAQPage` JSON-LD —
+ * two FAQPage blocks on one origin describing overlapping question sets is
+ * worse than one, so `jsonLd` is opt-in rather than automatic.
+ *
+ * Native `<details>`/`<summary>`, not a Radix Accordion. It is keyboard- and
+ * screen-reader-correct with zero JavaScript, and this site has no reason to
+ * ship an island for a disclosure widget the platform already provides. The
+ * `<h3>` inside each summary is what lets screen-reader heading navigation
+ * surface every question instead of skipping past them.
+ */
+import { type Locale } from "@/i18n";
+import { site } from "@/config/site";
 import { ChevronDown } from "lucide-react";
 
 interface Props {
   locale: Locale;
+  eyebrow?: string;
+  title: string;
+  lead?: string;
+  items: { q: string; a: string }[];
+  /** Emit a FAQPage block. Set on the page carrying the complete set. */
+  jsonLd?: boolean;
+  /** Optional "see all" link. */
+  ctaHref?: string;
+  ctaLabel?: string;
+  id?: string;
+  /** Single column reads better on a dedicated /faq/ page. */
+  columns?: 1 | 2;
 }
 
-const { locale } = Astro.props;
-const d = t(locale);
+const {
+  eyebrow,
+  title,
+  lead,
+  items,
+  jsonLd = false,
+  ctaHref,
+  ctaLabel,
+  id,
+  columns = 2,
+} = Astro.props;
 
 const faqJsonLd = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
-  // Reference the business declared by SeoHead instead of redeclaring it.
+  // Reference the organisation SeoHead already declared rather than
+  // redeclaring it — verify-dist.mjs checks that every referenced @id resolves.
   about: { "@id": `${site.domain}/#business` },
-  mainEntity: d.faq.items.map((item) => ({
+  mainEntity: items.map((item) => ({
     "@type": "Question",
     name: item.q,
     acceptedAnswer: { "@type": "Answer", text: item.a },
@@ -23,29 +57,50 @@ const faqJsonLd = {
 };
 ---
 
-<section id={anchors.faq} class="border-b border-border/60 bg-background py-20 sm:py-24">
+<section id={id} class="border-b border-border/70 bg-background py-16 sm:py-20">
   <div class="mx-auto max-w-6xl px-4 sm:px-6">
-    <h2 class="text-3xl sm:text-4xl">{d.faq.title}</h2>
-
-    <div class="mt-10 grid gap-x-10 sm:grid-cols-2">
-      {d.faq.items.map((item) => (
-        <details class="group border-b border-border py-5">
-          <summary
-            class="flex cursor-pointer list-none items-center justify-between gap-4 marker:hidden"
-          >
-            {/* A heading here, not bare text, so screen-reader heading
-                navigation (e.g. NVDA/JAWS "H" key) surfaces every question
-                instead of skipping straight past them. */}
-            <h3 class="subhead">{item.q}</h3>
-            <ChevronDown
-              className="size-5 shrink-0 text-muted-foreground transition-transform group-open:rotate-180"
-            />
-          </summary>
-          <p class="mt-3 text-sm leading-relaxed text-muted-foreground">{item.a}</p>
-        </details>
-      ))}
+    <div class="max-w-3xl">
+      {eyebrow && <p class="label text-brand-700 dark:text-brand-400">{eyebrow}</p>}
+      <h2 class:list={["display-2", eyebrow && "mt-4"]}>{title}</h2>
+      {lead && <p class="lead mt-4">{lead}</p>}
     </div>
+
+    <div
+      class:list={[
+        "mt-10 grid gap-x-12",
+        columns === 2 ? "md:grid-cols-2" : "max-w-3xl grid-cols-1",
+      ]}
+    >
+      {
+        items.map((item) => (
+          <details class="group border-b border-border py-5">
+            <summary
+              class="flex cursor-pointer list-none items-start justify-between gap-4 marker:hidden"
+            >
+              <h3 class="subhead">{item.q}</h3>
+              <ChevronDown
+                className="mt-0.5 size-5 shrink-0 text-muted-foreground transition-transform group-open:rotate-180"
+              />
+            </summary>
+            <p class="mt-3 max-w-2xl text-[0.9375rem] leading-relaxed text-muted-foreground">
+              {item.a}
+            </p>
+          </details>
+        ))
+      }
+    </div>
+
+    {
+      ctaHref && ctaLabel && (
+        <a
+          href={ctaHref}
+          class="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-brand-700 dark:text-brand-400"
+        >
+          {ctaLabel}
+        </a>
+      )
+    }
   </div>
 </section>
 
-<script type="application/ld+json" is:inline set:html={JSON.stringify(faqJsonLd)} />
+{jsonLd && <script type="application/ld+json" is:inline set:html={JSON.stringify(faqJsonLd)} />}

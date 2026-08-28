@@ -1,103 +1,134 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource/gilda-display";
+
+/* Display: Fraunces, loaded from the `wonk` variable file (wght + WONK axes,
+   36 KB latin) rather than `index.css` (wght only) — WONK 1 is what swaps in
+   the alternate g/y/f forms that give the headline voice its signature. The
+   `full` file adds a SOFT axis for 3.3x the bytes and is not worth it. */
+@import "@fontsource-variable/fraunces/wonk.css";
+@import "@fontsource-variable/instrument-sans/index.css";
+/* Data face: two static weights only. 400 for figures and table cells, 600
+   for the uppercase micro-labels. A variable Plex Mono does not exist. */
+@import "@fontsource/ibm-plex-mono/latin-400.css";
+@import "@fontsource/ibm-plex-mono/latin-600.css";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-heading: "Gilda Display", Georgia, "Times New Roman", serif;
+  /* ---------------------------------------------------------------
+     THREE ROLES, AND THE MONO IS THE ONE THAT MATTERS
+
+     This business runs on numbers a patient has to trust: doses in mg,
+     a review window in hours, a dispatch cutoff, an itemised fee. So
+     every figure on this site is set in a monospace with tabular
+     figures, at real reading sizes — not as a decorative eyebrow. That
+     is the type decision the brand is built on; the serif and the sans
+     are chosen to stay out of its way.
+
+     - heading  Fraunces, weight 400, WONK 1, tight tracking. Warm and
+                slightly irregular, so a platform named after a person
+                reads like one.
+     - sans     Instrument Sans. Crisp humanist grotesque; deliberately
+                not Inter, and not the Poppins/Google-Sans rounding that
+                every competitor in this category uses.
+     - mono     IBM Plex Mono. Institutional rather than code-editor.
+     --------------------------------------------------------------- */
+  --font-sans: "Instrument Sans Variable", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, sans-serif;
+  --font-heading: "Fraunces Variable", Georgia, "Times New Roman", serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 
   /* ---------------------------------------------------------------
-     Brand ramp — three switchable palettes (see PaletteSwitcher.tsx),
-     selected at runtime via a `data-palette` attribute on <html> (mirrors
-     how `.dark` switches light/dark — see the no-flash script in
-     Layout.astro). This @theme block declares the *default* palette,
-     "original" (warm taupe/bronze, the site's initial ship colour);
-     `[data-palette="blue"]` and `[data-palette="emerald"]` below
-     redeclare the same custom properties with a more specific selector,
-     which wins the cascade for elements under that attribute — plain CSS
-     variable overriding, nothing Tailwind-specific. Same ramp in both
-     light/dark themes within a given palette; low-opacity tints
-     (brand-500/15 etc.) are what tints icon chips, so 500 itself must
-     stay mid-light to read against a dark page too.
-     brand-600 is tuned per palette so brand-50 text on it clears
-     ~4.5:1+ as a flat solid-button surface (see .bg-primary below, the
-     one CTA style shared by all three palettes). brand-800 is a fixed
-     (non-theme-flipping) deep shade, for the rare full-bleed "accent
-     band" sections (Contact backdrop, Footer) that want to read as a
-     dark, branded surface in both light and dark mode rather than
-     inverting with the page.
+     BRAND RAMP — three switchable palettes (see PaletteSwitcher.tsx),
+     selected at runtime via a `data-palette` attribute on <html>, the
+     same way `.dark` switches light/dark (see the no-flash script in
+     Layout.astro). This block declares the default palette.
 
-     glow-* is a second, deliberately minor hue per palette — used only
-     as the far stop of the site's one signature gradient (see
-     .hero-scrim below), echoed quietly in card edges and the page-tint
-     corner wash. It is not a second set of semantic tokens — no
-     background/border/muted-* anywhere is glow-based, and glow never
-     carries small text or meaningful icons on its own (a light glow tint
-     directly on the page background can fall under the 3:1 floor for
-     graphical/UI contrast) — so the UI itself stays calmly one colour
-     and the duotone reads as one considered, restrained accent, not
-     decoration everywhere.
+     DEFAULT — "saline" (hue ~193, petrol/mineral teal + amber signal).
+     Chosen against the field rather than from a mood board: all three
+     reference sites the client supplied are warm, cream-grounded and
+     light-only (Pomegranate burgundy #861a26 on #faf7e9, Ivím forest
+     #444E43 on #F5F4F2, Good Life charcoal #323232 on #fffef8). A cool
+     mineral ground is the one open position that still reads clinical,
+     and it is the only palette here that also ships a real dark mode —
+     which none of the three has.
 
-     Static assets that can't respond to a runtime attribute — favicons,
-     og-image.jpg, the /kontakt/ office-map pin — are generated once
-     (`pnpm icons` / `pnpm office-map`) against this default "original"
-     palette; switching palettes in the browser doesn't regenerate them.
+     brand-600 is the flat CTA surface; brand-50 text on it clears 6:1.
+     brand-800 is a fixed deep shade for the full-bleed dark bands
+     (Footer, the compliance band, the Relay backdrop) that must read
+     dark in both themes rather than inverting with the page.
+
+     glow-* is one deliberately minor second hue — amber. It is the far
+     stop of the site's single gradient and the accent on anything that
+     measures TIME (the Relay's ticks, the dispatch cutoff, the review
+     window). It never carries small text on its own and there is no
+     glow-based semantic token, so the UI stays one colour and the amber
+     stays legible as "this is a clock".
      --------------------------------------------------------------- */
-  --color-brand-50: #f6f1e9;
-  --color-brand-300: #d9c7ae;
-  --color-brand-400: #bea88c;
-  --color-brand-500: #a38f75;
-  --color-brand-600: #7e6a54;
-  --color-brand-700: #6e5d4a;
-  --color-brand-800: #43362a;
-  --color-brand-foreground: #2c3e50;
+  --color-brand-50: #ebf4f6;
+  --color-brand-300: #a3cbd5;
+  --color-brand-400: #6fadbc;
+  --color-brand-500: #3d8b9c;
+  --color-brand-600: #25626f;
+  --color-brand-700: #1a4a55;
+  --color-brand-800: #0b2a31;
+  --color-brand-foreground: #06181d;
 
-  --color-glow-300: #e8d6b0;
-  --color-glow-500: #c4a35a;
-  --color-glow-700: #7c5d27;
+  --color-glow-300: #f3dcb4;
+  --color-glow-500: #d89c3e;
+  --color-glow-700: #845213;
 }
 
-/* Palette: blue (sky blue + light lavender glow). */
-:root[data-palette="blue"] {
-  --color-brand-50: #eef6fc;
-  --color-brand-300: #b7d9ef;
-  --color-brand-400: #8ec3e4;
-  --color-brand-500: #5aa2d6;
-  --color-brand-600: #326f9f;
-  --color-brand-700: #21567c;
-  --color-brand-800: #133a56;
-  --color-brand-foreground: #0d2740;
+/* Palette: indigo — deep indigo ink + soft coral signal. Cooler and more
+   technical than the default; the option for a client who wants the site to
+   read closer to fintech than to a clinic. */
+:root[data-palette="indigo"] {
+  --color-brand-50: #eef0fa;
+  --color-brand-300: #b4bce8;
+  --color-brand-400: #8994d8;
+  --color-brand-500: #5a66be;
+  --color-brand-600: #3c4491;
+  --color-brand-700: #2c3270;
+  --color-brand-800: #171b3d;
+  --color-brand-foreground: #101230;
 
-  --color-glow-300: #dcd0f2;
-  --color-glow-500: #ab8fdb;
-  --color-glow-700: #573f89;
+  --color-glow-300: #fad5cb;
+  --color-glow-500: #e8836a;
+  --color-glow-700: #8e3a26;
 }
 
-/* Palette: emerald (deep emerald + gold glow). */
-:root[data-palette="emerald"] {
-  --color-brand-50: #f3f7f6;
-  --color-brand-300: #bcd7d4;
-  --color-brand-400: #88bfb7;
-  --color-brand-500: #37867b;
-  --color-brand-600: #25554e;
-  --color-brand-700: #194841;
-  --color-brand-800: #103c36;
-  --color-brand-foreground: #0f2924;
+/* Palette: clay — deep clay/oxblood + sage. This is deliberately the warm,
+   cream-grounded apothecary look the reference sites use, kept as a switchable
+   option so the direction can be compared side by side rather than argued
+   about. */
+:root[data-palette="clay"] {
+  --color-brand-50: #f7f0ea;
+  --color-brand-300: #debda9;
+  --color-brand-400: #c89578;
+  --color-brand-500: #a96b4b;
+  --color-brand-600: #8a4a32;
+  --color-brand-700: #6e3826;
+  --color-brand-800: #3d1e14;
+  --color-brand-foreground: #2a1610;
 
-  --color-glow-300: #e8d6b0;
-  --color-glow-500: #c4a35a;
-  --color-glow-700: #7c5d27;
+  /* Sage rather than amber, so the duotone stays warm-plus-cool the way
+     Pomegranate's burgundy-and-sage does. glow-500 is lightened from the
+     obvious mid-sage (#7e9463): amber's job on this site is to carry the
+     time figures on the fixed-dark bands, and at #7e9463 that text cleared
+     4.5:1 on solid brand-800 but not on the Hero's brand-800/55 over a
+     photograph, which is where it actually sits. */
+  --color-glow-300: #d7e1c4;
+  --color-glow-500: #9ab27f;
+  --color-glow-700: #3f4e2c;
 }
+
 /* Note: the radius scale is NOT declared here. `@theme inline` below derives
    --radius-sm/md/lg/xl/2xl/3xl from the single `--radius` token in :root, so a
-   --radius-lg here would be silently overridden and become dead config sitting
-   inside the block whose comment tells maintainers everything in it is live. */
+   --radius-lg here would be silently overridden. */
 
 @theme inline {
-  --font-heading: "Gilda Display", Georgia, "Times New Roman", serif;
+  --font-heading: "Fraunces Variable", Georgia, "Times New Roman", serif;
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -125,144 +156,139 @@
 }
 
 :root {
-  /* "Reserved trend" warm palette — the default "original" palette (see
-     the @theme brand-ramp comment above for how palette switching
-     works). Clotted-cream background, slate-blue ink, taupe/bronze
-     accent. Cards sit on a soft beige one step down from the page so
-     they read as distinct surfaces via colour, not just a border.
-     --primary/--primary-foreground are pinned to brand-600/brand-50 —
-     the same pair .bg-primary renders below — rather than brand-500, so
-     the semantic tokens actually match what a "primary" surface looks
-     like on screen. */
-  --background: #fdfcfb;
-  --foreground: #2c3e50;
-  --card: #f4f1ea;
-  --card-foreground: #2c3e50;
-  --popover: #fdfcfb;
-  --popover-foreground: #2c3e50;
-  --primary: #7e6a54;
-  --primary-foreground: #f6f1e9;
-  --secondary: #f4f1ea;
-  --secondary-foreground: #2c3e50;
-  --muted: #f4f1ea;
-  /* Body prose is set in this token almost everywhere (service copy, FAQ
-     answers, section leads), so it is a reading colour, not just a "muted"
-     one. The previous #78716c cleared AA on --background (4.68:1) but only
-     managed 4.25:1 on --card, i.e. every paragraph inside a card failed.
-     Darkened to hold >=5:1 on the card surface and 5.5:1 on the page. */
-  --muted-foreground: #6c6661;
-  --accent: #efe8da;
-  --accent-foreground: #2c3e50;
+  /* "Saline" — cool mineral paper, petrol ink. Cards sit one step down from
+     the page so they read as surfaces via colour as well as a hairline.
+     --primary/--primary-foreground are pinned to brand-600/brand-50, the
+     same pair `.btn-solid` renders, so the semantic token matches what a
+     primary surface actually looks like on screen.
+
+     --radius is 0.5rem so cards land at 8px, close to the 10px the premium
+     end of this category uses. Buttons opt out to a near-square 3px via
+     `.btn-solid`/`.btn-outline` below — round cards, square controls. */
+  --background: #f5f7f7;
+  --foreground: #0f1f23;
+  --card: #e9eeef;
+  --card-foreground: #0f1f23;
+  --popover: #f5f7f7;
+  --popover-foreground: #0f1f23;
+  --primary: #25626f;
+  --primary-foreground: #ebf4f6;
+  --secondary: #e9eeef;
+  --secondary-foreground: #0f1f23;
+  --muted: #e9eeef;
+  /* Body prose is set in this token nearly everywhere, so it is a reading
+     colour, not just a "muted" one. Held at >=5:1 on --card (5.0) and
+     --background (5.2), not merely on the page. */
+  --muted-foreground: #59676c;
+  --accent: #dee7e9;
+  --accent-foreground: #0f1f23;
   --destructive: oklch(0.577 0.245 27.325);
-  --border: #e8e1d3;
-  --input: #ded4c0;
-  --ring: #7e6a54;
-  --radius: 0.375rem;
+  --border: #d5e0e2;
+  --input: #b9cace;
+  --ring: #25626f;
+  --radius: 0.5rem;
 }
 
 .dark {
-  /* Same warm family, inverted: deep roasted-coffee background instead of
-     pure black, so the accent and card surfaces keep their temperature
-     rather than turning cold/neutral gray. */
-  --background: #211d1a;
-  --foreground: #f4efe8;
-  --card: #2a2521;
-  --card-foreground: #f4efe8;
-  --popover: #2a2521;
-  --popover-foreground: #f4efe8;
-  --primary: #7e6a54;
-  --primary-foreground: #f6f1e9;
-  --secondary: #332c26;
-  --secondary-foreground: #f4efe8;
-  --muted: #332c26;
-  --muted-foreground: #b8afa3;
-  --accent: #3a3229;
-  --accent-foreground: #f4efe8;
+  /* Same family, inverted: a deep petrol-black rather than neutral #000, so
+     the accent and card surfaces keep their temperature instead of going
+     cold grey. */
+  --background: #0c1418;
+  --foreground: #eaf1f2;
+  --card: #131e23;
+  --card-foreground: #eaf1f2;
+  --popover: #131e23;
+  --popover-foreground: #eaf1f2;
+  --primary: #25626f;
+  --primary-foreground: #ebf4f6;
+  --secondary: #17242a;
+  --secondary-foreground: #eaf1f2;
+  --muted: #17242a;
+  --muted-foreground: #a3b3b8;
+  --accent: #1a282e;
+  --accent-foreground: #eaf1f2;
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: #7e6a54;
+  --input: oklch(1 0 0 / 16%);
+  --ring: #3d8b9c;
 }
 
-/* Palette: blue — near-white blue background, deep-navy ink. */
-:root[data-palette="blue"] {
-  --background: #f6fafd;
-  --foreground: #0d2740;
-  --card: #e8f1f9;
-  --card-foreground: #0d2740;
-  --popover: #f6fafd;
-  --popover-foreground: #0d2740;
-  --primary: #326f9f;
-  --primary-foreground: #eef6fc;
-  --secondary: #e8f1f9;
-  --secondary-foreground: #0d2740;
-  --muted: #e8f1f9;
-  /* See the original palette's note — held to >=5:1 on --card too. */
-  --muted-foreground: #4d6987;
-  --accent: #d9ebf6;
-  --accent-foreground: #0d2740;
-  --border: #cfe3f2;
-  --input: #aed2ea;
-  --ring: #326f9f;
+/* Palette: indigo — near-white cool ground, deep indigo ink. */
+:root[data-palette="indigo"] {
+  --background: #f7f8fc;
+  --foreground: #171b3d;
+  --card: #eceef8;
+  --card-foreground: #171b3d;
+  --popover: #f7f8fc;
+  --popover-foreground: #171b3d;
+  --primary: #3c4491;
+  --primary-foreground: #eef0fa;
+  --secondary: #eceef8;
+  --secondary-foreground: #171b3d;
+  --muted: #eceef8;
+  /* >=5:1 on --card, as in the default palette. */
+  --muted-foreground: #575e7e;
+  --accent: #e1e5f5;
+  --accent-foreground: #171b3d;
+  --border: #dadef0;
+  --input: #bcc3e6;
+  --ring: #3c4491;
 }
-.dark[data-palette="blue"] {
-  --background: #0d2233;
-  --foreground: #eaf3fa;
-  --card: #142c40;
-  --card-foreground: #eaf3fa;
-  --popover: #142c40;
-  --popover-foreground: #eaf3fa;
-  --primary: #326f9f;
-  --primary-foreground: #eef6fc;
-  --secondary: #193347;
-  --secondary-foreground: #eaf3fa;
-  --muted: #193347;
-  --muted-foreground: #a7c1d8;
-  --accent: #1c3c54;
-  --accent-foreground: #eaf3fa;
-  --ring: #326f9f;
+.dark[data-palette="indigo"] {
+  --background: #0d0f22;
+  --foreground: #eef0fa;
+  --card: #15183a;
+  --card-foreground: #eef0fa;
+  --popover: #15183a;
+  --popover-foreground: #eef0fa;
+  --primary: #3c4491;
+  --primary-foreground: #eef0fa;
+  --secondary: #1a1e45;
+  --secondary-foreground: #eef0fa;
+  --muted: #1a1e45;
+  --muted-foreground: #a9b0d4;
+  --accent: #1e2350;
+  --accent-foreground: #eef0fa;
+  --ring: #5a66be;
 }
 
-/* Palette: emerald — flat neutral background/ink (not brand-tinted), per
-   the "solid, confident, detail-focused" brief this palette was built
-   for; colour lives in the accents (buttons, links, icons, the Hero
-   gradient), not diffused into every surface. */
-:root[data-palette="emerald"] {
-  --background: #f5f6f4;
-  --foreground: #303030;
-  --card: #eceeeb;
-  --card-foreground: #303030;
-  --popover: #f5f6f4;
-  --popover-foreground: #303030;
-  --primary: #25554e;
-  --primary-foreground: #f3f7f6;
-  --secondary: #eceeeb;
-  --secondary-foreground: #303030;
-  --muted: #eceeeb;
-  /* See the original palette's note — held to >=5:1 on --card too. */
-  --muted-foreground: #616662;
-  --accent: #e6ece8;
-  --accent-foreground: #303030;
-  --border: #dde2dd;
-  --input: #c9d0c9;
-  --ring: #25554e;
+/* Palette: clay — warm cream ground, deep clay ink. */
+:root[data-palette="clay"] {
+  --background: #fbf8f3;
+  --foreground: #2a1610;
+  --card: #f2ebe1;
+  --card-foreground: #2a1610;
+  --popover: #fbf8f3;
+  --popover-foreground: #2a1610;
+  --primary: #8a4a32;
+  --primary-foreground: #f7f0ea;
+  --secondary: #f2ebe1;
+  --secondary-foreground: #2a1610;
+  --muted: #f2ebe1;
+  /* >=5:1 on --card, as in the default palette. */
+  --muted-foreground: #6b5a50;
+  --accent: #efe6d8;
+  --accent-foreground: #2a1610;
+  --border: #e6dcce;
+  --input: #d3c3ae;
+  --ring: #8a4a32;
 }
-.dark[data-palette="emerald"] {
-  --background: #152420;
-  --foreground: #edefec;
-  --card: #1f2e29;
-  --card-foreground: #edefec;
-  --popover: #1f2e29;
-  --popover-foreground: #edefec;
-  --primary: #25554e;
-  --primary-foreground: #f3f7f6;
-  --secondary: #1f2e29;
-  --secondary-foreground: #edefec;
-  --muted: #1f2e29;
-  --muted-foreground: #a9b4ae;
-  --accent: #253a33;
-  --accent-foreground: #edefec;
-  --ring: #25554e;
+.dark[data-palette="clay"] {
+  --background: #191110;
+  --foreground: #f7f0ea;
+  --card: #241814;
+  --card-foreground: #f7f0ea;
+  --popover: #241814;
+  --popover-foreground: #f7f0ea;
+  --primary: #8a4a32;
+  --primary-foreground: #f7f0ea;
+  --secondary: #2c1e18;
+  --secondary-foreground: #f7f0ea;
+  --muted: #2c1e18;
+  --muted-foreground: #beac9f;
+  --accent: #33231c;
+  --accent-foreground: #f7f0ea;
+  --ring: #a96b4b;
 }
 
 @layer base {
@@ -281,233 +307,322 @@
       scroll-behavior: auto;
     }
   }
-  /* Softer reading rhythm than the browser default, per the "airier, less
-     aggressive contrast" direction. Only touches elements with no explicit
-     Tailwind `leading-*` utility already set on them — utilities live in a
-     higher-priority layer, so e.g. `leading-relaxed`/`leading-none` callers
-     are untouched. */
   p,
   li,
   dd {
     line-height: 1.6;
   }
-  /* In-page anchor targets sit beneath a `sticky top-0` header that is h-16
-     (4rem) tall. Without this, clicking a nav link scrolls the section's
-     heading underneath the header. Scoped to `section[id]` so sections added
-     later by /add-section inherit it automatically. */
+  /* In-page anchor targets sit beneath a `sticky top-0` header. Scoped to
+     `section[id]` so sections added later inherit it automatically. */
   section[id] {
-    scroll-margin-top: 5rem;
+    scroll-margin-top: 6rem;
   }
-  /* Gilda Display ships regular (400) weight only — a bold/extrabold utility
-     or the browser's default h1-h6 UA-stylesheet bold would both trigger
-     synthetic/faux-bold, which looks noticeably worse on a serif display face
-     than just using its own regular weight (the reference build does the
-     same: h1-h4 { font-weight: 400 }). */
+  /* The category's premium end sets display type big, LIGHT and tight —
+     never bold. Fraunces is variable so 400 is a real weight here, not the
+     synthetic-bold compromise a single-weight display serif would force.
+     WONK 1 is the whole point of loading the wonk file: it swaps in the
+     alternate g/y/f, which is the one typographic detail nobody else in
+     this category has. */
   h1,
   h2,
   h3 {
     font-family: var(--font-heading);
     font-weight: 400;
+    font-variation-settings: "WONK" 1;
+    letter-spacing: -0.025em;
   }
-  /* Tailwind v4 preflight dropped v3's `button { cursor: pointer }` reset, so
-     bare <button>s (theme toggle, language switcher, shadcn Button, etc.)
-     fall back to the browser's native `cursor: default` instead of signalling
-     interactivity the way `<a href>` already does natively. */
+  h1,
+  h2 {
+    line-height: 1.04;
+  }
+  h3 {
+    line-height: 1.15;
+  }
+  /* Tailwind v4's preflight dropped v3's `button { cursor: pointer }`. */
   button:not(:disabled) {
     cursor: pointer;
+  }
+  /* Every figure on this site is tabular, so columns of prices, doses and
+     durations line up without per-cell width juggling. */
+  table {
+    font-variant-numeric: tabular-nums;
   }
 }
 
 @layer components {
-  /* The sub-heading level: card/column titles, FAQ questions, the small
-     section headings on the legal and Über-mich pages.
+  /* ---------------------------------------------------------------
+     THE MONO MICRO-LAYER — `.label`
+     Eyebrows, section indices, table headers, chips, footer column
+     headings, the units beside a figure. One style, used everywhere a
+     word is doing a labelling job rather than a reading job.
+     --------------------------------------------------------------- */
+  .label {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
 
-     Deliberately NOT the Gilda Display serif that h1/h2 use. Gilda ships
-     400 only, and it is a high-contrast display face — its stems are
-     *thinner* than the system sans at the same size. At the 16–18px these
-     headings sit at, a Gilda sub-head therefore carries less ink than the
-     16px sans paragraph underneath it, so it reads as quieter than the text
-     it is supposed to introduce. (This is why headings "weren't
-     noticeable": the body copy was bumped 14px → 16px in 24c1243 without
-     re-scaling the headings above it, leaving sub-heads at, or below, the
-     size of their own body text.)
+  /* A figure the reader is meant to trust: doses, hours, cutoffs, dollars.
+     Tabular so it aligns in a column; tight tracking so it does not read as
+     code. */
+  .figure {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
 
-     The rule this encodes: the display serif is used at 24px and up, where
-     it has the size to carry the brand voice; below that the sans carries
-     headings, using weight — which the serif cannot supply — to hold the
-     level at any column width. Size and weight together, so the hierarchy
-     survives independently of colour.
-
-     Lives in the `components` layer so a caller can still override any
-     single property with a utility (`text-xl` on the Dienste headings,
-     `text-brand-50` on the dark Hero/Contact bands). */
+  /* The sub-heading level: card titles, FAQ questions, table row labels.
+     Deliberately the SANS, not Fraunces. Below ~24px the display serif has
+     less ink than the 16px sans paragraph beneath it, so a serif sub-head
+     reads quieter than the text it introduces. The rule: Fraunces at 24px
+     and up, where it can carry the voice; the sans below that, using weight
+     — which a 400-only display face cannot supply — to hold the level at
+     any column width. */
   .subhead {
     font-family: var(--font-sans);
-    font-size: 1.125rem;
+    font-size: 1.0625rem;
     font-weight: 600;
-    line-height: 1.4;
-    letter-spacing: -0.01em;
+    line-height: 1.35;
+    letter-spacing: -0.011em;
+  }
+
+  /* Display sizes. Named rather than inlined so the three ramps stay in
+     proportion and a page cannot invent a fourth. */
+  .display-1 {
+    font-size: clamp(2.5rem, 6.2vw, 4.5rem);
+  }
+  .display-2 {
+    font-size: clamp(2rem, 4.2vw, 3rem);
+  }
+  .display-3 {
+    font-size: clamp(1.5rem, 2.6vw, 2rem);
+  }
+
+  /* Section lead paragraph — the one that sits under an h2. */
+  .lead {
+    font-size: 1.0625rem;
+    line-height: 1.62;
+    color: var(--muted-foreground);
+    max-width: 46rem;
+  }
+
+  /* ---------------------------------------------------------------
+     CONTROLS — near-square, flat, no gradient, no shadow. The one
+     shape decision that separates this from the pill-button house
+     style the rest of the category shares.
+     --------------------------------------------------------------- */
+  .btn-solid {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: none;
+    border-radius: 3px;
+    background: var(--color-brand-600);
+    color: var(--color-brand-50);
+    padding: 0.8125rem 1.375rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    transition:
+      background-color 0.2s ease,
+      transform 0.2s ease;
+  }
+  .btn-solid:hover {
+    background: var(--color-brand-700);
+  }
+
+  .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: transparent;
+    color: var(--foreground);
+    padding: 0.75rem 1.3125rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease;
+  }
+  .btn-outline:hover {
+    background: var(--accent);
+    border-color: var(--input);
+  }
+
+  /* Same two controls, pinned light, for use on the fixed-dark bands (Hero
+     scrim, Footer, compliance band) where the page's own foreground/border
+     tokens are tuned for a light background. */
+  .btn-solid-invert {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: none;
+    border-radius: 3px;
+    background: var(--color-brand-50);
+    color: var(--color-brand-800);
+    padding: 0.8125rem 1.375rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+  }
+  .btn-solid-invert:hover {
+    background: #fff;
+  }
+  .btn-outline-invert {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid color-mix(in oklab, var(--color-brand-50) 34%, transparent);
+    border-radius: 3px;
+    background: transparent;
+    color: var(--color-brand-50);
+    padding: 0.75rem 1.3125rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+  }
+  .btn-outline-invert:hover {
+    background: var(--color-brand-50);
+    color: var(--color-brand-800);
+  }
+
+  /* ---------------------------------------------------------------
+     SURFACES — flat fill plus a hairline. No glass, no blur, no drop
+     shadow: the whole visual language here is hairlines and figures,
+     and a blurred translucent card fights that.
+     --------------------------------------------------------------- */
+  .panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+  }
+  /* Only cards that are themselves links get hover feedback; a plain info
+     panel stays inert. */
+  a.panel:hover {
+    border-color: var(--color-brand-400);
+  }
+
+  /* A panel on a fixed-dark band. */
+  .panel-invert {
+    background: color-mix(in oklab, var(--color-brand-50) 7%, transparent);
+    border: 1px solid color-mix(in oklab, var(--color-brand-50) 14%, transparent);
+    border-radius: var(--radius-lg);
+  }
+
+  /* ---------------------------------------------------------------
+     THE RELAY — the site's signature element. A tick-marked
+     measurement track for the four custody handoffs (you → clinician →
+     pharmacy → courier), because the content genuinely is a sequence
+     measured in elapsed time, and a scale is the honest form for that.
+     Three icon cards would throw the time information away.
+
+     The rule is drawn per step as a `border-top` rather than as one
+     absolutely-positioned bar across the container. That is what makes
+     it responsive for free: at `grid-cols-2` or `grid-cols-1` the
+     segments simply re-line-up per row, where a single absolute rule
+     would stay pinned to the top of the whole grid and lose every step
+     below the first. The ticks are amber because on this site amber
+     means "clock".
+
+     Two instances exist. `--relay-line` defaults to a light hairline
+     for the fixed-dark bands (Hero, /how-it-works/'s header); add
+     `.relay-on-light` for a placement on the ordinary page.
+     --------------------------------------------------------------- */
+  .relay {
+    display: grid;
+    gap: 0;
+    --relay-line: color-mix(in oklab, var(--color-brand-50) 22%, transparent);
+    --relay-tick: var(--color-glow-500);
+  }
+  .relay-on-light {
+    --relay-line: var(--border);
+  }
+  .relay-step {
+    position: relative;
+    border-top: 1px solid var(--relay-line);
+    padding-top: 1.625rem;
+  }
+  /* The tick: a short vertical stroke dropping from the rule, plus a dot
+     sitting on it. `top: -1px` puts the dot's centre on the 1px border
+     rather than 1px below it. */
+  .relay-step::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: 0.625rem;
+    background: var(--relay-tick);
+  }
+  .relay-step::after {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--relay-tick);
   }
 }
 
 /* -----------------------------------------------------------------------
-   "Bring the template to life" pass — deliberately UNLAYERED (not inside
-   any @layer), so these rules win over the same-named Tailwind utility
-   classes already sitting in component markup regardless of source order:
-   CSS cascade layers rank an explicit layer below the implicit "no layer"
-   bucket no matter its specificity. That lets every visual tweak below live
-   entirely in this stylesheet, with zero edits to .astro/.tsx markup.
-   ----------------------------------------------------------------------- */
-
-/* More air inside every top-level page section. `.py-20`/`.sm:py-24` are
-   used exclusively for this one purpose across the codebase (verified via
-   grep) — never for anything smaller like a card or a chip — so widening
-   them here is safe and section-scoped without needing a new selector. */
-.py-20 {
-  padding-block: 6rem;
-}
-@media (min-width: 40rem) {
-  .sm\:py-24 {
-    padding-block: 7.5rem;
-  }
-}
-
-/* Body copy at the Tailwind `text-sm` default (14px) reads small on
-   content-heavy pages (FAQ answers, service descriptions, legal intro) —
-   bumped to the browser's 16px base. Scoped to `p`/`li` specifically so
-   UI chrome that intentionally stays smaller (buttons, form labels, nav
-   links, badges, the cookie banner's actions) is untouched — only actual
-   prose picks this up. */
-p.text-sm,
-li.text-sm {
-  font-size: 1rem;
-  /* `line-height` has to move with the font-size. Tailwind's `text-sm` sets
-     the two as a matched pair (14px / 20px); bumping only the font-size left
-     every one of these paragraphs at 20px leading on 16px text — a 1.43
-     ratio, under the 1.5 WCAG 1.4.12 expects content to support and well
-     under what 16px prose wants. 1.6 matches the bare `p, li` rule in
-     @layer base, so all body copy now shares one rhythm. */
-  line-height: 1.6;
-}
-
-/* More air inside every card-style surface (`bg-card`), whatever padding
-   utility it individually carries (p-4 through p-6/p-8). A soft diagonal
-   gradient of the card colour (still translucent + blurred, so it reads as
-   glass, not a flat block) replaces the hairline border for definition —
-   `border: none` beats every component's own `border border-border`
-   classes the same way (unlayered wins regardless of source order). The
-   far stop mixes in glow-300 rather than brand-300 — a quiet, barely-there
-   echo of the site's signature dusk gradient (see .hero-scrim/.bg-primary)
-   in every card's glass. */
-.bg-card {
-  padding: 1.75rem;
-  border: none;
-  background: linear-gradient(
-    155deg,
-    color-mix(in oklab, var(--card) 82%, transparent),
-    color-mix(in oklab, var(--card) 60%, transparent) 60%,
-    color-mix(in oklab, var(--color-glow-300) 35%, var(--card))
-  );
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-@media (min-width: 40rem) {
-  .bg-card {
-    padding: 2.25rem;
-  }
-}
-
-/* Pill/tag/button shapes (rounded-full paired with horizontal padding —
-   the attribute check excludes plain rounded-full icon circles like
-   size-8/size-11 badges, which have no px-* class and should stay round)
-   get a softer, less "capsule" corner instead of a full pill. */
-.rounded-full[class*="px-"] {
-  border-radius: var(--radius-lg);
-}
-
-/* Smooth, deliberate motion everywhere something can move or recolour. */
-a,
-button,
-.bg-card {
-  transition: all 0.3s ease;
-}
-
-/* Interactive cards (the channel/service links, not the static info boxes)
-   lift slightly on hover — the anchor/button scoping keeps a plain `<div
-   class="bg-card">` info box inert. */
-a.bg-card:hover,
-button.bg-card:hover {
-  transform: translateY(-2px);
-}
-
-/* Primary buttons: flat brand-600, borderless, the same in all three
-   palettes — the brand-800→glow-700 gradient stays a Hero-only moment
-   (see the scrim comment in Hero.astro) rather than repeating on every
-   button, so it reads as one deliberate accent instead of a texture
-   plastered everywhere. Each palette's brand-600 is tuned so brand-50
-   text clears ~4.5:1+ on it (see the @theme comment above). Hover deepens
-   to brand-700, instead of the opacity trick (which over a light page
-   would visually lighten a mid-tone accent rather than darken it). */
-.bg-primary {
-  border: none;
-  background: var(--color-brand-600);
-  color: var(--color-brand-50);
-}
-.bg-primary:hover {
-  background: var(--color-brand-700);
-  color: var(--color-brand-50);
-}
-
-/* Heavy black drop shadows replaced with a barely-there tint of the ink
-   colour — enough to separate the portrait/panel from the page, not enough
-   to read as a "shadow". color-mix against --foreground (not a hardcoded
-   rgba) so the tint stays correct across all three palettes instead of
-   silently keeping one palette's ink colour after a switch. */
-.shadow-lg,
-.shadow-xl,
-.shadow-2xl {
-  box-shadow: 0 12px 32px color-mix(in oklab, var(--foreground) 4%, transparent);
-}
-
-/* Brand-tinted wash for inner (non-home) pages — Über mich, Dienste,
-   Kontakt, Impressum/Datenschutz, 404 — so they read as belonging to this
-   site's brand rather than a flat, undecorated white/near-black body
-   background the way the homepage's own photos/sections already avoid. A
-   uniform low-percentage background-color tint carries the "not just
-   white" base across the whole page, with two soft corner blobs layered on
-   top for depth — top-right brand, bottom-left glow, the same pairing as
-   Hero's scrim (whichever palette is active), just diffused into a much
-   quieter ambient wash here rather than a directional sweep. Applied via a
+   PAGE WASH — a quiet brand tint for inner pages, so they read as part of
+   this site rather than as an undecorated white body. Applied via a
    `page-tint` class on each page's <main> rather than globally on <body>,
-   so the homepage's own Hero/Contact photos and dark Footer band aren't
-   affected — PhoneCta.astro is the one homepage section that also opts
-   into it directly (a deliberate neutral break between the dark
-   Contact/Footer bands). */
+   so the homepage's own photography and dark bands are untouched.
+   ----------------------------------------------------------------------- */
 .page-tint {
-  background-color: color-mix(in oklab, var(--color-brand-300) 9%, var(--background));
+  background-color: color-mix(in oklab, var(--color-brand-300) 7%, var(--background));
   background-image:
     radial-gradient(
-      ellipse 70% 60% at 100% 0%,
-      color-mix(in oklab, var(--color-brand-300) 38%, transparent),
+      ellipse 70% 55% at 100% 0%,
+      color-mix(in oklab, var(--color-brand-300) 30%, transparent),
       transparent 70%
     ),
     radial-gradient(
-      ellipse 60% 50% at 0% 100%,
-      color-mix(in oklab, var(--color-glow-500) 24%, transparent),
+      ellipse 55% 45% at 0% 100%,
+      color-mix(in oklab, var(--color-glow-300) 34%, transparent),
       transparent 70%
     );
 }
 .dark .page-tint {
-  background-color: color-mix(in oklab, var(--color-brand-700) 16%, var(--background));
+  background-color: color-mix(in oklab, var(--color-brand-700) 14%, var(--background));
   background-image:
     radial-gradient(
-      ellipse 70% 60% at 100% 0%,
-      color-mix(in oklab, var(--color-brand-700) 45%, transparent),
+      ellipse 70% 55% at 100% 0%,
+      color-mix(in oklab, var(--color-brand-700) 42%, transparent),
       transparent 70%
     ),
     radial-gradient(
-      ellipse 60% 50% at 0% 100%,
-      color-mix(in oklab, var(--color-glow-500) 22%, transparent),
+      ellipse 55% 45% at 0% 100%,
+      color-mix(in oklab, var(--color-glow-700) 26%, transparent),
       transparent 70%
     );
+}
+
+/* Smooth recolour on anything interactive. Deliberately narrow — `all` on
+   every element makes layout changes animate too, which reads as lag. */
+a {
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+/* Shadows are used in exactly one place — the mobile menu sheet — and even
+   there as a tint of the ink colour rather than black, so it stays correct
+   across all three palettes. */
+.shadow-lg,
+.shadow-xl,
+.shadow-2xl {
+  box-shadow: 0 16px 40px color-mix(in oklab, var(--foreground) 10%, transparent);
 }

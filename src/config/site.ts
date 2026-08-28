@@ -1,97 +1,104 @@
 /**
  * Non-text business data. Single source for markup, legal pages, and JSON-LD.
- * All user-visible *copy* belongs in `src/i18n/`, not here.
+ * All user-visible *copy* belongs in `src/i18n/`, not here. Every price, dose
+ * and duration belongs in `src/config/pricing.ts`, not here.
  *
  * Optional fields left empty are omitted from structured data rather than
- * emitted as nulls. The `/new-site` skill fills this file in.
+ * emitted as nulls.
+ *
+ * DEMO SITE. The company, the address, the phone number (a reserved 555-01xx
+ * fictional-use number) and the pharmacy-network names are illustrative. What
+ * is NOT illustrative is the compliance posture: every sentence on this site
+ * is written for a business that administers and coordinates, and neither
+ * prescribes nor dispenses.
  */
 export const site = {
   /** Brand name, as shown in page titles, JSON-LD, and OG tags. */
-  name: "Rechtsanwältin Olga Gatlin",
-  /** Name only, without the professional title — used for the header logotype. */
-  shortName: "Olga Gatlin",
-  /** Registered legal entity, if it differs from the brand name. */
-  legalName: "",
-  /** Founder or responsible person. Optional. */
+  name: "Ellery Health",
+  /** Name only, for the header logotype. */
+  shortName: "Ellery",
+  /** Registered legal entity. */
+  legalName: "Ellery Health, Inc.",
+  /** Founder or responsible person. Not named on a demo build. */
   owner: "",
   /**
    * Canonical origin, no trailing slash. Single source of truth for the
    * site's domain — `astro.config.ts` imports this file and sets
-   * `site: site.domain` from it, so the two can no longer drift.
-   *
-   * TEMPORARY test domain (the workers.dev subdomain this Worker serves
-   * from, see `wrangler.jsonc`'s `name`) while the real domain isn't live
-   * yet — swap this for the real origin once it is; `pnpm verify`'s
-   * placeholder checks only special-case example.com, so they'll pass as-is
-   * either way. NOT the same domain as the contact-form's outbound mail
-   * (`chorno.us`, see `worker/wrangler.toml`) — those are deliberately two
-   * separate test domains right now.
+   * `site: site.domain` from it, so the two can never drift.
    */
-  domain: "https://swt.webspirio.workers.dev",
+  domain: "https://joinellery.com",
 
   /**
-   * schema.org type for the primary entity. Attorney — most specific fit for
-   * a solo-practice Rechtsanwältin (subtype of LegalService/LocalBusiness).
+   * schema.org type for the primary entity. Deliberately `Organization`, NOT
+   * `MedicalBusiness` / `MedicalOrganization` / `Pharmacy`. Ellery does not
+   * practise medicine and does not dispense, and the structured data has to
+   * say the same thing the footer does — a `MedicalBusiness` entity would
+   * assert in machine-readable form exactly the claim every page disclaims.
    */
-  schemaType: "Attorney",
+  schemaType: "Organization",
 
-  email: "olga@gatlin.de",
-  mailHref: "mailto:olga@gatlin.de",
-  /** Human-readable phone number. Leave empty to hide phone CTAs. */
-  phoneDisplay: "+49 176 7938 8816",
-  /** e.g. "tel:+10000000000" */
-  phoneHref: "tel:+4917679388816",
-  /** WhatsApp/Signal/Telegram deep link. Leave empty to hide messenger CTAs. */
+  email: "hello@joinellery.com",
+  mailHref: "mailto:hello@joinellery.com",
+  /**
+   * Human-readable phone. The premium end of this category publishes a real
+   * number and real hours, because the top anxiety in a mail-order
+   * prescription flow is "will anyone answer". 555-01xx is the reserved
+   * fictional-use range, so a demo can show the pattern without ringing a
+   * real business.
+   */
+  phoneDisplay: "(888) 555-0134",
+  phoneHref: "tel:+18885550134",
+  /** WhatsApp/Signal/Telegram deep link. Empty hides the messenger CTAs. */
   messengerHref: "",
-  /** Social profile URLs. Leave empty to hide the footer's social icons. */
-  facebookUrl: "https://www.facebook.com/lawyergatlin",
-  youtubeUrl: "https://www.youtube.com/@soliduaritye.v.2113",
+  /**
+   * Social profile URLs. Deliberately empty on this build: a footer icon that
+   * links nowhere is the same defect as an "Important Safety Information"
+   * link with href="#", which two of the three reference sites ship. Fill
+   * these in when the accounts exist and the icons appear on their own.
+   */
+  facebookUrl: "",
+  youtubeUrl: "",
 
   /* --- Optional: omitted from JSON-LD when empty --------------------- */
-  addressStreet: "Ludwigstraße 8",
-  addressPostal: "80539",
-  addressLocality: "München",
-  addressRegion: "Bayern",
-  /** ISO 3166-1 alpha-2, e.g. "DE". Required by schema.org if an address is set. */
-  addressCountryCode: "DE",
-  /**
-   * Geo coordinates, if you have a physical location. Also drives the
-   * office-location map on /kontakt/ (`pnpm office-map` — re-run it after
-   * changing these, its tile coordinates aren't read live from here).
-   */
-  geoLat: 48.1456326 as number | undefined,
-  geoLng: 11.5796767 as number | undefined,
-  /** VAT / tax identifier, where legally displayed. TODO(owner): fill in. */
+  addressStreet: "600 Congress Avenue, Suite 1400",
+  addressPostal: "78701",
+  addressLocality: "Austin",
+  addressRegion: "TX",
+  /** ISO 3166-1 alpha-2. Required by schema.org if an address is set. */
+  addressCountryCode: "US",
+  /** No physical storefront to map — Ellery is not a clinic and not a pharmacy. */
+  geoLat: undefined as number | undefined,
+  geoLng: undefined as number | undefined,
   vatId: "",
   /**
-   * Relative price level, e.g. "$$" or "€€". Deliberately left empty and
-   * must STAY empty — this site never displays consultation prices/sums.
+   * Relative price level. Deliberately empty and must STAY empty: a
+   * `priceRange` on the organization would read as Ellery pricing medical
+   * care, which is precisely the claim the administrative-fee model rests on
+   * not making. Real, itemised prices live on /pricing/.
    */
   priceRange: "",
-  /** City or region served. Leave empty for non-local businesses. */
-  areaServed: "München",
-  /** Opening hours, or undefined if not applicable. */
-  openingHours: undefined as
-    | { days: string[]; opens: string; closes: string }
-    | undefined,
+  /** Where the service is available. */
+  areaServed: "United States",
   /**
-   * Public profile URLs for schema.org `sameAs` (entity reconciliation).
-   * Derived from facebookUrl/youtubeUrl above rather than duplicated here.
+   * Support hours, published because the category's premium end does and
+   * because a coordination business is judged on reachability. Weekend hours
+   * are narrower and stated in copy; schema.org takes the weekday block.
    */
+  openingHours: {
+    days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+    opens: "08:00",
+    closes: "20:00",
+  } as { days: string[]; opens: string; closes: string } | undefined,
+  /** Public profile URLs for schema.org `sameAs`. Derived, not duplicated. */
   get sameAs(): string[] {
     return [this.facebookUrl, this.youtubeUrl].filter(Boolean);
   },
 
-  /**
-   * "Open in Google Maps" link for the office address — shared by
-   * /kontakt/ (address row + map photo card) and the homepage's closing
-   * Contact section, so the query string is only ever built once. Empty
-   * string when there's no address to link to.
-   */
+  /** "Open in Google Maps" link, or "" when there is no address to link. */
   get mapHref(): string {
     if (!this.addressStreet) return "";
     const query = encodeURIComponent(
-      `${this.addressStreet}, ${this.addressPostal} ${this.addressLocality}`,
+      `${this.addressStreet}, ${this.addressLocality} ${this.addressRegion} ${this.addressPostal}`,
     );
     return `https://www.google.com/maps/search/?api=1&query=${query}`;
   },
@@ -102,8 +109,10 @@ export const site = {
 
 /** In-page anchor ids, shared by header nav, sections, and footer. */
 export const anchors = {
-  gallery: "work",
-  why: "why",
+  relay: "how",
+  programs: "programs",
+  pricing: "pricing",
+  roles: "who-does-what",
   faq: "faq",
-  contact: "contact",
+  learn: "learn",
 } as const;

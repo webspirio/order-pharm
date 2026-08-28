@@ -1,0 +1,228 @@
+---
+/**
+ * /faq/ — the complete question set, in named groups.
+ *
+ * THREE DECISIONS WORTH THE COMMENT.
+ *
+ * 1. ONE `FAQPage` BLOCK, EMITTED HERE. `Faq.astro` can emit its own, but
+ *    this page renders eight instances of it, and eight FAQPage blocks
+ *    describing eight overlapping subsets is worse than one. So every group
+ *    is rendered with `jsonLd` off and the structured data is built once here
+ *    from the flattened set, with the same shape the component uses — an
+ *    `about` reference to the organisation `@id` that `SeoHead` declares,
+ *    which is what keeps `verify-dist.mjs`'s @id check satisfied.
+ *
+ * 2. FIGURES ARE SUBSTITUTED, NOT TYPED. `faq.ts` writes `{standardDays}`,
+ *    `{cutoff}`, `{practice}`; `fill()` resolves them from
+ *    `src/config/pricing.ts` and THROWS on an unknown token, so a typo fails
+ *    the build instead of shipping a literal brace to a reader. Same
+ *    mechanism as the trust ticker, same reason.
+ *
+ * 3. THE GROUP INDEX IS STICKY AT `lg`, and it is a real list of links rather
+ *    than a scroll-spy island: twenty-seven questions is a page you navigate,
+ *    and `section[id] { scroll-margin-top: 6rem }` in global.css already makes
+ *    the anchors land clear of the sticky header. Below `lg` it is hidden —
+ *    a jump list above a list is just the list twice.
+ */
+import { type Locale, t, localizedPath } from "@/i18n";
+import { site } from "@/config/site";
+import { coverageLabel, fees, partners, shipping, sla, usd } from "@/config/pricing";
+import Layout from "@/layouts/Layout.astro";
+import SeoHead from "@/components/SeoHead.astro";
+import TrustTicker from "@/components/sections/TrustTicker.astro";
+import Header from "@/components/sections/Header.astro";
+import Faq from "@/components/sections/Faq.astro";
+import Cta from "@/components/sections/Cta.astro";
+import ComplianceBand from "@/components/sections/ComplianceBand.astro";
+import Footer from "@/components/sections/Footer.astro";
+import { ArrowRight, Phone } from "lucide-react";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const d = t(locale);
+
+/** Every figure the answers reference, resolved from the pricing config. */
+const figures: Record<string, string> = {
+  practice: partners.practice,
+  pharmacies: partners.pharmacies.map((pharmacy) => pharmacy.name).join(", "),
+  states: coverageLabel(),
+  reviewHours: String(sla.reviewHours),
+  cutoff: sla.dispatchCutoff,
+  standardDays: shipping.standardDays,
+  remoteDays: shipping.remoteDays,
+  deliveryDays: sla.deliveryDays,
+};
+
+/** An unresolved token is a build error, not a literal brace on the page. */
+const fill = (text: string): string =>
+  text.replace(/\{(\w+)\}/g, (_match, token: string) => {
+    const value = figures[token];
+    if (value === undefined) {
+      throw new Error(`/faq/ copy references an unknown figure token: {${token}}`);
+    }
+    return value;
+  });
+
+const groups = d.faq.groups.map((group, index) => ({
+  ...group,
+  index: String(index + 1).padStart(2, "0"),
+  items: group.items.map((item) => ({ q: fill(item.q), a: fill(item.a) })),
+}));
+
+const allItems = groups.flatMap((group) => group.items);
+
+const headerFigures = [
+  { value: String(allItems.length), label: d.faq.header.figures.questions },
+  { value: `≤ ${sla.reviewHours} hrs`, label: d.faq.header.figures.review },
+  { value: usd(fees.visit), label: d.faq.header.figures.refund },
+];
+
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  about: { "@id": `${site.domain}/#business` },
+  mainEntity: allItems.map((item) => ({
+    "@type": "Question",
+    name: item.q,
+    acceptedAnswer: { "@type": "Answer", text: item.a },
+  })),
+};
+---
+
+<Layout locale={locale} title={d.meta.faq.title} description={d.meta.faq.description}>
+  <SeoHead slot="head" locale={locale} path="/faq/" />
+  <TrustTicker locale={locale} />
+  <Header locale={locale} />
+  <main id="main" tabindex="-1" class="outline-none">
+    <section class="border-b border-border/70 bg-background pb-14 pt-14 sm:pb-16 sm:pt-16">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <p class="label text-brand-700 dark:text-brand-400">{d.faq.header.eyebrow}</p>
+        <h1 class="display-1 mt-5 max-w-4xl">{d.faq.header.title}</h1>
+        <p class="lead mt-6 text-lg">{d.faq.header.lead}</p>
+
+        <dl class="mt-10 grid max-w-3xl gap-x-8 gap-y-6 sm:grid-cols-3">
+          {
+            headerFigures.map((item) => (
+              <div class="border-t border-border pt-4">
+                <dd class="figure text-2xl text-foreground">{item.value}</dd>
+                <dt class="mt-1.5 text-sm text-muted-foreground">{item.label}</dt>
+              </div>
+            ))
+          }
+        </dl>
+
+        <p class="mt-8 max-w-3xl text-sm leading-relaxed text-muted-foreground">{d.gating.long}</p>
+        <p class="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+          {d.faq.header.note}
+        </p>
+      </div>
+    </section>
+
+    {/* The load-bearing four, on the page's one fixed-dark band, between the
+        header and the long pale set. A reader who scrolls no further still
+        leaves with the ones that never change. */}
+    <section class="border-b border-brand-50/10 bg-brand-800 py-14 text-brand-50 sm:py-16">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <div class="grid gap-8 lg:grid-cols-[17rem_1fr] lg:gap-14">
+          <div>
+            <p class="label text-brand-300">{d.faq.fixed.eyebrow}</p>
+            <h2 class="display-3 mt-4 text-brand-50">{d.faq.fixed.title}</h2>
+          </div>
+
+          <dl class="grid gap-x-10 sm:grid-cols-2">
+            {
+              d.faq.fixed.items.map((item, index) => (
+                <div class="border-t border-brand-50/12 py-4">
+                  <dt class="subhead text-brand-50">
+                    <span class="figure mr-2 text-xs font-normal text-brand-300">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    {item.term}
+                    {item.symbols && <sup class="ml-0.5 text-brand-300">{item.symbols}</sup>}
+                  </dt>
+                  <dd class="mt-2 text-[0.8125rem] leading-relaxed text-brand-50/60">{item.def}</dd>
+                </div>
+              ))
+            }
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    {/* The set. Each group is a `Faq` instance in the right-hand column, so
+        the hairline between groups belongs to the column rather than to the
+        page, and the sticky index keeps its own. */}
+    <div class="border-b border-border/70 bg-background">
+      <div class="mx-auto max-w-6xl lg:grid lg:grid-cols-[15rem_1fr] lg:items-start">
+        <nav
+          aria-label={d.faq.nav.label}
+          class="hidden px-4 pt-20 sm:px-6 lg:sticky lg:top-24 lg:block"
+        >
+          <h2 class="label text-muted-foreground">{d.faq.nav.heading}</h2>
+          <ol class="mt-4 flex flex-col">
+            {
+              groups.map((group) => (
+                <li class="border-t border-border">
+                  <a href={`#${group.id}`} class="group flex items-baseline gap-3 py-2.5">
+                    <span class="figure text-[0.6875rem] text-brand-700 dark:text-brand-400">
+                      {group.index}
+                    </span>
+                    <span class="flex-1 text-sm font-medium group-hover:text-brand-700 dark:group-hover:text-brand-400">
+                      {group.title}
+                    </span>
+                    <span class="figure text-xs text-muted-foreground">{group.items.length}</span>
+                  </a>
+                </li>
+              ))
+            }
+          </ol>
+
+          <div class="panel mt-8 p-4">
+            <h3 class="subhead text-[0.9375rem]">{d.faq.nav.helpTitle}</h3>
+            <p class="mt-2 text-sm leading-relaxed text-muted-foreground">{d.faq.nav.helpBody}</p>
+            <a
+              href={site.phoneHref}
+              class="figure mt-3 flex items-center gap-2 text-sm text-foreground hover:text-brand-700 dark:hover:text-brand-400"
+            >
+              <Phone className="size-3.5 shrink-0 text-muted-foreground" />
+              {site.phoneDisplay}
+            </a>
+            <a
+              href={localizedPath(locale, "/contact/")}
+              class="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-brand-700 dark:text-brand-400"
+            >
+              {d.faq.nav.helpCta}
+              <ArrowRight className="size-4" />
+            </a>
+          </div>
+        </nav>
+
+        <div>
+          {
+            groups.map((group) => (
+              <Faq
+                locale={locale}
+                id={group.id}
+                eyebrow={`${group.index} · ${group.items.length} ${d.faq.nav.countLabel}`}
+                title={group.title}
+                lead={group.lead}
+                items={group.items}
+                columns={1}
+              />
+            ))
+          }
+        </div>
+      </div>
+    </div>
+
+    <Cta locale={locale} />
+    <ComplianceBand locale={locale} />
+
+    {/* Exactly one FAQPage block per page, for the complete flattened set. */}
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(faqJsonLd)} />
+  </main>
+  <Footer locale={locale} />
+</Layout>

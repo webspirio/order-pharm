@@ -1,9 +1,18 @@
 ---
+/**
+ * 404. Astro/Cloudflare special-case this to a single flat dist/404.html, so
+ * `SeoHead` gets `selfOnly` — a generic hreflang loop would declare per-locale
+ * 404s that are never built, which verify-dist.mjs correctly rejects.
+ *
+ * It routes rather than apologises: a visitor who mistyped a URL wants the
+ * link they were looking for, not a sad illustration.
+ */
 import { type Locale, t, localizedPath } from "@/i18n";
 import Layout from "@/layouts/Layout.astro";
 import SeoHead from "@/components/SeoHead.astro";
 import Header from "@/components/sections/Header.astro";
 import Footer from "@/components/sections/Footer.astro";
+import { ArrowRight } from "lucide-react";
 
 interface Props {
   locale: Locale;
@@ -11,41 +20,55 @@ interface Props {
 
 const { locale } = Astro.props;
 const d = t(locale);
-const meta = d.meta.notFound;
-const home = localizedPath(locale, "/");
+
+const links = [
+  { label: d.nav.weightLoss, href: localizedPath(locale, "/weight-loss/") },
+  { label: d.nav.longevity, href: localizedPath(locale, "/longevity/") },
+  { label: d.nav.howItWorks, href: localizedPath(locale, "/how-it-works/") },
+  { label: d.nav.pricing, href: localizedPath(locale, "/pricing/") },
+  { label: d.nav.learn, href: localizedPath(locale, "/learn/") },
+  { label: d.nav.faq, href: localizedPath(locale, "/faq/") },
+  { label: d.nav.contact, href: localizedPath(locale, "/contact/") },
+  { label: d.nav.cta, href: localizedPath(locale, "/start/") },
+];
 ---
 
-<Layout locale={locale} title={meta.title} description={meta.description}>
-  {
-    /*
-      path="/404.html", not the usual "/imprint/"-style default-locale path:
-      Astro special-cases src/pages/404.astro to always build a single flat
-      dist/404.html — ignoring `trailingSlash` — because that is the filename
-      hosting platforms (Cloudflare Pages included) look for. Pointing SeoHead
-      at that literal path makes canonical and this locale's hreflang
-      self-reference the page's own real, built route.
-      selfOnly: there is exactly one physical 404 file for the whole site,
-      regardless of which locale a visitor was on — Cloudflare Pages has no
-      per-locale 404 routing, and Astro doesn't treat a nested
-      src/pages/<locale>/404.astro as a special error page the way it does the
-      root one. So this page must NOT declare cross-locale hreflang alternates
-      (there is nothing for e.g. "/ua/404.html" to reciprocate, since that file
-      is never built) — selfOnly restricts SeoHead to a single self-referencing
-      alternate instead of looping every locale.
-    */
-  }
+<Layout locale={locale} title={d.meta.notFound.title} description={d.meta.notFound.description}>
+  {/* `path="/404.html"`, not "/". Astro and Cloudflare special-case this to a
+      single flat dist/404.html, so `selfOnly` skips the cross-locale loop —
+      but with path="/" the one alternate it does emit points at the homepage,
+      and verify-dist's reciprocity check then fails because the homepage
+      does not link back to a 404. Pointing it at its own built path makes the
+      alternate equal the route, which the check skips. It also avoids telling
+      a crawler that this page is a duplicate of the homepage. */}
   <SeoHead slot="head" locale={locale} path="/404.html" selfOnly />
   <Header locale={locale} />
   <main id="main" tabindex="-1" class="page-tint outline-none">
-    <div class="mx-auto max-w-3xl px-4 py-24 text-center sm:px-6 sm:py-32">
-      <h1 class="text-3xl sm:text-4xl">{d.notFound.title}</h1>
-      <p class="mt-4 text-muted-foreground">{d.notFound.body}</p>
-      <a
-        href={home}
-        class="mt-8 inline-flex rounded-full bg-primary px-5 py-3 font-semibold text-primary-foreground"
-      >
-        {d.notFound.backHome}
-      </a>
+    <div class="mx-auto max-w-3xl px-4 py-24 sm:px-6 sm:py-32">
+      <p class="figure text-sm text-brand-700 dark:text-brand-400">{d.notFound.code}</p>
+      <h1 class="display-2 mt-4">{d.notFound.title}</h1>
+      <p class="lead mt-4">{d.notFound.body}</p>
+
+      <h2 class="label mt-12 text-muted-foreground">{d.notFound.linksLabel}</h2>
+      <ul class="mt-4 grid gap-x-8 sm:grid-cols-2">
+        {
+          links.map((link) => (
+            <li class="border-b border-border">
+              <a
+                href={link.href}
+                class="group flex items-center justify-between gap-4 py-3.5 text-[0.9375rem] font-medium"
+              >
+                {link.label}
+                <ArrowRight
+                  className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1"
+                />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+
+      <a href={localizedPath(locale, "/")} class="btn-outline mt-10">{d.notFound.backHome}</a>
     </div>
   </main>
   <Footer locale={locale} />

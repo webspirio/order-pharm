@@ -1,0 +1,84 @@
+---
+/**
+ * Testimonials, deliberately without photographs.
+ *
+ * Two reasons, and the licensing one is the harder constraint: both the
+ * Unsplash and Pexels licences forbid using a depicted person in a way that
+ * implies their endorsement, and attaching a written quotation to a stranger's
+ * face does exactly that. Stock portraits of thin smiling people are also the
+ * single loudest "cheap" signal in this category.
+ *
+ * What replaces them is a mono monogram, which fits the site's own visual
+ * language better than a face would. The middle quotation is from someone who
+ * was declined — a review that includes the failure case reads as real, and it
+ * is the only place on the site where the refund rule is evidenced rather than
+ * promised.
+ */
+import { type Locale, t } from "@/i18n";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const d = t(locale);
+
+/** "Dana R." -> "DR". Computed rather than stored, so a renamed voice cannot
+    keep someone else's initials. */
+const monogram = (name: string) =>
+  name
+    .split(/\s+/)
+    .map((part) => part[0])
+    .join("")
+    .replace(/[^A-Za-z]/g, "")
+    .slice(0, 2)
+    .toUpperCase();
+---
+
+<section class="border-b border-border/70 bg-background py-16 sm:py-20">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <div class="max-w-3xl">
+      <p class="label text-brand-700 dark:text-brand-400">{d.home.voices.eyebrow}</p>
+      <h2 class="display-2 mt-4">{d.home.voices.title}</h2>
+      <p class="lead mt-4">{d.home.voices.lead}</p>
+    </div>
+
+    <ul class="mt-12 grid gap-6 md:grid-cols-3 lg:gap-8">
+      {
+        d.home.voices.items.map((voice) => (
+          <li class="panel flex flex-col p-6 sm:p-7">
+            <blockquote class="flex-1">
+              {/* An em-dash-free, quote-mark-free blockquote: the panel and
+                  the attribution already mark it as a quotation, and a
+                  decorative 6rem curly quote is decoration that says nothing. */}
+              <p class="text-[1.0625rem] leading-relaxed text-foreground">{voice.quote}</p>
+            </blockquote>
+            <footer class="mt-6 flex items-center gap-3 border-t border-border pt-5">
+              <span
+                class="label flex size-9 shrink-0 items-center justify-center bg-accent text-brand-700 dark:text-brand-300"
+                style="border-radius:3px"
+                aria-hidden="true"
+              >
+                {monogram(voice.name)}
+              </span>
+              <span class="min-w-0">
+                <span class="block truncate text-sm font-semibold">
+                  {voice.name}
+                  <span class="font-normal text-muted-foreground"> · {voice.location}</span>
+                </span>
+                <span class="figure mt-0.5 block truncate text-xs text-muted-foreground">
+                  {voice.context}
+                </span>
+              </span>
+            </footer>
+          </li>
+        ))
+      }
+    </ul>
+
+    <p class="mt-6 text-xs text-muted-foreground">
+      {d.home.voices.disclosure}
+      <sup class="ml-0.5">◇</sup>
+    </p>
+  </div>
+</section>

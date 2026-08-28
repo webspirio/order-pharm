@@ -1,0 +1,47 @@
+---
+/**
+ * Four figures, in the data face, on a hairline grid.
+ *
+ * Every value is imported from `src/config/pricing.ts`; the dictionary
+ * supplies only the label and the gloss. That split is the point — a number
+ * typed into copy is a number that will one day disagree with the pricing
+ * page, which is what happened to all three reference sites.
+ */
+import { type Locale, t } from "@/i18n";
+import { fees, sla, coverage, usd } from "@/config/pricing";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const d = t(locale);
+
+const values = [
+  `${coverage.states}${coverage.includesDC ? " + DC" : ""}`,
+  `≤ ${sla.reviewHours} hrs`,
+  sla.dispatchCutoff,
+  usd(fees.admin),
+];
+
+const items = d.home.stats.items.map((item, index) => ({ ...item, value: values[index] }));
+---
+
+<section class="border-b border-border/70 bg-background">
+  <div class="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12">
+    <h2 class="label text-muted-foreground">{d.home.stats.label}</h2>
+    <dl class="mt-6 grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-4 sm:gap-x-8">
+      {
+        items.map((item) => (
+          <div class="border-t border-border pt-4">
+            <dd class="figure text-2xl text-foreground sm:text-[1.75rem]">{item.value}</dd>
+            <dt class="mt-2">
+              <span class="subhead block text-[0.9375rem]">{item.label}</span>
+              <span class="mt-1 block text-sm text-muted-foreground">{item.note}</span>
+            </dt>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+</section>

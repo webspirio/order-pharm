@@ -1,9 +1,10 @@
 {
   "$schema": "https://json.schemastore.org/wrangler.json",
   // Worker name is also the workers.dev subdomain slug: this serves at
-  // swt.<account-subdomain>.workers.dev. TEMPORARY test name — swap once the
-  // real domain is live (see CLAUDE.md's domain/email test-config note).
-  "name": "swt",
+  // ellery-health.<account-subdomain>.workers.dev until a real domain is
+  // attached. `site.domain` in src/config/site.ts is the canonical origin and
+  // is what every canonical/hreflang/sitemap URL is built from.
+  "name": "ellery-health",
   "compatibility_date": "2026-07-31",
   // Workers-with-assets shape (`wrangler deploy`). Cloudflare Pages
   // (`wrangler pages deploy`, used by deploy.yml.disabled) requires

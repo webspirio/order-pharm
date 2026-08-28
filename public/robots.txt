@@ -24,4 +24,4 @@ Allow: /
 User-agent: Google-Extended
 Allow: /
 
-Sitemap: https://swt.webspirio.workers.dev/sitemap-index.xml
+Sitemap: https://joinellery.com/sitemap-index.xml

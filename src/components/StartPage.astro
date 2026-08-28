@@ -1,0 +1,216 @@
+---
+/**
+ * /start/ — the intake.
+ *
+ * The page around the form does the work the form must not: it says what the
+ * intake is and is not, how long it takes, that no payment is requested until
+ * the itemisation has been shown, and that the decision belongs to a clinician
+ * rather than to Ellery. The form itself then stays a form.
+ *
+ * `IntakeForm` is the site's only substantial island and is mounted
+ * `client:load` — it is the reason a visitor is on this page, so deferring it
+ * would trade a visible delay for bytes that are needed immediately. Every
+ * string it renders is passed in from `d.start.form`; every figure it renders
+ * it imports from `src/config/pricing.ts` itself.
+ *
+ * State availability is DERIVED here rather than declared: the platform serves
+ * `coverage.states` of `coverage.totalStates`, so exactly that many codes are
+ * withheld from the list. The page and the ticker cannot claim different
+ * coverage.
+ */
+import { type Locale, t, localizedPath } from "@/i18n";
+import { coverage, coverageLabel, fees, sla, usd } from "@/config/pricing";
+import Layout from "@/layouts/Layout.astro";
+import SeoHead from "@/components/SeoHead.astro";
+import TrustTicker from "@/components/sections/TrustTicker.astro";
+import Header from "@/components/sections/Header.astro";
+import Relay from "@/components/sections/Relay.astro";
+import Cta from "@/components/sections/Cta.astro";
+import ComplianceBand from "@/components/sections/ComplianceBand.astro";
+import Footer from "@/components/sections/Footer.astro";
+import IntakeForm from "@/components/islands/IntakeForm.tsx";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const d = t(locale);
+
+/**
+ * Candidate states with no affiliated clinician licensed yet, longest-standing
+ * first. Sliced to the shortfall in `coverage`, so raising the published state
+ * count removes entries from the end of this list instead of leaving the map
+ * and the count disagreeing.
+ */
+const WITHHELD: readonly string[] = ["AR", "LA", "MS"];
+const notYetCodes = WITHHELD.slice(0, Math.max(0, coverage.totalStates - coverage.states));
+
+/** Alaska and Hawaii: the carrier surcharge in `shipping` applies. */
+const REMOTE: readonly string[] = ["AK", "HI"];
+
+const stateOptions = d.start.states.map((state) => ({
+  code: state.code,
+  name: state.name,
+  available: !notYetCodes.includes(state.code),
+  remote: REMOTE.includes(state.code),
+}));
+
+const notYetNames = stateOptions
+  .filter((state) => !state.available)
+  .map((state) => state.name)
+  .join(", ");
+
+/** Positionally matched to `d.start.header.facts`. */
+const factValues = [
+  `~${sla.intakeMinutes} min`,
+  `≤ ${sla.reviewHours} hrs`,
+  usd(fees.visit),
+  usd(fees.admin),
+];
+const factSymbols = ["", "", "", "†"];
+const facts = d.start.header.facts.map((fact, index) => ({
+  ...fact,
+  value: factValues[index],
+  symbol: factSymbols[index],
+}));
+---
+
+<Layout locale={locale} title={d.meta.start.title} description={d.meta.start.description}>
+  <SeoHead slot="head" locale={locale} path="/start/" />
+  <TrustTicker locale={locale} />
+  <Header locale={locale} />
+  <main id="main" tabindex="-1" class="outline-none">
+    <section class="border-b border-border/70 bg-background pt-14 pb-14 sm:pt-16 sm:pb-16">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <p class="label text-brand-700 dark:text-brand-400">{d.start.header.eyebrow}</p>
+        <h1 class="display-1 mt-5 max-w-4xl">{d.start.header.title}</h1>
+        <p class="lead mt-6 text-lg">{d.start.header.lead}</p>
+
+        <p class="label mt-12 text-muted-foreground">{d.start.header.factsLabel}</p>
+        <dl class="mt-4 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
+          {
+            facts.map((fact) => (
+              <div class="border-t border-border pt-4">
+                <dt class="label text-muted-foreground">{fact.label}</dt>
+                <dd>
+                  <p class="figure mt-2.5 text-3xl">
+                    {fact.value}
+                    {fact.symbol && <sup class="ml-0.5 text-base text-muted-foreground">{fact.symbol}</sup>}
+                  </p>
+                  <p class="mt-2 text-sm leading-relaxed text-muted-foreground">{fact.note}</p>
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+
+        <p class="mt-12 max-w-3xl text-[0.9375rem] leading-relaxed">{d.start.scope.decider}</p>
+        <p class="mt-4 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+          <span class="figure mr-1.5 text-brand-700 dark:text-brand-400">◇</span>
+          {d.start.header.demo}
+        </p>
+      </div>
+    </section>
+
+    <section class="border-b border-border/70 bg-card py-16 sm:py-20">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <div class="max-w-3xl">
+          <p class="label text-brand-700 dark:text-brand-400">{d.start.scope.eyebrow}</p>
+          <h2 class="display-2 mt-4">{d.start.scope.title}</h2>
+          <p class="lead mt-4">{d.start.scope.lead}</p>
+        </div>
+
+        <div class="mt-10 grid gap-8 sm:grid-cols-2 sm:gap-12">
+          <div>
+            <p class="label text-brand-700 dark:text-brand-400">{d.start.scope.isLabel}</p>
+            <ul class="mt-4 flex flex-col">
+              {
+                d.start.scope.is.map((item) => (
+                  <li class="border-t border-border py-4 text-[0.9375rem] leading-relaxed">{item}</li>
+                ))
+              }
+            </ul>
+          </div>
+          <div>
+            <p class="label text-muted-foreground">{d.start.scope.isNotLabel}</p>
+            <ul class="mt-4 flex flex-col">
+              {
+                d.start.scope.isNot.map((item) => (
+                  <li class="border-t border-border py-4 text-[0.9375rem] leading-relaxed text-muted-foreground">
+                    {item}
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+        </div>
+
+        {/* The sentence that argues against starting. Inside a bg-card band, so
+            the panel takes bg-background or it disappears. */}
+        <div class="panel mt-10 max-w-3xl bg-background p-6">
+          <p class="label text-muted-foreground">{d.start.scope.concessionLabel}</p>
+          <p class="mt-3 text-[0.9375rem] leading-relaxed">{d.start.scope.concession}</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="border-b border-border/70 bg-background py-16 sm:py-20">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <div class="max-w-3xl">
+          <p class="label text-brand-700 dark:text-brand-400">{d.start.intake.eyebrow}</p>
+          <h2 class="display-2 mt-4">{d.start.intake.title}</h2>
+          <p class="lead mt-4">{d.start.intake.lead}</p>
+        </div>
+
+        <div class="mt-8 flex flex-wrap gap-x-12 gap-y-6">
+          <div>
+            <p class="label text-muted-foreground">{d.start.intake.coverageLabel}</p>
+            <p class="figure mt-2 text-2xl">{coverage.states}</p>
+            <p class="mt-1 text-sm text-muted-foreground">{coverageLabel()}</p>
+          </div>
+          <div>
+            <p class="label text-muted-foreground">{d.start.intake.notYetLabel}</p>
+            <p class="figure mt-2 text-2xl">{notYetCodes.length}</p>
+            <p class="mt-1 text-sm text-muted-foreground">{notYetNames}</p>
+          </div>
+        </div>
+
+        <div class="mt-12">
+          <IntakeForm
+            client:load
+            copy={d.start.form}
+            states={stateOptions}
+            gating={d.gating.short}
+            links={{
+              pricing: localizedPath(locale, "/pricing/"),
+              howItWorks: localizedPath(locale, "/how-it-works/"),
+            }}
+          />
+        </div>
+      </div>
+    </section>
+
+    <section class="border-b border-border/70 bg-card py-16 sm:py-20">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <div class="max-w-3xl">
+          <p class="label text-brand-700 dark:text-brand-400">{d.start.next.eyebrow}</p>
+          <h2 class="display-2 mt-4">{d.start.next.title}</h2>
+          <p class="lead mt-4">{d.start.next.lead}</p>
+        </div>
+
+        <div class="mt-12">
+          <Relay locale={locale} variant="full" onLight />
+        </div>
+
+        <p class="mt-10 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+          {d.start.next.note}
+        </p>
+      </div>
+    </section>
+
+    <Cta locale={locale} />
+    <ComplianceBand locale={locale} />
+  </main>
+  <Footer locale={locale} />
+</Layout>

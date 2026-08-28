@@ -1,0 +1,624 @@
+---
+/**
+ * One component for all three articles; the route shim passes a `slug`.
+ *
+ * The dictionary holds each article as a list of typed blocks (see
+ * `LearnBlock` in `src/i18n/en/learn.ts`) and this file is the only thing that
+ * knows how a block looks. Three reasons it is built that way rather than as
+ * one HTML string per article:
+ *
+ * 1. NO FIGURE IS TYPED INTO COPY. `{token}` in a string is substituted here
+ *    from `src/config/pricing.ts`, and every substituted figure comes out in
+ *    the mono `.figure` face automatically. `{gating}` pulls the shared
+ *    price-gating sentence from `common.ts` verbatim, so an article cannot
+ *    paraphrase the one sentence that must not be paraphrased. A `dataTable`
+ *    block goes further and takes its whole body from config — the titration
+ *    ladders and the price tables below are generated, not transcribed.
+ * 2. Evidence figures — trial durations, percentages, trial names — cannot
+ *    come from pricing.ts but are still figures, so copy marks them `~like
+ *    this~` and they render in mono too. That is what keeps a long-form page
+ *    looking like the rest of this site.
+ * 3. The footnote symbols are written inline in the copy and rendered as
+ *    <sup> here, which means an editor cannot accidentally ship one that the
+ *    compliance band does not resolve.
+ *
+ * The prose measure is capped at `max-w-2xl` (~65 characters at this size)
+ * while tables get the full `max-w-3xl`, because a four-column comparison at
+ * 42rem is unreadable and this is the one page on the site with long-form
+ * text on it.
+ */
+import { type Locale, type Dictionary, t, localizedPath, htmlLang } from "@/i18n";
+import { site } from "@/config/site";
+import {
+  fees,
+  shipping,
+  ladders,
+  brandOptions,
+  treatment,
+  monthlyEquivalent,
+  usd,
+  usdMonthly,
+  mg,
+} from "@/config/pricing";
+import type { LearnBlock } from "@/i18n/en/learn";
+import Layout from "@/layouts/Layout.astro";
+import SeoHead from "@/components/SeoHead.astro";
+import TrustTicker from "@/components/sections/TrustTicker.astro";
+import Header from "@/components/sections/Header.astro";
+import Cta from "@/components/sections/Cta.astro";
+import ComplianceBand from "@/components/sections/ComplianceBand.astro";
+import Footer from "@/components/sections/Footer.astro";
+import { Image } from "astro:assets";
+import learn01 from "@/assets/learn-01.jpg";
+import learn02 from "@/assets/learn-02.jpg";
+import learn03 from "@/assets/learn-03.jpg";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+
+type ArticleSlug = keyof Dictionary["meta"]["articles"];
+
+interface Props {
+  locale: Locale;
+  slug: ArticleSlug;
+}
+
+const { locale, slug } = Astro.props;
+const d = t(locale);
+
+const thumbs = [learn01, learn02, learn03];
+const entries = d.learn.articles.map((entry, index) => ({
+  ...entry,
+  image: thumbs[index % thumbs.length],
+  href: localizedPath(locale, `/learn/${entry.slug}/`),
+}));
+
+const article = entries.find((entry) => entry.slug === slug);
+if (!article) throw new Error(`ArticlePage: no article in the dictionary for slug "${slug}"`);
+const others = entries.filter((entry) => entry.slug !== slug);
+
+const path = `/learn/${slug}/`;
+const pageMeta = d.meta.articles[slug];
+const chrome = d.learn.article;
+
+/* ------------------------------------------------------------------ */
+/* Figures and shared sentences available to copy as {tokens}          */
+/* ------------------------------------------------------------------ */
+
+const sema = treatment("semaglutide");
+const tirz = treatment("tirzepatide");
+const nad = treatment("nad");
+const semaLadder = ladders.semaglutide;
+const tirzLadder = ladders.tirzepatide;
+const top = (steps: typeof semaLadder) => steps[steps.length - 1].mg;
+
+/** Substituted, then set in the mono face — every figure on this site is. */
+const figures: Record<string, string> = {
+  semaFrom: usdMonthly(sema.fromMonthly),
+  tirzFrom: usdMonthly(tirz.fromMonthly),
+  semaOne: usd(sema.oneMonth),
+  tirzOne: usd(tirz.oneMonth),
+  monthlyGap: usd(tirz.fromMonthly - sema.fromMonthly),
+  semaTop: mg(top(semaLadder)),
+  tirzTop: mg(top(tirzLadder)),
+  /** The dose the diabetes head-to-head used, i.e. not the weight-management one. */
+  semaMid: mg(semaLadder[2].mg),
+  nadFrom: usdMonthly(nad.fromMonthly),
+  nadOne: usd(nad.oneMonth),
+  visit: usd(fees.visit),
+  admin: usd(fees.admin),
+  membership: usdMonthly(fees.membershipMonthly),
+};
+
+/** Substituted as plain prose. The gating sentences are quoted, never rewritten. */
+const phrases: Record<string, string> = {
+  gating: d.gating.short,
+  gatingLong: d.gating.long,
+  nadCadence: nad.cadence,
+};
+
+const escapeHtml = (raw: string): string =>
+  raw.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+/** Inline mono runs sit a touch smaller than the sans around them: IBM Plex
+    Mono is wider per character, and at 1em a figure mid-sentence reads as a
+    size jump rather than as a change of voice. */
+const monoSpan = (text: string): string =>
+  `<span class="figure text-[0.95em]">${text}</span>`;
+const supSymbol = (symbol: string): string =>
+  symbol ? `<sup class="ml-px text-[0.68em] text-muted-foreground">${symbol}</sup>` : "";
+
+/**
+ * Copy -> HTML. Escapes first, then resolves the three conventions, so a
+ * dictionary string can never inject markup: `{token}`, `~figure~`, and the
+ * eight footnote symbols defined in `common.ts`.
+ */
+const rich = (raw: string): string =>
+  escapeHtml(raw)
+    .replace(/\{(\w+)\}/g, (whole: string, key: string) => {
+      if (key in figures) return monoSpan(escapeHtml(figures[key]));
+      if (key in phrases) return escapeHtml(phrases[key]);
+      return whole;
+    })
+    .replace(/~([^~]+)~/g, (_whole: string, inner: string) => monoSpan(inner))
+    .replace(/([*†‡§¶◆‖◇])/g, (_whole: string, symbol: string) => supSymbol(symbol));
+
+/* ------------------------------------------------------------------ */
+/* Blocks -> a single render model                                     */
+/* ------------------------------------------------------------------ */
+
+interface Cell {
+  html: string;
+  /** Rendered in the mono face and kept on one line: a price, a dose, a week. */
+  mono: boolean;
+}
+
+type Rendered =
+  | { kind: "h2"; text: string; id: string }
+  | { kind: "p"; html: string }
+  | { kind: "ul"; items: string[] }
+  | { kind: "table"; caption: string; head: string[]; rows: Cell[][] }
+  | { kind: "callout"; html: string }
+  | { kind: "cta"; html: string; href: string; label: string };
+
+const dash = "—";
+
+/**
+ * The rows a `dataTable` block asks for. Copy owns the caption and the column
+ * headers; every cell below is generated from config, which is why an article
+ * cannot quote a price or a dose the rest of the site does not charge or use.
+ */
+function dataRows(source: "ladders" | "metabolicPrices" | "receipt"): Cell[][] {
+  if (source === "ladders") {
+    const depth = Math.max(semaLadder.length, tirzLadder.length);
+    return Array.from({ length: depth }, (_unused, index) => {
+      const left = semaLadder[index];
+      const right = tirzLadder[index];
+      return [
+        { html: left ? escapeHtml(left.weeks) : dash, mono: true },
+        { html: left ? escapeHtml(mg(left.mg)) : dash, mono: true },
+        { html: right ? escapeHtml(right.weeks) : dash, mono: true },
+        { html: right ? escapeHtml(mg(right.mg)) : dash, mono: true },
+      ];
+    });
+  }
+
+  if (source === "metabolicPrices") {
+    const compounded = [sema, tirz].map((item) => [
+      { html: escapeHtml(item.display) + supSymbol("‡"), mono: false },
+      { html: escapeHtml(usd(item.oneMonth)), mono: true },
+      { html: escapeHtml(usd(item.threeMonth)), mono: true },
+      { html: escapeHtml(usdMonthly(monthlyEquivalent(item))), mono: true },
+    ]);
+    const branded = brandOptions.map((option) => [
+      {
+        html: `${escapeHtml(option.display)} (${escapeHtml(option.molecule)})${supSymbol("‖")}`,
+        mono: false,
+      },
+      { html: `${escapeHtml(usd(option.low))}–${escapeHtml(usd(option.high))}`, mono: true },
+      { html: dash, mono: true },
+      { html: dash, mono: true },
+    ]);
+    return [...compounded, ...branded];
+  }
+
+  // The receipt, line for line as `Receipt.astro` renders it on the homepage:
+  // same rows, same amounts, same two words that are deliberately not numbers.
+  const amounts = [
+    usd(fees.visit),
+    d.home.receipt.atCost,
+    shipping.standardCost === 0 ? d.home.receipt.included : usd(shipping.standardCost),
+    usd(fees.admin),
+  ];
+  const symbols = ["", "‡", "", "†"];
+  return d.home.receipt.rows.map((row, index) => [
+    { html: escapeHtml(row.item), mono: false },
+    { html: escapeHtml(amounts[index]) + supSymbol(symbols[index]), mono: true },
+    { html: escapeHtml(row.dest), mono: false },
+  ]);
+}
+
+const slugify = (text: string): string =>
+  text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+const blocks: LearnBlock[] = article.body;
+
+const rendered: Rendered[] = blocks.map((block): Rendered => {
+  switch (block.type) {
+    case "h2":
+      return { kind: "h2", text: block.text, id: slugify(block.text) };
+    case "p":
+      return { kind: "p", html: rich(block.text) };
+    case "ul":
+      return { kind: "ul", items: block.items.map(rich) };
+    case "callout":
+      return { kind: "callout", html: rich(block.text) };
+    case "cta":
+      return {
+        kind: "cta",
+        html: rich(block.text),
+        href: localizedPath(locale, block.to),
+        label: block.label,
+      };
+    case "table":
+      return {
+        kind: "table",
+        caption: block.caption,
+        head: block.head,
+        rows: block.rows.map((row) => row.map((cell) => ({ html: rich(cell), mono: false }))),
+      };
+    case "dataTable":
+      return {
+        kind: "table",
+        caption: block.caption,
+        head: block.head,
+        rows: dataRows(block.source),
+      };
+  }
+});
+
+const contents = rendered.filter(
+  (block): block is Extract<Rendered, { kind: "h2" }> => block.kind === "h2",
+);
+
+/* ------------------------------------------------------------------ */
+/* Structured data                                                     */
+/* ------------------------------------------------------------------ */
+
+const canonical = new URL(localizedPath(locale, path), site.domain).href;
+
+/**
+ * `author` and `publisher` reference the Organization `SeoHead` declares
+ * rather than redeclaring it — verify-dist.mjs fails on an @id that no block
+ * on the page defines.
+ */
+const articleJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "@id": `${canonical}#article`,
+  headline: article.title,
+  description: article.dek,
+  articleSection: article.category,
+  datePublished: article.publishedIso,
+  dateModified: article.updatedIso,
+  inLanguage: htmlLang[locale],
+  isAccessibleForFree: true,
+  url: canonical,
+  author: { "@id": `${site.domain}/#business` },
+  publisher: { "@id": `${site.domain}/#business` },
+};
+
+const crumbs = [
+  { name: chrome.home, href: localizedPath(locale, "/") },
+  { name: d.learn.eyebrow, href: localizedPath(locale, "/learn/") },
+  { name: article.title, href: localizedPath(locale, path) },
+];
+
+const breadcrumbJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: crumbs.map((crumb, index) => ({
+    "@type": "ListItem",
+    position: index + 1,
+    name: crumb.name,
+    item: new URL(crumb.href, site.domain).href,
+  })),
+};
+---
+
+<Layout locale={locale} title={pageMeta.title} description={pageMeta.description}>
+  <SeoHead slot="head" locale={locale} path={path} />
+  <script
+    slot="head"
+    type="application/ld+json"
+    is:inline
+    set:html={JSON.stringify(articleJsonLd)}
+  />
+  <script
+    slot="head"
+    type="application/ld+json"
+    is:inline
+    set:html={JSON.stringify(breadcrumbJsonLd)}
+  />
+  <TrustTicker locale={locale} />
+  <Header locale={locale} />
+  <main id="main" tabindex="-1" class="outline-none">
+    <article>
+      {/* Header block: the article's own metadata, then the disclaimer —
+          prominent, above the first paragraph, not in small print. */}
+      <section class="border-b border-border/70 bg-background pb-12 pt-10 sm:pb-14 sm:pt-12">
+        <div class="mx-auto max-w-6xl px-4 sm:px-6">
+          <nav aria-label="Breadcrumb">
+            <ol class="label flex flex-wrap items-center gap-2.5 text-muted-foreground">
+              {
+                crumbs.slice(0, 2).map((crumb, index) => (
+                  <>
+                    {index > 0 && <li aria-hidden="true">/</li>}
+                    <li>
+                      <a href={crumb.href} class="hover:text-foreground">
+                        {crumb.name}
+                      </a>
+                    </li>
+                  </>
+                ))
+              }
+            </ol>
+          </nav>
+
+          <div class="mt-8 max-w-3xl">
+            <p class="label flex flex-wrap items-center gap-3 text-muted-foreground">
+              <span class="text-brand-700 dark:text-brand-400">{article.category}</span>
+              <span aria-hidden="true">·</span>
+              <span class="figure font-normal tracking-normal">
+                {article.readMinutes} {d.learn.readTime}
+              </span>
+            </p>
+            <h1 class="display-2 mt-5">{article.title}</h1>
+            <p class="lead mt-5 text-lg">{article.dek}</p>
+            <p class="label mt-7 flex flex-wrap items-center gap-3 text-muted-foreground">
+              <span>{d.learn.reviewedBy}</span>
+              <span aria-hidden="true">·</span>
+              <span>{d.learn.updated}</span>
+              <time datetime={article.updatedIso} class="figure font-normal tracking-normal">
+                {article.updated}
+              </time>
+            </p>
+          </div>
+
+          <aside class="panel mt-9 max-w-3xl border-l-2 border-l-brand-600 p-5 dark:border-l-brand-400">
+            <p class="label text-brand-700 dark:text-brand-400">{chrome.disclaimerLabel}</p>
+            <p class="mt-3 text-[0.9375rem] leading-relaxed text-foreground">
+              {d.learn.disclaimer}
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      {/* The article itself, with the table of contents in a rail that sticks
+          on lg and simply sits above the prose below it. */}
+      <section class="bg-background pb-16 pt-10 sm:pb-20 sm:pt-14">
+        <div class="mx-auto max-w-6xl px-4 sm:px-6">
+          <div class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_15rem] lg:gap-16">
+            <aside class="lg:col-start-2 lg:row-start-1">
+              <nav
+                aria-labelledby="toc-heading"
+                class="panel p-5 lg:sticky lg:top-24 lg:border-0 lg:bg-transparent lg:p-0"
+              >
+                <p id="toc-heading" class="label text-muted-foreground">{chrome.toc}</p>
+                <ol class="mt-4 flex flex-col gap-3">
+                  {
+                    contents.map((heading, index) => (
+                      <li class="flex gap-3">
+                        <span class="figure mt-0.5 shrink-0 text-xs text-glow-500">
+                          {String(index + 1).padStart(2, "0")}
+                        </span>
+                        <a
+                          href={`#${heading.id}`}
+                          class="text-sm leading-snug text-muted-foreground hover:text-brand-700 dark:hover:text-brand-400"
+                        >
+                          {heading.text}
+                        </a>
+                      </li>
+                    ))
+                  }
+                </ol>
+              </nav>
+            </aside>
+
+            <div class="max-w-3xl lg:col-start-1 lg:row-start-1">
+              {
+                rendered.map((block) => (
+                  <>
+                    {block.kind === "h2" && (
+                      <h2 id={block.id} class="display-3 mt-14 scroll-mt-28 first:mt-0">
+                        {block.text}
+                      </h2>
+                    )}
+
+                    {block.kind === "p" && (
+                      <p
+                        class="mt-5 max-w-2xl text-[1.0625rem] leading-[1.75] text-foreground sm:text-lg"
+                        set:html={block.html}
+                      />
+                    )}
+
+                    {block.kind === "ul" && (
+                      <ul class="mt-6 flex max-w-2xl flex-col gap-3.5">
+                        {block.items.map((item) => (
+                          <li class="flex gap-3.5 text-[1.0625rem] leading-[1.7] text-foreground">
+                            <span
+                              class="mt-2.5 size-1.5 shrink-0 rounded-full bg-brand-600 dark:bg-brand-400"
+                              aria-hidden="true"
+                            />
+                            <span set:html={item} />
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+
+                    {block.kind === "callout" && (
+                      <aside class="panel mt-8 max-w-2xl border-l-2 border-l-brand-600 p-5 dark:border-l-brand-400">
+                        <p
+                          class="text-[0.9375rem] leading-relaxed text-foreground"
+                          set:html={block.html}
+                        />
+                      </aside>
+                    )}
+
+                    {block.kind === "table" && (
+                      <figure class="mt-10">
+                        <figcaption class="label text-muted-foreground">{block.caption}</figcaption>
+
+                        {/* sm and up: the real table. */}
+                        <div class="mt-4 hidden overflow-x-auto sm:block">
+                          <table class="w-full border-collapse text-left">
+                            <thead>
+                              <tr class="border-y border-border">
+                                {block.head.map((cell, index) => (
+                                  <th
+                                    scope="col"
+                                    class:list={[
+                                      "label py-3 align-bottom text-muted-foreground",
+                                      index === 0 ? "pr-4" : "pl-4",
+                                    ]}
+                                  >
+                                    {cell}
+                                  </th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {block.rows.map((row) => (
+                                <tr class="border-b border-border align-top">
+                                  {row.map((cell, index) =>
+                                    index === 0 ? (
+                                      <th
+                                        scope="row"
+                                        class:list={[
+                                          "py-4 pr-4 text-[0.9375rem] leading-relaxed",
+                                          cell.mono ? "figure font-normal whitespace-nowrap" : "font-semibold",
+                                        ]}
+                                        set:html={cell.html}
+                                      />
+                                    ) : (
+                                      <td
+                                        class:list={[
+                                          "py-4 pl-4 text-[0.9375rem] leading-relaxed",
+                                          cell.mono
+                                            ? "figure whitespace-nowrap text-foreground"
+                                            : "text-muted-foreground",
+                                        ]}
+                                        set:html={cell.html}
+                                      />
+                                    ),
+                                  )}
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+
+                        {/* Below sm: the same rows as a definition list. A
+                            four-column comparison at 360px is unreadable. */}
+                        <dl class="mt-4 flex flex-col sm:hidden">
+                          {block.rows.map((row) => (
+                            <div class="border-t border-border py-4">
+                              {/* A name labels itself; a figure does not, so a
+                                  mono first cell keeps its column heading. */}
+                              {row[0].mono && (
+                                <p class="label text-muted-foreground">{block.head[0]}</p>
+                              )}
+                              <dt
+                                class:list={[
+                                  row[0].mono ? "figure mt-1 text-[0.9375rem]" : "subhead",
+                                ]}
+                                set:html={row[0].html}
+                              />
+                              {row.slice(1).map((cell, index) => (
+                                <dd class="mt-2.5">
+                                  <span class="label block text-muted-foreground">
+                                    {block.head[index + 1]}
+                                  </span>
+                                  <span
+                                    class:list={[
+                                      "mt-1 block text-sm leading-relaxed",
+                                      cell.mono ? "figure text-foreground" : "text-muted-foreground",
+                                    ]}
+                                    set:html={cell.html}
+                                  />
+                                </dd>
+                              ))}
+                            </div>
+                          ))}
+                        </dl>
+                      </figure>
+                    )}
+
+                    {block.kind === "cta" && (
+                      <div class="mt-12 max-w-2xl border-t border-border pt-6">
+                        <p
+                          class="text-[0.9375rem] leading-relaxed text-muted-foreground"
+                          set:html={block.html}
+                        />
+                        <a
+                          href={block.href}
+                          class="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-brand-700 dark:text-brand-400"
+                        >
+                          {block.label}
+                          <ArrowRight className="size-4" />
+                        </a>
+                      </div>
+                    )}
+                  </>
+                ))
+              }
+
+              <p class="mt-12 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+                {chrome.reviewNote}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </article>
+
+    {/* The other two articles, plus the way back to the index. */}
+    <section class="border-y border-border/70 bg-card py-16 sm:py-20">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <div class="flex flex-wrap items-end justify-between gap-6">
+          <div class="max-w-2xl">
+            <p class="label text-brand-700 dark:text-brand-400">{chrome.nextTitle}</p>
+            <h2 class="display-3 mt-4">{d.learn.title}</h2>
+            <p class="lead mt-4">{chrome.nextLead}</p>
+          </div>
+          <a
+            href={localizedPath(locale, "/learn/")}
+            class="inline-flex items-center gap-2 text-sm font-semibold text-brand-700 dark:text-brand-400"
+          >
+            <ArrowLeft className="size-4" />
+            {chrome.backToIndex}
+          </a>
+        </div>
+
+        <ul class="mt-10 grid gap-6 md:grid-cols-2 lg:gap-8">
+          {
+            others.map((entry) => (
+              <li>
+                <a href={entry.href} class="panel group flex h-full flex-col overflow-hidden bg-background">
+                  <div class="aspect-[16/9] overflow-hidden">
+                    <Image
+                      src={entry.image}
+                      alt=""
+                      widths={[400, 640, 900]}
+                      sizes="(min-width: 768px) 28rem, 100vw"
+                      class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div class="flex flex-1 flex-col p-6">
+                    <p class="label flex items-center gap-3 text-muted-foreground">
+                      <span class="text-brand-700 dark:text-brand-400">{entry.category}</span>
+                      <span aria-hidden="true">·</span>
+                      <span class="figure font-normal tracking-normal">
+                        {entry.readMinutes} {d.learn.readTime}
+                      </span>
+                    </p>
+                    <h3 class="subhead mt-3">{entry.title}</h3>
+                    <p class="mt-2.5 flex-1 text-sm leading-relaxed text-muted-foreground">
+                      {entry.dek}
+                    </p>
+                  </div>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    <Cta locale={locale} />
+    <ComplianceBand locale={locale} />
+  </main>
+  <Footer locale={locale} />
+</Layout>

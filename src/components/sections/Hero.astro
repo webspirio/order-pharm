@@ -1,9 +1,25 @@
 ---
+/**
+ * The hero is the thesis.
+ *
+ * Every site in this category opens on the outcome — "Expert Care for a
+ * Healthier, More Confident You". This one opens on the thing the reader is
+ * actually anxious about and nobody addresses: the middle. The headline poses
+ * it ("Nothing hidden in the middle.") and the Relay bar on the photo's lower
+ * edge answers it in the same screen, which is why the two are one component
+ * and not two sections.
+ *
+ * The scrim is a petrol sweep inside the brand ramp (brand-800 -> brand-700),
+ * not the brand-to-amber duotone an earlier pass used: teal and warm brown
+ * mix through olive, and the midpoint read as a printing error. Amber survives
+ * as accent only — the Relay's ticks, the rule under a heading — which is
+ * also what keeps it readable as this site's colour for "clock".
+ */
 import { type Locale, t, localizedPath } from "@/i18n";
-import { site } from "@/config/site";
 import { Image } from "astro:assets";
-import heroBg from "@/assets/hero-bg.png";
-import { CalendarCheck, Phone, Landmark, Compass, Briefcase, Scale } from "lucide-react";
+import heroBg from "@/assets/hero.jpg";
+import Relay from "@/components/sections/Relay.astro";
+import { ArrowRight } from "lucide-react";
 
 interface Props {
   locale: Locale;
@@ -11,164 +27,73 @@ interface Props {
 
 const { locale } = Astro.props;
 const d = t(locale);
-
-const primaryHref = localizedPath(locale, "/kontakt/");
-const dienstePath = localizedPath(locale, "/dienste/");
-
-// Positional by the fixed practice-area order (steuerrecht, migrationsrecht,
-// arbeitsrecht, zivilrecht) — same order as d.dienste.items, which supplies
-// the anchor id each tile links to on the full Dienste page.
-const icons = [Landmark, Compass, Briefcase, Scale];
 ---
 
-<section class="relative isolate overflow-hidden border-b border-border/60">
-  <div class="relative isolate flex min-h-[30rem] flex-col overflow-hidden lg:min-h-[36rem]">
-    {/* Full-bleed photo backdrop, so all hero text sits directly on the
-        image rather than the page background. The taller min-height (vs. an
-        exact aspect-ratio match) keeps object-cover cropping the photo's own
-        edges rather than its middle, so more of the scene shows — "zoomed
-        out" relative to a tighter box — with extra room reserved at the
-        bottom for the practice-tiles bar below. The scrim is the site's one
-        signature moment: a sweep from brand-800 into glow-700, left to
-        right — the same brand/glow pair the active palette defines (see
-        the @theme comment in global.css), echoed much more quietly as a
-        card-edge/page-tint tint elsewhere. CTA buttons stay flat
-        brand-600, not part of the gradient, so it doesn't repeat into a
-        texture. It's strongest on the left, where the headline column
-        sits, to offset the image's own brighter window highlight there —
-        kept deliberately light in light mode (35–45%) so the photo itself
-        reads through, with a text-shadow on the headline as a legibility
-        backstop; the dark-mode page already reads darker overall, so its
-        own band stays stronger (58–70%). Contact's backdrop and the
-        Footer stay solid brand-800 rather than picking up the glow stop
-        too — this is the one place the full duotone appears at full
-        strength. HeroMotif.tsx (concentric-ring backdrop) stays in
-        the codebase as an opt-in seam — see its own comment — but has no
-        role now that there's a photo. */}
+<section class="relative isolate overflow-hidden border-b border-border/70">
+  <div class="relative isolate flex min-h-[34rem] flex-col overflow-hidden lg:min-h-[40rem]">
     <Image
       src={heroBg}
       alt=""
-      widths={[640, 960, 1280, 1717]}
+      widths={[640, 960, 1280, 1920]}
       sizes="100vw"
       class="absolute inset-0 -z-20 h-full w-full object-cover"
       loading="eager"
       fetchpriority="high"
     />
+    {/* Stronger on the left, where the headline column sits, so the photo's
+        own window highlight there cannot ride up under the type. Light mode
+        stays lighter than dark mode's because the page around it is already
+        pale; a text-shadow on the headline is the legibility backstop. */}
     <div
-      class="absolute inset-0 -z-10 bg-gradient-to-r from-brand-800/45 via-brand-700/40 to-glow-700/32 dark:from-brand-800/70 dark:via-brand-700/65 dark:to-glow-700/58"
+      class="absolute inset-0 -z-10 bg-gradient-to-r from-brand-800/88 via-brand-800/62 to-brand-700/38 dark:from-brand-800/94 dark:via-brand-800/80 dark:to-brand-700/58"
     >
     </div>
 
-    {/* flex-1 (not the outer flex box directly) so the headline centers
-        within the space ABOVE the tiles bar, not the section's full height
-        — the previous version centered across the whole box and then
-        overlaid the tiles bar absolutely on top of it, so on shorter
-        viewports the (correctly centered) CTAs ended up sitting behind the
-        tiles bar. Making the tiles bar a normal flow sibling instead of an
-        absolute overlay means this flex-1 row's available height already
-        excludes it, so the two can never overlap regardless of viewport
-        height — and the photo/scrim behind both still cover the full
-        (now-taller-if-needed) box since they're inset-0/h-full. */}
+    {/* flex-1 on this row rather than centring the outer box, so the headline
+        centres in the space ABOVE the Relay bar. The bar is a normal flow
+        sibling, not an absolute overlay, so the two can never collide on a
+        short viewport however tall the copy gets. */}
     <div class="relative flex flex-1 items-center">
-      {/* Shares the same mx-auto max-w-6xl wrapper as the tiles bar below
-          and the rest of the page's sections, so its left edge lines up
-          with everything else. The extra pl-5 sm:pl-6 then matches the
-          tiles' own p-5/sm:p-6 padding exactly, so the headline's text
-          starts at precisely the same x-position as the first tile's
-          text/icon below it — an exact match by construction rather than
-          an eyeballed translate-x offset. */}
       <div class="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
-        {/* No max-w-2xl here (there used to be one): at text-6xl, "Ihr
-            Recht. Klar verstanden." alone is wider than 42rem/672px, so
-            capping the whole block at that width made the first of the two
-            intentional \n-separated lines wrap a second time on its own —
-            three visual lines instead of two. The subtitle right below
-            still keeps its own max-w-xl, so it doesn't grow wide just
-            because this wrapper no longer caps it. */}
-        <div class="pl-5 text-left sm:pl-6">
-          <p class="mb-4 text-xs font-bold uppercase leading-relaxed tracking-[0.28em] text-brand-300">
-            {d.hero.kicker}
-          </p>
-          <h1 class="hero-heading whitespace-pre-line text-4xl leading-[1.05] text-brand-50 sm:text-5xl lg:text-6xl">
-            {d.hero.title}
-          </h1>
-          <p class="hero-heading mt-5 max-w-xl text-base text-brand-50/80 sm:text-lg">{d.hero.subtitle}</p>
-          <div class="mt-8 flex flex-wrap gap-3">
-            <a
-              href={primaryHref}
-              class="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3.5 font-semibold"
-            >
-              <CalendarCheck className="size-5" />
-              {d.hero.ctaPrimary}
-            </a>
-            {site.phoneHref && (
-              <a
-                href={site.phoneHref}
-                class="hero-secondary-cta inline-flex items-center gap-2 rounded-full border px-6 py-3.5 font-semibold"
-              >
-                <Phone className="size-5" />
-                {d.hero.ctaSecondary}
-              </a>
-            )}
-          </div>
+        <p class="label text-brand-300">{d.home.hero.kicker}</p>
+        <h1
+          class="hero-type display-1 mt-5 whitespace-pre-line text-brand-50"
+        >
+          {d.home.hero.title}
+        </h1>
+        <p class="hero-type mt-6 max-w-xl text-base text-brand-50/80 sm:text-lg">
+          {d.home.hero.subtitle}
+        </p>
+        <div class="mt-8 flex flex-wrap items-center gap-3">
+          <a href={localizedPath(locale, "/start/")} class="btn-solid-invert">
+            {d.home.hero.ctaPrimary}
+            <ArrowRight className="size-4" />
+          </a>
+          <a href={localizedPath(locale, "/pricing/")} class="btn-outline-invert">
+            {d.home.hero.ctaSecondary}
+          </a>
         </div>
+        <p class="mt-5 max-w-md text-xs text-brand-50/60">{d.home.hero.note}</p>
       </div>
     </div>
 
-    {/* Practice-area tiles, sitting on the photo's own bottom edge rather
-        than living on a separate solid strip beneath it — a translucent,
-        blurred glass bar (same brand-800 scrim family, split 35–45%/60–70%
-        light/dark like the backdrop above) so the photo keeps showing
-        through behind the tile content, divided by hairlines instead of
-        four boxed cards. In normal flow (not absolutely positioned) so it
-        can never overlap the headline above it — see the flex-1 comment. */}
-    <div
-      class="relative border-t border-brand-50/10 bg-brand-800/38 backdrop-blur-sm dark:bg-brand-800/65"
-    >
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
-        <div class="grid grid-cols-2 divide-x divide-y divide-brand-50/15 sm:grid-cols-4 sm:divide-y-0">
-          {d.services.items.map((item, index) => {
-            const Icon = icons[index % icons.length];
-            const id = d.dienste.items[index]?.id;
-            return (
-              <a
-                href={id ? `${dienstePath}#${id}` : dienstePath}
-                class="flex flex-col gap-2 p-5 transition-colors hover:bg-brand-50/10 sm:p-6"
-              >
-                <div class="flex items-center gap-2.5">
-                  <span class="inline-flex size-8 shrink-0 items-center justify-center rounded-lg bg-brand-50/15 text-brand-50">
-                    <Icon className="size-4" />
-                  </span>
-                  <h3 class="subhead text-brand-50">{item.title}</h3>
-                </div>
-                <p class="text-sm text-brand-50/70">{item.desc}</p>
-              </a>
-            );
-          })}
-        </div>
+    {/* The Relay, on the photo's own bottom edge as a translucent blurred bar
+        rather than on a separate solid strip below it — the photo keeps
+        showing through, and the four handoffs read as part of the same claim
+        the headline makes. */}
+    <div class="relative border-t border-brand-50/10 bg-brand-800/55 backdrop-blur-sm dark:bg-brand-800/75">
+      <div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-9">
+        <Relay locale={locale} variant="compact" />
       </div>
     </div>
   </div>
 </section>
 
 <style>
-  /* With the scrim lightened to 35–45% (light mode), the photo's own bright
-     spots can get close to the brand-50 headline/subtitle text — a soft
-     shadow keeps a legibility margin without needing a darker scrim. */
-  .hero-heading {
-    text-shadow: 0 1px 16px color-mix(in oklab, var(--color-brand-800) 60%, transparent);
-  }
-
-  /* Scoped to this component: the outline "Anrufen" button has no fill of
-     its own, so it needs light text/border pinned explicitly here — the
-     sitewide border-border/foreground it'd otherwise inherit are tuned for
-     a light page background, not this section's fixed dark photo. */
-  .hero-secondary-cta {
-    border-color: color-mix(in oklab, var(--color-brand-50) 35%, transparent);
-    color: var(--color-brand-50);
-  }
-  .hero-secondary-cta:hover {
-    background: var(--color-brand-50);
-    color: var(--color-brand-800);
+  /* With the scrim kept light enough for the photograph to read through, the
+     image's bright spots can come close to the brand-50 type. A soft shadow
+     buys a legibility margin without darkening the whole band. */
+  .hero-type {
+    text-shadow: 0 1px 18px color-mix(in oklab, var(--color-brand-800) 65%, transparent);
   }
 </style>

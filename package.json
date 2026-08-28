@@ -1,5 +1,5 @@
 {
-  "name": "rechtsanwaeltin-gatlin",
+  "name": "ellery-health",
   "type": "module",
   "version": "0.1.0",
   "private": true,
@@ -13,16 +13,16 @@
     "preview": "astro preview",
     "check": "astro check",
     "test": "vitest run",
-    "placeholders": "node scripts/make-placeholders.mjs",
     "icons": "node scripts/make-icons.mjs",
-    "office-map": "node scripts/make-office-map.mjs",
     "verify": "pnpm check && pnpm test && pnpm build && node scripts/verify-dist.mjs",
     "astro": "astro"
   },
   "dependencies": {
     "@astrojs/react": "^6.0.2",
     "@astrojs/sitemap": "^3.7.3",
-    "@fontsource/gilda-display": "^5.3.0",
+    "@fontsource-variable/fraunces": "^5.3.0",
+    "@fontsource-variable/instrument-sans": "^5.3.0",
+    "@fontsource/ibm-plex-mono": "^5.3.0",
     "@tailwindcss/vite": "^4.3.3",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",

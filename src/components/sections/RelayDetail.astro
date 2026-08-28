@@ -1,0 +1,92 @@
+---
+/**
+ * The Relay again, in detail — and deliberately on the other axis.
+ *
+ * The hero's bar gives the clock: four actors, four durations, nothing else.
+ * This section gives the explanation. Repeating the same horizontal
+ * tick-marked track with paragraphs bolted under it would read as a duplicate
+ * section; turning it 90 degrees into a vertical rail keeps the visual
+ * language (one hairline, amber ticks, mono durations) while making it
+ * obvious this is the long version rather than the same thing twice.
+ *
+ * The rail is a `border-l` on the list with a dot per item, rather than the
+ * `.relay-step` border-top used horizontally — same idea, correct axis.
+ */
+import { type Locale, t, localizedPath } from "@/i18n";
+import { anchors } from "@/config/site";
+import { sla } from "@/config/pricing";
+import { ArrowRight } from "lucide-react";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const d = t(locale);
+
+const durations = [
+  `~${sla.intakeMinutes} min`,
+  `≤ ${sla.reviewHours} hrs`,
+  "Same day",
+  sla.deliveryDays,
+];
+
+const steps = d.home.relay.steps.map((step, index) => ({
+  ...step,
+  duration: durations[index],
+  index: index + 1,
+}));
+---
+
+<section id={anchors.relay} class="border-b border-border/70 bg-background py-16 sm:py-20">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <div class="grid gap-10 lg:grid-cols-[20rem_1fr] lg:gap-16">
+      <div class="lg:sticky lg:top-24 lg:self-start">
+        <p class="label text-brand-700 dark:text-brand-400">{d.home.relay.eyebrow}</p>
+        <h2 class="display-2 mt-4">{d.home.relay.title}</h2>
+        <p class="lead mt-4 max-w-none">{d.home.relay.lead}</p>
+        <a
+          href={localizedPath(locale, "/how-it-works/")}
+          class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-brand-700 dark:text-brand-400"
+        >
+          {d.home.relay.cta}
+          <ArrowRight className="size-4" />
+        </a>
+      </div>
+
+      <ol class="relative flex flex-col border-l border-border pl-6 sm:pl-8">
+        {
+          steps.map((step) => (
+            <li class="relative pb-10 last:pb-0">
+              {/* The tick, on the rail. -1px of the 5px dot's own radius past
+                  the 1px border puts its centre on the line. */}
+              <span
+                aria-hidden="true"
+                class="absolute -left-[1.5625rem] top-[0.45rem] size-[7px] rounded-full bg-glow-500 sm:-left-[2.0625rem]"
+              ></span>
+              <span
+                aria-hidden="true"
+                class="absolute -left-6 top-[0.7rem] h-px w-4 bg-glow-500/50 sm:-left-8 sm:w-6"
+              ></span>
+
+              <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+                <p class="label text-muted-foreground">
+                  <span class="text-brand-700 dark:text-brand-400">
+                    {String(step.index).padStart(2, "0")}
+                  </span>
+                  {" · "}
+                  {step.actor}
+                </p>
+                <p class="figure text-sm text-glow-700 dark:text-glow-500">{step.duration}</p>
+              </div>
+              <h3 class="display-3 mt-2">{step.action}</h3>
+              <p class="mt-2.5 max-w-2xl text-[0.9375rem] leading-relaxed text-muted-foreground">
+                {step.detail}
+              </p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </div>
+</section>

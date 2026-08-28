@@ -1,0 +1,102 @@
+---
+/**
+ * WHO DOES WHAT — the division of labour, as a table, on the homepage.
+ *
+ * This is the strongest differentiator available to a business whose only
+ * product is coordination, and the category's own convergence says it belongs
+ * somewhere plain and findable rather than in §14 of the Terms. Every
+ * competitor examined either buries it or omits it entirely — Ivím has no
+ * "we are not a pharmacy" statement anywhere on its site.
+ *
+ * On a fixed brand-800 band, for two reasons. It is the page's thesis restated
+ * as fact, so it should carry the same weight as the hero; and the homepage
+ * otherwise ran eight consecutive pale sections between the hero and the
+ * closing CTA, where one hairline between two identical grounds is not a
+ * section break.
+ *
+ * Rendered as a real two-column table, not a card grid: each row pairs a task
+ * with exactly one owner, and a table is the form that makes "no overlap"
+ * visible at a glance. Below `sm` it becomes a definition list — a two-column
+ * table at 360px produces twelve-character columns.
+ */
+import { type Locale, t, localizedPath } from "@/i18n";
+import { anchors } from "@/config/site";
+import { ArrowRight } from "lucide-react";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const d = t(locale);
+const rows = d.home.roles.rows;
+---
+
+<section
+  id={anchors.roles}
+  class="border-b border-brand-50/10 bg-brand-800 py-16 text-brand-50 sm:py-20"
+>
+  <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <div class="max-w-3xl">
+      <p class="label text-brand-300">{d.home.roles.eyebrow}</p>
+      <h2 class="display-2 mt-4 text-brand-50">{d.home.roles.title}</h2>
+      <p class="mt-4 max-w-2xl text-[1.0625rem] leading-relaxed text-brand-50/65">
+        {d.home.roles.lead}
+      </p>
+    </div>
+
+    {/* sm and up: the table. */}
+    <div class="mt-10 hidden sm:block">
+      <table class="w-full border-collapse text-left">
+        <thead>
+          <tr class="border-y border-brand-50/15">
+            <th scope="col" class="label w-[46%] py-3 pr-6 text-brand-50/40">
+              {d.home.roles.header.task}
+            </th>
+            <th scope="col" class="label py-3 text-brand-50/40">{d.home.roles.header.who}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            rows.map((row, index) => (
+              <tr class="border-b border-brand-50/12 align-top">
+                <th scope="row" class="py-5 pr-6 font-normal">
+                  <span class="figure mr-3 text-xs text-glow-500">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <span class="subhead inline text-brand-50">{row.task}</span>
+                </th>
+                <td class="py-5 text-[0.9375rem] leading-relaxed text-brand-50/60">{row.who}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    {/* Below sm: the same pairs as a definition list. */}
+    <dl class="mt-10 flex flex-col sm:hidden">
+      {
+        rows.map((row, index) => (
+          <div class="border-t border-brand-50/12 py-5">
+            <dt class="subhead flex gap-3 text-brand-50">
+              <span class="figure shrink-0 text-xs font-normal text-glow-500">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <span>{row.task}</span>
+            </dt>
+            <dd class="mt-2 pl-8 text-sm leading-relaxed text-brand-50/60">{row.who}</dd>
+          </div>
+        ))
+      }
+    </dl>
+
+    <a
+      href={localizedPath(locale, "/how-it-works/")}
+      class="mt-9 inline-flex items-center gap-2 text-sm font-semibold text-brand-300 hover:text-brand-50"
+    >
+      {d.home.roles.cta}
+      <ArrowRight className="size-4" />
+    </a>
+  </div>
+</section>

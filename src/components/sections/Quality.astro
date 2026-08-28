@@ -1,0 +1,104 @@
+---
+/**
+ * The per-batch release panel.
+ *
+ * Almost nobody in this category publishes lab work, and it is the most direct
+ * available answer to the compounded-pharmacy trust gap: the preparation is
+ * genuinely not FDA-approved, so the honest move is not to soften that
+ * sentence but to show what a licensed pharmacy CAN evidence instead. Citing
+ * the USP chapter by number is what separates a quality claim from a quality
+ * adjective.
+ *
+ * Paired with the named pharmacies, because a release panel from an unnamed
+ * facility evidences nothing.
+ */
+import { type Locale, t } from "@/i18n";
+import { batchPanel, partners } from "@/config/pricing";
+import { Image } from "astro:assets";
+import vial from "@/assets/vial.jpg";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const d = t(locale);
+---
+
+<section class="border-b border-border/70 bg-card py-16 sm:py-20">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <div class="grid items-start gap-10 lg:grid-cols-2 lg:gap-14">
+      <div>
+        <p class="label text-brand-700 dark:text-brand-400">{d.home.quality.eyebrow}</p>
+        <h2 class="display-2 mt-4">{d.home.quality.title}</h2>
+        <p class="lead mt-4">{d.home.quality.lead}</p>
+
+        <table class="mt-9 w-full border-collapse text-left">
+          <thead>
+            <tr class="border-y border-border">
+              <th scope="col" class="label py-3 pr-4 text-muted-foreground">
+                {d.home.quality.header.test}
+              </th>
+              <th scope="col" class="label py-3 pr-4 text-muted-foreground">
+                {d.home.quality.header.standard}
+              </th>
+              <th scope="col" class="label py-3 text-right text-muted-foreground">
+                {d.home.quality.header.result}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              batchPanel.map((row) => (
+                <tr class="border-b border-border">
+                  <th scope="row" class="py-3.5 pr-4 text-[0.9375rem] font-medium">{row.test}</th>
+                  <td class="figure py-3.5 pr-4 text-sm text-muted-foreground">{row.standard}</td>
+                  <td class="label py-3.5 text-right text-brand-700 dark:text-brand-400">
+                    {row.result}
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+
+        <p class="mt-5 text-sm text-muted-foreground">{d.home.quality.note}</p>
+      </div>
+
+      <div class="flex flex-col gap-6">
+        {/* Fixed 4:3 box. The source is a 2000x3000 portrait, so an
+            unconstrained `w-full` rendered it ~800px tall against a 650px text
+            column — and most of those pixels were empty seamless ground. */}
+        <div class="aspect-[4/3] overflow-hidden rounded-lg border border-border">
+          <Image
+            src={vial}
+            alt="A single clear glass vial with a blank label, on a seamless neutral ground, lit from one side."
+            widths={[480, 768, 1024]}
+            sizes="(min-width: 1024px) 32rem, 100vw"
+            class="h-full w-full object-cover"
+            loading="lazy"
+          />
+        </div>
+
+        <div class="panel bg-background p-6">
+          <h3 class="label text-muted-foreground">{d.home.quality.pharmaciesTitle}</h3>
+          <ul class="mt-4 flex flex-col divide-y divide-border">
+            {
+              partners.pharmacies.map((pharmacy) => (
+                <li class="flex items-baseline justify-between gap-4 py-3 first:pt-0 last:pb-0">
+                  <span class="text-[0.9375rem] font-medium">{pharmacy.name}</span>
+                  <span class="figure shrink-0 text-xs text-muted-foreground">
+                    {pharmacy.kind} · {pharmacy.state}
+                  </span>
+                </li>
+              ))
+            }
+          </ul>
+          <p class="mt-4 border-t border-border pt-4 text-sm text-muted-foreground">
+            {d.home.quality.pharmaciesNote}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,613 @@
+---
+/**
+ * /weight-loss/ — the metabolic program.
+ *
+ * The reader has already priced two or three competitors and cannot tell from
+ * any of them what month two costs, what dose they would be on, or whether
+ * they would be approved. So the page answers those three in that order:
+ * THE LADDER (what a course actually looks like, drawn to scale), THE PRICE
+ * TABLE (one month, three months, and the monthly equivalent — a real table
+ * rather than "from $X"), then ELIGIBILITY, which is the section that argues
+ * against buying and is the reason to trust the rest of it.
+ *
+ * The FDA-approved brand-name products are published between those two with
+ * their pharmacy price range, because a page that quietly omits the approved
+ * option is not a transparent page — and the Important Safety Information is
+ * a designed block ON the page, not a link with a dead anchor, which is the
+ * single cheapest tell in this category.
+ *
+ * Grounds alternate background / card, with the eligibility band fixed dark
+ * in the middle. Every figure comes from `src/config/pricing.ts`.
+ */
+import { type Locale, t, localizedPath } from "@/i18n";
+import Layout from "@/layouts/Layout.astro";
+import SeoHead from "@/components/SeoHead.astro";
+import TrustTicker from "@/components/sections/TrustTicker.astro";
+import Header from "@/components/sections/Header.astro";
+import Ladder from "@/components/sections/Ladder.astro";
+import Faq from "@/components/sections/Faq.astro";
+import Cta from "@/components/sections/Cta.astro";
+import ComplianceBand from "@/components/sections/ComplianceBand.astro";
+import Footer from "@/components/sections/Footer.astro";
+import { Image } from "astro:assets";
+import weightLossHero from "@/assets/weight-loss-hero.jpg";
+import { ArrowRight, Check, TriangleAlert, X } from "lucide-react";
+import {
+  brandOptions,
+  eligibility,
+  fees,
+  monthlyEquivalent,
+  sla,
+  treatmentsIn,
+  usd,
+  usdMonthly,
+} from "@/config/pricing";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const d = t(locale);
+const w = d.weightLoss;
+
+const metabolic = treatmentsIn("metabolic");
+
+/** The header's three figures, positionally matched to `w.header.figures`. */
+const headerValues = [
+  usdMonthly(Math.min(...metabolic.map(monthlyEquivalent))),
+  `≤ ${sla.reviewHours} hrs`,
+  sla.dispatchCutoff,
+];
+const headerFigures = w.header.figures.map((item, index) => ({
+  ...item,
+  value: headerValues[index],
+}));
+
+/** The price table. Three columns of figures, none of them a "from". */
+const priceRows = metabolic.map((tx) => ({
+  display: tx.display,
+  detail: `${tx.molecule} · ${tx.form}`,
+  cadence: tx.cadence,
+  oneMonth: usd(tx.oneMonth),
+  threeMonth: usd(tx.threeMonth),
+  equivalent: usdMonthly(monthlyEquivalent(tx)),
+}));
+
+/** The two lines that sit on top of any medication price. */
+const feeValues = [usd(fees.visit), usd(fees.admin)];
+const feeSymbols = ["", "†"];
+const feeRows = w.treatments.fees.map((item, index) => ({
+  ...item,
+  value: feeValues[index],
+  symbol: feeSymbols[index],
+}));
+
+/** Pharmacy cost, passed through, which is why it is a range. */
+const brandRows = brandOptions.map((option) => ({
+  ...option,
+  range: `${usd(option.low)}–${usd(option.high)}`,
+}));
+
+const thresholdValues = [
+  `≥ ${eligibility.bmiAlone}`,
+  `≥ ${eligibility.bmiWithCondition}`,
+  `${eligibility.minAge}+`,
+];
+const thresholds = w.eligibility.thresholds.map((item, index) => ({
+  ...item,
+  value: thresholdValues[index],
+}));
+---
+
+<Layout locale={locale} title={d.meta.weightLoss.title} description={d.meta.weightLoss.description}>
+  <SeoHead slot="head" locale={locale} path="/weight-loss/" />
+  <TrustTicker locale={locale} />
+  <Header locale={locale} />
+
+  <main id="main" tabindex="-1" class="page-tint outline-none">
+    {/* ---------------------------------------------------------------
+        HEADER BLOCK. Left transparent so the page wash shows through it,
+        which is what keeps an inner page from opening as a white slab. The
+        photograph is a 21/9 band under the type rather than a full-bleed
+        hero: the figures are the thing to read first here.
+        --------------------------------------------------------------- */}
+    <section class="border-b border-border/70 pb-14 pt-14 sm:pb-16 sm:pt-16">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <p class="label text-brand-700 dark:text-brand-400">{w.header.eyebrow}</p>
+        <h1 class="display-1 mt-5 max-w-4xl">{w.header.title}</h1>
+        <p class="lead mt-6 text-lg">{w.header.lead}</p>
+
+        <div class="mt-8 flex flex-wrap items-center gap-3">
+          <a href={localizedPath(locale, "/start/")} class="btn-solid">
+            {w.header.ctaPrimary}
+            <ArrowRight className="size-4" />
+          </a>
+          <a href={localizedPath(locale, "/pricing/")} class="btn-outline">
+            {w.header.ctaSecondary}
+          </a>
+        </div>
+
+        <h2 class="label mt-12 text-muted-foreground">{w.header.figuresLabel}</h2>
+        <dl class="mt-5 grid gap-x-8 gap-y-7 sm:grid-cols-3">
+          {
+            headerFigures.map((item) => (
+              <div class="border-t border-border pt-4">
+                <dd class="figure text-2xl text-foreground sm:text-[1.75rem]">{item.value}</dd>
+                <dt class="mt-2">
+                  <span class="subhead block text-[0.9375rem]">{item.label}</span>
+                  <span class="mt-1 block text-sm text-muted-foreground">{item.note}</span>
+                </dt>
+              </div>
+            ))
+          }
+        </dl>
+
+        <p class="mt-7 max-w-2xl text-sm text-muted-foreground">
+          {d.gating.short}<sup class="ml-0.5">*</sup>
+        </p>
+
+        <div
+          class="mt-10 aspect-[16/9] overflow-hidden rounded-lg border border-border sm:aspect-[21/9]"
+        >
+          <Image
+            src={weightLossHero}
+            alt={w.header.imageAlt}
+            widths={[640, 1024, 1440, 1920]}
+            sizes="(min-width: 1152px) 68rem, 100vw"
+            class="h-full w-full object-cover object-[50%_28%]"
+            loading="lazy"
+          />
+        </div>
+      </div>
+    </section>
+
+    {/* ---------------------------------------------------------------
+        THE LADDER. Two instances of one prop-driven component, stacked,
+        deliberately not on a shared axis — see Ladder.astro.
+        --------------------------------------------------------------- */}
+    <section class="border-b border-border/70 bg-card py-16 sm:py-20">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <div class="max-w-3xl">
+          <p class="label text-brand-700 dark:text-brand-400">{w.ladder.eyebrow}</p>
+          <h2 class="display-2 mt-4">{w.ladder.title}</h2>
+          <p class="lead mt-4">{w.ladder.lead}</p>
+        </div>
+
+        <div class="mt-10 grid gap-6 lg:grid-cols-2 lg:gap-8">
+          <Ladder
+            molecule="semaglutide"
+            caption={w.ladder.captions.semaglutide}
+            stepsLabel={w.ladder.stepsLabel}
+            axisLabel={w.ladder.axisLabel}
+          />
+          <Ladder
+            molecule="tirzepatide"
+            caption={w.ladder.captions.tirzepatide}
+            stepsLabel={w.ladder.stepsLabel}
+            axisLabel={w.ladder.axisLabel}
+          />
+        </div>
+
+        <p class="mt-8 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+          {w.ladder.caveat}
+        </p>
+        <a
+          href={localizedPath(locale, "/learn/semaglutide-vs-tirzepatide/")}
+          class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-brand-700 dark:text-brand-400"
+        >
+          {w.ladder.cta}
+          <ArrowRight className="size-4" />
+        </a>
+      </div>
+    </section>
+
+    {/* ---------------------------------------------------------------
+        THE PRICE TABLE. A real table with three columns of figures, not a
+        "from" badge — publishing the second month's price is the whole
+        premium tell here. Definition list below `sm`.
+        --------------------------------------------------------------- */}
+    <section class="border-b border-border/70 bg-background py-16 sm:py-20">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <div class="max-w-3xl">
+          <p class="label text-brand-700 dark:text-brand-400">{w.treatments.eyebrow}</p>
+          <h2 class="display-2 mt-4">{w.treatments.title}</h2>
+          <p class="lead mt-4">{w.treatments.lead}</p>
+        </div>
+
+        <table class="mt-10 hidden w-full border-collapse text-left sm:table">
+          <thead>
+            <tr class="border-y border-border">
+              <th scope="col" class="label py-3 pr-4 text-muted-foreground">
+                {w.treatments.header.preparation}
+              </th>
+              <th scope="col" class="label py-3 pr-4 text-right text-muted-foreground">
+                {w.treatments.header.oneMonth}
+              </th>
+              <th scope="col" class="label py-3 pr-4 text-right text-muted-foreground">
+                {w.treatments.header.threeMonth}
+              </th>
+              <th scope="col" class="label py-3 text-right text-muted-foreground">
+                {w.treatments.header.equivalent}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              priceRows.map((row) => (
+                <tr class="border-b border-border align-top">
+                  <th scope="row" class="py-5 pr-6 font-normal">
+                    <span class="subhead">
+                      {row.display}
+                      <sup class="ml-0.5 font-normal text-muted-foreground">‡§</sup>
+                    </span>
+                    <span class="mt-1.5 block text-sm leading-relaxed text-muted-foreground">
+                      {row.detail}
+                    </span>
+                    <span class="figure mt-1 block text-xs text-muted-foreground">
+                      {row.cadence}
+                    </span>
+                  </th>
+                  <td class="figure py-5 pr-4 text-right text-base whitespace-nowrap">
+                    {row.oneMonth}
+                  </td>
+                  <td class="figure py-5 pr-4 text-right text-base whitespace-nowrap">
+                    {row.threeMonth}
+                  </td>
+                  <td
+                    class="figure py-5 text-right text-base whitespace-nowrap text-brand-700 dark:text-brand-400"
+                  >
+                    {row.equivalent}
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+
+        {/* Below sm: four columns of figures becomes one card per preparation. */}
+        <div class="mt-8 flex flex-col gap-4 sm:hidden">
+          {
+            priceRows.map((row) => (
+              <div class="panel p-5">
+                <h3 class="subhead">
+                  {row.display}
+                  <sup class="ml-0.5 font-normal text-muted-foreground">‡§</sup>
+                </h3>
+                <p class="mt-1.5 text-sm leading-relaxed text-muted-foreground">{row.detail}</p>
+                <p class="figure mt-1 text-xs text-muted-foreground">{row.cadence}</p>
+                <dl class="mt-4 grid grid-cols-3 gap-3 border-t border-border pt-4">
+                  <div>
+                    <dt
+                      class="label min-h-[1.75rem] text-[0.5625rem] tracking-[0.06em] text-muted-foreground"
+                    >
+                      {w.treatments.header.oneMonth}
+                    </dt>
+                    <dd class="figure mt-1.5 text-[0.9375rem]">{row.oneMonth}</dd>
+                  </div>
+                  <div>
+                    <dt
+                      class="label min-h-[1.75rem] text-[0.5625rem] tracking-[0.06em] text-muted-foreground"
+                    >
+                      {w.treatments.header.threeMonth}
+                    </dt>
+                    <dd class="figure mt-1.5 text-[0.9375rem]">{row.threeMonth}</dd>
+                  </div>
+                  <div>
+                    <dt
+                      class="label min-h-[1.75rem] text-[0.5625rem] tracking-[0.06em] text-muted-foreground"
+                    >
+                      {w.treatments.header.equivalent}
+                    </dt>
+                    <dd class="figure mt-1.5 text-[0.9375rem] text-brand-700 dark:text-brand-400">
+                      {row.equivalent}
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+            ))
+          }
+        </div>
+
+        <div class="mt-10 grid gap-8 lg:grid-cols-[1fr_22rem] lg:gap-12">
+          <div>
+            <h3 class="label text-muted-foreground">{w.treatments.feesLabel}</h3>
+            <dl class="mt-4 grid gap-x-8 gap-y-5 sm:grid-cols-2">
+              {
+                feeRows.map((row) => (
+                  <div class="border-t border-border pt-4">
+                    <dd class="figure text-xl text-foreground">
+                      {row.value}
+                      {row.symbol && <sup class="ml-0.5 text-muted-foreground">{row.symbol}</sup>}
+                    </dd>
+                    <dt class="mt-2">
+                      <span class="subhead block text-[0.9375rem]">{row.label}</span>
+                      <span class="mt-1 block text-sm text-muted-foreground">{row.note}</span>
+                    </dt>
+                  </div>
+                ))
+              }
+            </dl>
+            <p class="mt-6 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+              {w.treatments.note}
+            </p>
+            <p class="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+              {d.gating.long}
+            </p>
+
+            <div class="mt-7 flex flex-wrap items-center gap-x-8 gap-y-3">
+              <a
+                href={localizedPath(locale, "/pricing/")}
+                class="inline-flex items-center gap-2 text-sm font-semibold text-brand-700 dark:text-brand-400"
+              >
+                {w.treatments.cta}
+                <ArrowRight className="size-4" />
+              </a>
+              <a
+                href={localizedPath(locale, "/learn/glp-1-cost-without-insurance/")}
+                class="inline-flex items-center gap-2 text-sm font-semibold text-brand-700 dark:text-brand-400"
+              >
+                {w.treatments.ctaSecondary}
+                <ArrowRight className="size-4" />
+              </a>
+            </div>
+          </div>
+
+          {/* The argue-against-buying panel, in the place a competitor would
+              put an upsell. */}
+          <aside class="panel h-fit p-6">
+            <p class="label text-muted-foreground">{w.treatments.hedgeLabel}</p>
+            <p class="mt-4 text-sm leading-relaxed text-muted-foreground">{w.treatments.hedge}</p>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    {/* ---------------------------------------------------------------
+        BRAND-NAME ALTERNATIVES. Named, priced as a range because the
+        pharmacy sets it, with the trademark note attached.
+        --------------------------------------------------------------- */}
+    <section class="border-b border-border/70 bg-card py-16 sm:py-20">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <div class="grid gap-10 lg:grid-cols-[1fr_24rem] lg:gap-14">
+          <div>
+            <p class="label text-brand-700 dark:text-brand-400">{w.brands.eyebrow}</p>
+            <h2 class="display-2 mt-4">{w.brands.title}</h2>
+            <p class="lead mt-4">{w.brands.lead}</p>
+
+            <table class="mt-9 w-full border-collapse text-left">
+              <thead>
+                <tr class="border-y border-border">
+                  <th scope="col" class="label py-3 pr-4 text-muted-foreground">
+                    {w.brands.header.product}
+                  </th>
+                  <th scope="col" class="label py-3 text-right text-muted-foreground">
+                    {w.brands.header.cost}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {
+                  brandRows.map((row) => (
+                    <tr class="border-b border-border align-top">
+                      <th scope="row" class="py-5 pr-4 font-normal">
+                        <span class="subhead">
+                          {row.display}
+                          <sup class="ml-0.5 font-normal text-muted-foreground">‖</sup>
+                        </span>
+                        <span class="mt-1.5 block text-sm text-muted-foreground">
+                          {row.molecule}
+                        </span>
+                      </th>
+                      <td class="figure py-5 text-right text-base whitespace-nowrap">{row.range}</td>
+                    </tr>
+                  ))
+                }
+              </tbody>
+            </table>
+
+            <p class="mt-5 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+              {d.gating.short}
+            </p>
+            <p class="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+              {w.brands.indication}
+            </p>
+          </div>
+
+          <div class="flex flex-col gap-6 lg:pt-2">
+            <div class="panel bg-background p-6">
+              <p class="mt-0 text-sm leading-relaxed text-muted-foreground">{w.brands.candour}</p>
+            </div>
+            <p class="text-sm leading-relaxed text-muted-foreground">
+              {w.brands.note}<sup class="ml-0.5">‖</sup>
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {/* ---------------------------------------------------------------
+        ELIGIBILITY — the fixed-dark band, and the section that argues
+        against buying. Thresholds as figures, then the two lists that
+        actually answer "would they take me".
+        --------------------------------------------------------------- */}
+    <section class="border-b border-brand-50/10 bg-brand-800 py-16 text-brand-50 sm:py-20">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <div class="max-w-3xl">
+          <p class="label text-brand-300">{w.eligibility.eyebrow}</p>
+          <h2 class="display-2 mt-4 text-brand-50">{w.eligibility.title}</h2>
+          <p class="mt-4 max-w-2xl text-[1.0625rem] leading-relaxed text-brand-50/65">
+            {w.eligibility.lead}<sup class="ml-0.5 text-brand-50/50">*</sup>
+          </p>
+        </div>
+
+        <dl class="mt-10 grid gap-x-8 gap-y-7 sm:grid-cols-3">
+          {
+            thresholds.map((item) => (
+              <div class="border-t border-brand-50/15 pt-4">
+                <dd class="figure text-3xl text-brand-50">{item.value}</dd>
+                <dt class="mt-2">
+                  <span class="subhead block text-[0.9375rem] text-brand-50">{item.label}</span>
+                  <span class="mt-1 block text-sm text-brand-50/60">{item.note}</span>
+                </dt>
+              </div>
+            ))
+          }
+        </dl>
+
+        <div class="mt-12 grid gap-10 md:grid-cols-2 md:gap-14">
+          <div>
+            <h3 class="label text-brand-300">{w.eligibility.countsTitle}</h3>
+            <ul class="mt-4 flex flex-col">
+              {
+                w.eligibility.counts.map((item) => (
+                  <li class="flex items-start gap-3 border-t border-brand-50/12 py-3 text-[0.9375rem] text-brand-50/85">
+                    <Check className="mt-1 size-3.5 shrink-0 text-brand-300" />
+                    <span>{item}</span>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+          <div>
+            <h3 class="label text-brand-300">{w.eligibility.rulesOutTitle}</h3>
+            <ul class="mt-4 flex flex-col">
+              {
+                w.eligibility.rulesOut.map((item) => (
+                  <li class="flex items-start gap-3 border-t border-brand-50/12 py-3 text-[0.9375rem] text-brand-50/85">
+                    <X className="mt-1 size-3.5 shrink-0 text-brand-50/45" />
+                    <span>{item}</span>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+        </div>
+
+        <div class="panel-invert mt-12 flex flex-col gap-5 p-6 sm:flex-row sm:items-start sm:gap-8">
+          <div class="shrink-0">
+            <p class="label text-brand-300">{w.eligibility.refundLabel}</p>
+            <p class="figure mt-2 text-2xl text-brand-50">{usd(fees.visit)}</p>
+          </div>
+          <p class="max-w-2xl text-sm leading-relaxed text-brand-50/70">{w.eligibility.closing}</p>
+        </div>
+      </div>
+    </section>
+
+    {/* ---------------------------------------------------------------
+        IMPORTANT SAFETY INFORMATION. On the page, designed, readable —
+        the category's cheap version of this is an anchor that goes
+        nowhere. The side-effect content is a table because it genuinely
+        pairs a symptom with an action.
+        --------------------------------------------------------------- */}
+    <section class="border-b border-border/70 bg-card py-16 sm:py-20">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <div class="max-w-3xl">
+          <p class="label text-brand-700 dark:text-brand-400">{w.safety.eyebrow}</p>
+          <h2 class="display-2 mt-4">
+            {w.safety.title}<sup class="ml-1 text-base text-muted-foreground">§</sup>
+          </h2>
+          <p class="lead mt-4">{w.safety.lead}</p>
+        </div>
+
+        <div class="panel mt-10 flex gap-4 bg-background p-6 sm:p-7">
+          <TriangleAlert className="mt-0.5 size-5 shrink-0 text-glow-500" />
+          <div>
+            <h3 class="label text-glow-700 dark:text-glow-500">{w.safety.warningLabel}</h3>
+            <p class="mt-3 max-w-3xl text-[0.9375rem] leading-relaxed text-foreground">
+              {w.safety.warning}
+            </p>
+          </div>
+        </div>
+
+        <div class="mt-6 grid gap-6 md:grid-cols-2">
+          <div class="panel bg-background p-6">
+            <h3 class="subhead">{w.safety.contraindicationsTitle}</h3>
+            <ul class="mt-4 flex flex-col">
+              {
+                w.safety.contraindications.map((item) => (
+                  <li class="flex items-start gap-3 border-t border-border py-3 text-sm leading-relaxed text-muted-foreground">
+                    <X className="mt-1 size-3.5 shrink-0 text-foreground/50" />
+                    <span>{item}</span>
+                  </li>
+                ))
+              }
+            </ul>
+            <p
+              class="mt-4 border-t border-border pt-4 text-sm leading-relaxed text-muted-foreground"
+            >
+              {w.safety.note}
+            </p>
+          </div>
+          <div class="panel bg-background p-6">
+            <h3 class="subhead">{w.safety.urgentTitle}</h3>
+            <ul class="mt-4 flex flex-col">
+              {
+                w.safety.urgent.map((item) => (
+                  <li class="flex items-start gap-3 border-t border-border py-3 text-sm leading-relaxed text-muted-foreground">
+                    <TriangleAlert className="mt-1 size-3.5 shrink-0 text-glow-700 dark:text-glow-500" />
+                    <span>{item}</span>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+        </div>
+
+        <h3 class="display-3 mt-14">{w.safety.effectsTitle}</h3>
+
+        <table class="mt-6 hidden w-full border-collapse text-left sm:table">
+          <thead>
+            <tr class="border-y border-border">
+              <th scope="col" class="label w-[38%] py-3 pr-6 text-muted-foreground">
+                {w.safety.effectsHeader.effect}
+              </th>
+              <th scope="col" class="label py-3 text-muted-foreground">
+                {w.safety.effectsHeader.action}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              w.safety.effects.map((row) => (
+                <tr class="border-b border-border align-top">
+                  <th scope="row" class="py-5 pr-6 font-normal">
+                    <span class="subhead text-[0.9375rem]">{row.effect}</span>
+                  </th>
+                  <td class="py-5 text-sm leading-relaxed text-muted-foreground">{row.action}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+
+        <dl class="mt-6 flex flex-col sm:hidden">
+          {
+            w.safety.effects.map((row) => (
+              <div class="border-t border-border py-4">
+                <dt class="subhead text-[0.9375rem]">{row.effect}</dt>
+                <dd class="mt-2 text-sm leading-relaxed text-muted-foreground">{row.action}</dd>
+              </div>
+            ))
+          }
+        </dl>
+
+      </div>
+    </section>
+
+    {/* The full question set, and its FAQPage markup, lives on /faq/. */}
+    <Faq
+      locale={locale}
+      eyebrow={w.faq.eyebrow}
+      title={w.faq.title}
+      items={w.faq.items}
+      jsonLd={false}
+      ctaHref={localizedPath(locale, "/faq/")}
+      ctaLabel={w.faq.cta}
+    />
+
+    <Cta locale={locale} />
+    <ComplianceBand locale={locale} />
+  </main>
+  <Footer locale={locale} />
+</Layout>

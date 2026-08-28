@@ -1,17 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import { Check } from "lucide-react";
 
-export type PaletteKey = "original" | "blue" | "emerald";
+export type PaletteKey = "original" | "indigo" | "clay";
 
-const PALETTE_KEYS: PaletteKey[] = ["original", "blue", "emerald"];
+const PALETTE_KEYS: PaletteKey[] = ["original", "indigo", "clay"];
 
 // Swatch colours are hardcoded here on purpose — each dot shows what that
 // palette's own brand-500 actually looks like, so it can't just read the
 // live --color-brand-500 (which is the *current* palette for every dot).
 const SWATCH: Record<PaletteKey, string> = {
-  original: "#a38f75",
-  blue: "#5aa2d6",
-  emerald: "#37867b",
+  original: "#3d8b9c",
+  indigo: "#5a66be",
+  clay: "#a96b4b",
 };
 
 /**

@@ -1,0 +1,57 @@
+---
+/**
+ * The closing call to action, shared by every page.
+ *
+ * The copy leads with the two things that stop a click in this category — how
+ * long it takes, and what happens if the answer is no — rather than with an
+ * offer. `common.cta` holds the strings so a page cannot invent its own
+ * version of the refund promise.
+ */
+import { type Locale, t, localizedPath } from "@/i18n";
+import { sla } from "@/config/pricing";
+import { Image } from "astro:assets";
+import consult from "@/assets/consult.jpg";
+import { ArrowRight } from "lucide-react";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const d = t(locale);
+---
+
+<section class="relative isolate overflow-hidden border-b border-border/70">
+  <Image
+    src={consult}
+    alt=""
+    widths={[768, 1280, 1920]}
+    sizes="100vw"
+    class="absolute inset-0 -z-20 h-full w-full object-cover"
+    loading="lazy"
+  />
+  <div
+    class="absolute inset-0 -z-10 bg-gradient-to-r from-brand-800/94 via-brand-800/80 to-brand-700/55"
+  >
+  </div>
+
+  <div class="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-24">
+    <div class="max-w-2xl">
+      <p class="label text-brand-300">{d.cta.eyebrow}</p>
+      <h2 class="display-2 mt-4 text-brand-50">{d.cta.title}</h2>
+      <p class="mt-5 text-base leading-relaxed text-brand-50/80">{d.cta.lead}</p>
+
+      <div class="mt-8 flex flex-wrap items-center gap-3">
+        <a href={localizedPath(locale, "/start/")} class="btn-solid-invert">
+          {d.cta.primary}
+          <ArrowRight className="size-4" />
+        </a>
+        <a href={localizedPath(locale, "/pricing/")} class="btn-outline-invert">{d.cta.secondary}</a>
+      </div>
+
+      <p class="figure mt-6 text-xs text-brand-50/55">
+        {d.cta.reassure} · ~{sla.intakeMinutes} MIN
+      </p>
+    </div>
+  </div>
+</section>

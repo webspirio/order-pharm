@@ -1,0 +1,76 @@
+---
+/**
+ * THE RELAY — this site's signature element, used in two places: compact, on
+ * the hero's lower edge, and expanded on /how-it-works/.
+ *
+ * It is a tick-marked measurement track, not three rounded cards with icons.
+ * That is a content decision, not a stylistic one: the reader's actual
+ * question in this category is "what happens between paying and a box
+ * arriving, and how long does each part take". Order and elapsed time are
+ * both information they came for, and a card grid preserves the order while
+ * throwing the time away. A scale keeps both.
+ *
+ * Durations come from `sla` in `src/config/pricing.ts` — they are commitments,
+ * so they are also what the ticker and /how-it-works/ quote, from the same
+ * constant.
+ */
+import { type Locale, t } from "@/i18n";
+import { sla } from "@/config/pricing";
+
+interface Props {
+  locale: Locale;
+  /**
+   * `compact` is the hero bar: four columns, duration and actor only.
+   * `full` adds the per-step explanation beneath.
+   */
+  variant?: "compact" | "full";
+  /** Set on light page backgrounds so the hairline uses the border token. */
+  onLight?: boolean;
+}
+
+const { locale, variant = "compact", onLight = false } = Astro.props;
+const d = t(locale);
+
+/**
+ * Durations, positionally matched to `d.home.relay.steps`. Kept here rather
+ * than in the dictionary because each one is a number with a unit that also
+ * appears in the ticker and the stat strip; a second hand-typed copy is
+ * exactly how the reference sites ended up quoting two different review
+ * windows on the same screen.
+ */
+const durations = [
+  `~${sla.intakeMinutes} min`,
+  `≤ ${sla.reviewHours} hrs`,
+  "Same day",
+  sla.deliveryDays,
+];
+
+const steps = d.home.relay.steps.map((step, index) => ({ ...step, duration: durations[index] }));
+
+const textMuted = onLight ? "text-muted-foreground" : "text-brand-50/55";
+const textStrong = onLight ? "text-foreground" : "text-brand-50";
+const textActor = onLight ? "text-brand-700 dark:text-brand-400" : "text-brand-300";
+---
+
+<ol
+  class:list={[
+    "relay grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-4 sm:gap-x-8",
+    onLight && "relay-on-light",
+    variant === "full" && "gap-y-10",
+  ]}
+>
+  {
+    steps.map((step) => (
+      <li class="relay-step">
+        <p class:list={["label", textActor]}>{step.actor}</p>
+        <p class:list={["subhead mt-2", textStrong]}>{step.action}</p>
+        <p class:list={["figure mt-1 text-sm", onLight ? "text-glow-700 dark:text-glow-500" : "text-glow-500"]}>
+          {step.duration}
+        </p>
+        {variant === "full" && (
+          <p class:list={["mt-3 text-sm", textMuted]}>{step.detail}</p>
+        )}
+      </li>
+    ))
+  }
+</ol>

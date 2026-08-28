@@ -1,0 +1,115 @@
+---
+/**
+ * The claim strip above the nav, on every page.
+ *
+ * All three reference sites run one, and it is the best value on the page:
+ * five claims a visitor reads before any image has loaded, for ~36px of
+ * height. What differs here is the content. Theirs assert things a visitor
+ * cannot check — "Trusted by 100,000+ patients", "FDA-Regulated Pharmacies".
+ * Every item here is a number or a rule that /pricing/ then proves, and the
+ * numbers are interpolated from `src/config/pricing.ts` rather than typed
+ * into the dictionary, so the ticker cannot drift from the pricing table.
+ *
+ * Motion: the list is duplicated once and the track translated -50%, which
+ * loops seamlessly. Under `prefers-reduced-motion` the animation is dropped
+ * AND the duplicate is hidden, so a reader who has asked for no motion gets
+ * five static claims rather than ten with a seam in the middle.
+ */
+import { type Locale, t } from "@/i18n";
+import { fees, sla, coverage, usd } from "@/config/pricing";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const d = t(locale);
+
+const substitutions: Record<string, string> = {
+  "{admin}": usd(fees.admin),
+  "{reviewHours}": String(sla.reviewHours),
+  "{states}": String(coverage.states),
+};
+
+const items = d.ticker.items.map((item) =>
+  Object.entries(substitutions).reduce(
+    (text, [token, value]) => text.replaceAll(token, value),
+    item,
+  ),
+);
+---
+
+<div
+  class="border-b border-brand-50/10 bg-brand-800 text-brand-50"
+  role="region"
+  aria-label={d.a11y.ticker}
+>
+  <div class="ticker-mask overflow-hidden">
+    <div class="ticker-track flex w-max items-center">
+      {
+        [0, 1].map((copy) => (
+          <ul
+            class:list={["flex shrink-0 items-center", copy === 1 && "ticker-dupe"]}
+            aria-hidden={copy === 1 ? "true" : undefined}
+          >
+            {items.map((item) => (
+              <li class="label flex items-center gap-3 whitespace-nowrap px-5 py-2.5 text-brand-50/80">
+                <span aria-hidden="true" class="inline-block size-1 shrink-0 bg-glow-500"></span>
+                {item}
+              </li>
+            ))}
+          </ul>
+        ))
+      }
+    </div>
+  </div>
+</div>
+
+<style>
+  .ticker-track {
+    animation: ticker-scroll 48s linear infinite;
+  }
+
+  @keyframes ticker-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      /* -50% of the doubled track is exactly one full copy of the list. */
+      transform: translateX(-50%);
+    }
+  }
+
+  /* A reader who has asked for no motion should not get a stationary double
+     list with a visible seam — hide the duplicate as well as stopping it. */
+  @media (prefers-reduced-motion: reduce) {
+    .ticker-track {
+      animation: none;
+      width: 100%;
+      justify-content: center;
+    }
+    .ticker-dupe {
+      display: none;
+    }
+    .ticker-mask ul {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }
+
+  /* Fade the cut edges so items enter and leave rather than being sliced. */
+  .ticker-mask {
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 3rem,
+      black calc(100% - 3rem),
+      transparent
+    );
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ticker-mask {
+      mask-image: none;
+    }
+  }
+</style>
