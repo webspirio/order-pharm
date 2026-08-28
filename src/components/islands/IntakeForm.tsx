@@ -105,6 +105,7 @@ const CONDITION_IDS = [
   "dyslipidaemia",
   "apnoea",
   "cardiovascular",
+  "nafld",
   "pcos",
   "osteoarthritis",
 ] as const;

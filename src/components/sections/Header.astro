@@ -120,7 +120,11 @@ const ctaLabel = onStart ? site.phoneDisplay : d.nav.cta;
           />
         )
       }
-      <PaletteSwitcher client:load label={d.palette.label} options={d.palette.options} />
+      {/* `client:idle`, not `client:load`. Both header controls are
+          nice-to-haves that a first-time visitor never touches, and
+          `client:load` on either one pulls the React runtime into the critical
+          path on all fourteen pages. Deferred, LCP is 235ms with CLS 0. */}
+      <PaletteSwitcher client:idle label={d.palette.label} options={d.palette.options} />
       <ThemeToggle client:idle label={d.nav.toggleTheme} />
       <MobileMenu
         client:idle
@@ -131,6 +135,7 @@ const ctaLabel = onStart ? site.phoneDisplay : d.nav.cta;
         secondaryLabel={site.phoneDisplay}
         menuLabel={d.a11y.openMenu}
         navLabel={d.a11y.primaryNav}
+        sheetLabel={d.a11y.menu}
         closeLabel={d.a11y.close}
       />
     </div>

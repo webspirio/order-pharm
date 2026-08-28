@@ -1,3 +1,5 @@
+import { qualifyingConditions } from "./programs";
+
 /**
  * /start/ — the intake, previewed in full.
  *
@@ -210,16 +212,8 @@ const start = {
         title: "Has a clinician diagnosed any of these?",
         lead: "This is the second half of the lower BMI threshold, which is why it is asked here rather than buried in the history. Tick only what has actually been diagnosed.",
         legend: "Diagnosed, not suspected",
-        items: {
-          hypertension: "High blood pressure (hypertension)",
-          type2: "Type 2 diabetes",
-          prediabetes: "Prediabetes",
-          dyslipidaemia: "High cholesterol or dyslipidaemia",
-          apnoea: "Obstructive sleep apnoea",
-          cardiovascular: "Cardiovascular disease",
-          pcos: "Polycystic ovary syndrome (PCOS)",
-          osteoarthritis: "Osteoarthritis",
-        },
+        /** The shared record — see the note on it in ./programs. */
+        items: qualifyingConditions,
         none: "None of these",
         lowerThresholdLabel: "The lower threshold",
         lowerThresholdNote:

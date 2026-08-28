@@ -45,7 +45,8 @@ export const shipping = {
   /** Overnight, or included with membership. */
   overnightCost: 19,
   overnightDays: "next business day",
-  /** Alaska, Hawaii and US territories: carriers charge more, so we do. */
+  /** Alaska and Hawaii: carriers charge more, so we do. US territories are
+      outside the served states entirely — see `coverage`. */
   remoteSurcharge: 45,
   remoteDays: "3–5 business days",
 } as const;
@@ -60,8 +61,20 @@ export const sla = {
   reviewHours: 2,
   /** Orders approved before this go out the same day. */
   dispatchCutoff: "4:00 pm ET",
-  deliveryDays: "1–2 business days",
-} as const;
+  /**
+   * The delivery window the Relay quotes on the hero of every page.
+   *
+   * Derived from `shipping.standardDays` rather than written out. It used to
+   * be its own literal, "1–2 business days", which meant the hero promised a
+   * delivery window two days faster than the shipping table further down the
+   * same page — the exact defect this file exists to prevent, shipped by the
+   * file that prevents it. The Relay quotes the STANDARD lane because standard
+   * is what is included; overnight is named in the courier step's own copy.
+   */
+  get deliveryDays(): string {
+    return shipping.standardDays;
+  },
+};
 
 /** Service availability. Stated as a real number, including the shortfall. */
 export const coverage = {
@@ -289,6 +302,42 @@ export const mg = (dose: number): string => `${dose} mg`;
 
 /** The three-month total expressed as its monthly equivalent. */
 export const monthlyEquivalent = (t: Treatment): number => Math.round(t.threeMonth / 3);
+
+/**
+ * How many orders a year membership has to cover before it pays for itself.
+ *
+ * Membership waives the per-order administration fee and, for a buyer who
+ * would otherwise have paid for overnight, the overnight charge too. So the
+ * break-even depends on two things the buyer controls: whether they pay
+ * yearly or monthly, and whether they actually wanted overnight.
+ *
+ * `best` is the friendliest case (yearly billing, overnight every time) and
+ * `worst` the least (monthly billing, standard delivery). Quoting only `best`
+ * halves the real threshold for the majority who take standard delivery, so
+ * copy states the range.
+ *
+ * These are derived rather than written because five surfaces used to assert
+ * "pays for itself above one order a quarter" — four orders a year — while
+ * /pricing/ computed seven from these same constants. Everything that makes
+ * the claim now calls this.
+ */
+export const membershipBreakEven = {
+  /** Yearly billing, and you would have bought overnight anyway. */
+  get best(): number {
+    return Math.ceil(fees.membershipYearly / (fees.admin + shipping.overnightCost));
+  },
+  /** Monthly billing, standard delivery — only the admin fee is saved. */
+  get worst(): number {
+    return Math.ceil((fees.membershipMonthly * 12) / fees.admin);
+  },
+  /** Roughly one order every N weeks, at the best case. */
+  get weeks(): number {
+    return Math.round(52 / this.best);
+  },
+};
+
+/** The friendliest break-even, for surfaces that have room for only one figure. */
+export const membershipBreakEvenOrders = (): number => membershipBreakEven.best;
 
 /** `"47 states and the District of Columbia"`. */
 export const coverageLabel = (): string =>

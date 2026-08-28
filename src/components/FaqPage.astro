@@ -26,7 +26,9 @@
  */
 import { type Locale, t, localizedPath } from "@/i18n";
 import { site } from "@/config/site";
-import { coverageLabel, fees, partners, shipping, sla, usd } from "@/config/pricing";
+import { coverageLabel, fees, partners, shipping, sla, usd,
+  membershipBreakEven,
+} from "@/config/pricing";
 import Layout from "@/layouts/Layout.astro";
 import SeoHead from "@/components/SeoHead.astro";
 import TrustTicker from "@/components/sections/TrustTicker.astro";
@@ -54,6 +56,10 @@ const figures: Record<string, string> = {
   standardDays: shipping.standardDays,
   remoteDays: shipping.remoteDays,
   deliveryDays: sla.deliveryDays,
+  // Membership break-even. Both ends, because quoting only the friendly one
+  // halves the real threshold for anyone taking standard delivery.
+  breakEvenBest: String(membershipBreakEven.best),
+  breakEvenWorst: String(membershipBreakEven.worst),
 };
 
 /** An unresolved token is a build error, not a literal brace on the page. */

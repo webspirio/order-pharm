@@ -18,6 +18,7 @@ export default function MobileMenu({
   secondaryLabel,
   menuLabel,
   navLabel,
+  sheetLabel,
   closeLabel,
 }: {
   links: MenuLink[];
@@ -25,8 +26,13 @@ export default function MobileMenu({
   primaryLabel?: string;
   secondaryHref?: string;
   secondaryLabel?: string;
+  /** Names the trigger button. */
   menuLabel: string;
+  /** Names the <nav> inside the sheet. */
   navLabel: string;
+  /** Names the dialog itself — without it the sheet announced as "Primary",
+      the name of the nav it contains. */
+  sheetLabel: string;
   closeLabel: string;
 }) {
   const [open, setOpen] = useState(false);
@@ -128,7 +134,7 @@ export default function MobileMenu({
               ref={panelRef}
               role="dialog"
               aria-modal="true"
-              aria-label={navLabel}
+              aria-label={sheetLabel}
               className="absolute inset-y-0 right-0 flex w-4/5 max-w-sm flex-col gap-6 border-l border-border bg-background p-6 shadow-2xl"
             >
               <div className="flex justify-end">
@@ -160,7 +166,7 @@ export default function MobileMenu({
                 {primaryHref && primaryLabel && (
                   <a
                     href={primaryHref}
-                    className="rounded-full bg-primary px-5 py-3 text-center font-semibold text-primary-foreground"
+                    className="btn-solid justify-center"
                   >
                     {primaryLabel}
                   </a>
@@ -168,7 +174,7 @@ export default function MobileMenu({
                 {secondaryHref && secondaryLabel && (
                   <a
                     href={secondaryHref}
-                    className="rounded-full border border-border px-5 py-3 text-center font-semibold"
+                    className="btn-outline justify-center"
                   >
                     {secondaryLabel}
                   </a>

@@ -204,6 +204,13 @@ text on its own, and there is no glow-based semantic token. That restraint is
 what keeps it readable as "this is a clock". Never hardcode a brand hex in a
 component and never use a raw Tailwind palette colour.
 
+**On the fixed-dark `bg-brand-800` bands, `text-brand-50` has an opacity floor
+of `/60`.** Below that it fails WCAG AA against that ground: `/40` is 3.4:1,
+`/45` is 3.7:1, `/50` is 4.4:1, `/60` is 5.8:1. Lighthouse caught `/40` and
+`/45` on the footer column headings, the registered-office label and the
+compliance band's entity line. Borders and hairlines (`border-brand-50/12`)
+are decorative and exempt.
+
 Shape: cards 8px (`.panel`), controls near-square 3px (`.btn-*`). No shadows
 except the mobile sheet. No gradients except the two photographic scrims.
 
@@ -253,6 +260,20 @@ is. Ellery administers; it does not prescribe or dispense. Therefore:
 - **The HIPAA posture is stated truthfully**: Ellery is not a covered entity;
   the practice and the pharmacies are; Ellery is their business associate where
   that applies. Never a bare "HIPAA compliant" badge.
+
+### The JavaScript budget
+
+Three pages' worth of React ships on every route for the header's theme and
+palette controls and the mobile sheet (~180 KB raw, ~57 KB over the wire),
+plus ~170 KB more on `/start/` for the intake form's Radix primitives. Both
+are `client:idle`, so neither is in the critical path — the homepage measures
+LCP 235 ms and CLS 0.00 on the production build.
+
+Rewriting the three header controls in vanilla JS would remove React from
+thirteen of fourteen routes. It was measured and deliberately not done: the
+existing islands are correct, focus-trapped and portalled, and the payload is
+not on the critical path. Revisit it if the JS budget ever becomes the
+constraint — the intake form must stay React either way.
 
 ## SEO / structured data
 

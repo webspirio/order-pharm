@@ -117,14 +117,14 @@ const legal = {
                   "Ellery administration",
                   "{admin}",
                   "Ellery",
-                  "In full if no prescription is issued",
+                  "Not charged unless a prescription is transmitted",
                 ],
               ],
-              note: "Overnight shipping costs {overnight} and is included with membership. Alaska, Hawaii and the US territories carry a {remote} carrier surcharge, because the carrier charges it and Ellery does not absorb or mark up carrier costs.",
+              note: "Overnight shipping costs {overnight} and is included with membership. Alaska and Hawaii carry a {remote} carrier surcharge, because the carrier charges it and Ellery does not absorb or mark up carrier costs.",
             },
           },
           {
-            text: "The administration fee is fixed, charged once per order, and billed as its own line. It does not include, purchase or guarantee a prescription, a medical service or medication, and it is never calculated as a share of what the medication costs.{n_fee} Ellery does not mark the pharmacy invoice up, and is not paid more when a more expensive preparation is prescribed.\n\nEllery collects the review fee as agent for {practice} and the medication charge as agent for the dispensing pharmacy. Money collected as agent is not Ellery's revenue: it is held for, and paid to, the party that earned it. That is why those amounts appear as separate lines rather than inside one bundled price.\n\nIf no prescription is issued, the review fee is refunded in full to the card you paid with, automatically, without a form and without a phone call. Ellery's administration fee is refunded with it. You are never charged for medication that was not dispensed.\n\nPrices can change. A change never applies to an order already placed, and a change to a subscription price is notified before it is charged.",
+            text: "The administration fee is fixed, charged once per order, and billed as its own line. It does not include, purchase or guarantee a prescription, a medical service or medication, and it is never calculated as a share of what the medication costs.{n_fee} Ellery does not mark the pharmacy invoice up, and is not paid more when a more expensive preparation is prescribed.\n\nEllery collects the review fee as agent for {practice} and the medication charge as agent for the dispensing pharmacy. Money collected as agent is not Ellery's revenue: it is held for, and paid to, the party that earned it. That is why those amounts appear as separate lines rather than inside one bundled price.\n\nIf no prescription is issued, the review fee is refunded in full to the card you paid with, automatically, without a form and without a phone call. The administration fee is not charged at all in that case — it falls due only when a prescription is transmitted to a pharmacy — so there is nothing to refund. You are never charged for medication that was not dispensed.\n\nPrices can change. A change never applies to an order already placed, and a change to a subscription price is notified before it is charged.",
           },
           { note: "{gatingLong}" },
         ],
@@ -160,17 +160,18 @@ const legal = {
       },
       {
         id: "subscriptions",
-        heading: "Subscriptions and automatic renewal",
+        heading: "Repeat orders, and the one thing that renews on its own",
         blocks: [
           {
-            text: "An order can be set to repeat. A subscription is optional, is never pre-selected for you, and is shown with its cadence and its price on the page where you choose it. Here is every term of one:",
+            text: "An order can be set to repeat. That is a scheduling convenience, not a standing authority to charge you: a repeat order still needs your confirmation each cycle before anything is transmitted to a pharmacy or taken from your card. Membership is the one thing on this site that renews by itself. A repeat order is optional, is never pre-selected, and is shown with its cadence and its price on the page where you choose it. Here is every term:",
           },
           {
             items: [
               "Cadence — every month, or every three months, matching the supply the clinician approved. You choose it, and you can change it between charges.",
               "Price — the pharmacy's price for that supply on the day it ships, plus the fixed {admin} administration fee, unless you hold a membership. Shipping is included at standard speed.",
-              "Membership — {memberMonthly}, or {memberYearly} paid yearly. It waives the administration fee and upgrades shipping to overnight. If you order less than once a quarter it costs you more than it saves, and we would rather write that here than sell it to you.",
-              "Renewal notice — you are emailed before every charge, with the amount and the date, at least {renewalNotice} beforehand. No charge on a subscription is a surprise.",
+              "Membership — {memberMonthly}, or {memberYearly} paid yearly. It waives the administration fee and upgrades shipping to overnight. Below about {breakEvenBest} orders a year — or {breakEvenWorst} if you would have taken standard delivery — it costs you more than it saves, and we would rather write that here than sell it to you.",
+              "Refill confirmation — when a cycle is due you are messaged in your account thread with the amount and the date, at least {renewalNotice} beforehand. The charge is raised only after you confirm. If you do not confirm, nothing is transmitted to a pharmacy and no card is charged.",
+              "Membership renewal — membership itself does renew automatically, at {memberMonthly} or {memberYearly}. You are emailed before every membership charge with the amount and the date, at least {renewalNotice} beforehand, and cancelling stops the next one.",
               "Cancelling — from your account in one step, or by one email to {email}. No phone call, no retention offer, no “are you sure” loop.",
               "When cancellation takes effect — immediately, for anything not yet transmitted to a pharmacy. The charge for that cycle is reversed the same day.",
               "What cannot be undone — once a pharmacy has compounded, labelled or dispensed a preparation for you, it cannot be returned, resold or refunded. That is not a policy Ellery chose; federal and state law forbids a pharmacy taking a dispensed prescription back into stock.",
@@ -481,7 +482,7 @@ const legal = {
         blocks: [
           {
             subheading: "Children",
-            text: "This service is for adults. Ellery does not knowingly collect information from anyone under {minAge}; the intake asks for a date of birth in its first few questions and stops there if the answer is below the threshold. An account found to belong to a minor is closed and its data deleted, and the parent or guardian on record is told.",
+            text: "This service is for adults. Ellery does not knowingly collect information from anyone under {minAge}; the intake asks for your age in its first few questions and stops there if the answer is below the threshold. An account found to belong to a minor is closed and its data deleted, and the parent or guardian on record is told.",
           },
           {
             subheading: "Changes to this policy",

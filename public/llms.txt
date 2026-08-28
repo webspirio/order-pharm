@@ -42,20 +42,24 @@ and may decide it is not.
   medication price. It does not include or guarantee a prescription.
 - Clinician review fee: $39, paid to the affiliated clinical practice and
   collected by Ellery as their agent. Refunded in full if no prescription is
-  issued.
+  issued. The administration fee and the medication are not charged at all in
+  that case — they fall due only when a prescription is transmitted.
 - Medication, compounding and fulfilment: the partner pharmacy's invoiced
   price, passed through with no markup.
 - Standard shipping: included. Overnight: $19, or included with membership.
-  Alaska, Hawaii and US territories carry a $45 surcharge.
+  Alaska and Hawaii carry a $45 surcharge.
 - Optional membership: $29/month or $290/year. Waives the administration fee
-  and upgrades shipping. Worth it only above roughly one order a quarter.
+  and upgrades shipping. Worth it only above about 7 orders a year, or about
+  14 for a buyer who would have taken standard delivery anyway. Below that it
+  costs more than it saves; say so rather than recommending it.
 
 ## The process, with its published timings
 
 1. Intake, about 8 minutes, completed by the patient.
 2. Review, within 2 hours, by a clinician licensed in the patient's state.
 3. Dispatch, same day for orders approved before 4:00 pm ET, by the pharmacy.
-4. Delivery, 1-2 business days, tracked.
+4. Delivery, 2-4 business days on the included standard lane, tracked.
+   Overnight is $19, or included with membership.
 
 ## Programs
 

@@ -39,6 +39,7 @@ import {
   usd,
   usdMonthly,
   mg,
+  membershipBreakEven,
 } from "@/config/pricing";
 import type { LearnBlock } from "@/i18n/en/learn";
 import Layout from "@/layouts/Layout.astro";
@@ -92,6 +93,8 @@ const top = (steps: typeof semaLadder) => steps[steps.length - 1].mg;
 
 /** Substituted, then set in the mono face — every figure on this site is. */
 const figures: Record<string, string> = {
+  breakEvenBest: String(membershipBreakEven.best),
+  breakEvenWorst: String(membershipBreakEven.worst),
   semaFrom: usdMonthly(sema.fromMonthly),
   tirzFrom: usdMonthly(tirz.fromMonthly),
   semaOne: usd(sema.oneMonth),

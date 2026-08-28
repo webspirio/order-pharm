@@ -11,7 +11,7 @@
  */
 import { type Locale, t, localizedPath } from "@/i18n";
 import { anchors } from "@/config/site";
-import { treatmentsIn, usdMonthly, type ProgramId } from "@/config/pricing";
+import { fees, treatmentsIn, usd, usdMonthly, type ProgramId } from "@/config/pricing";
 import { Image } from "astro:assets";
 import metabolicImg from "@/assets/program-metabolic.jpg";
 import longevityImg from "@/assets/program-longevity.jpg";
@@ -32,6 +32,14 @@ const hrefs: Record<string, string> = {
   metabolic: localizedPath(locale, "/weight-loss/"),
   longevity: localizedPath(locale, "/longevity/"),
 };
+
+/**
+ * The two fees that sit on top of the medication price, substituted into the
+ * dictionary's sentence rather than typed into it.
+ */
+const feeLine = d.programs.price.fees
+  .replaceAll("{visit}", usd(fees.visit))
+  .replaceAll("{admin}", usd(fees.admin));
 
 const cards = d.programs.items.map((program) => {
   const cheapest = Math.min(...treatmentsIn(program.id as ProgramId).map((tx) => tx.fromMonthly));
@@ -75,13 +83,19 @@ const cards = d.programs.items.map((program) => {
             <div class="flex flex-1 flex-col p-6 sm:p-7">
               <h3 class="display-3">{card.title}</h3>
 
-              <div class="mt-4 flex items-baseline gap-2 border-y border-border py-3">
-                <span class="label text-muted-foreground">From</span>
-                <span class="figure text-xl text-foreground">{card.from}</span>
-                <span class="label text-muted-foreground">
-                  all in
-                  <sup class="ml-0.5 tracking-normal">†‡</sup>
-                </span>
+              <div class="mt-4 border-y border-border py-3">
+                <p class="flex items-baseline gap-2">
+                  <span class="label text-muted-foreground">{d.programs.price.from}</span>
+                  <span class="figure text-xl text-foreground">{card.from}</span>
+                  <span class="label text-muted-foreground">
+                    {d.programs.price.unit}
+                    <sup class="ml-0.5 tracking-normal">‡</sup>
+                  </span>
+                </p>
+                <p class="mt-2 text-xs leading-relaxed text-muted-foreground">
+                  {feeLine}
+                  <sup>†</sup>
+                </p>
               </div>
 
               <p class="mt-4 text-[0.9375rem] leading-relaxed text-muted-foreground">{card.desc}</p>

@@ -379,7 +379,7 @@ const learn = {
         },
         {
           type: "p",
-          text: "The administration fee is fixed per order and is never calculated as a share of what the medication costs†. The review fee is refunded in full if no prescription is issued. Medication is invoiced by the partner pharmacy at its own price and passed through unchanged. Membership at {membership} is optional, waives the administration fee and upgrades shipping to overnight, and is worth buying only if you order more than once a quarter — if you do not, it is a fee for nothing. {gating}",
+          text: "The administration fee is fixed per order and is never calculated as a share of what the medication costs†. The review fee is refunded in full if no prescription is issued. Medication is invoiced by the partner pharmacy at its own price and passed through unchanged. Membership at {membership} is optional, waives the administration fee and upgrades shipping to overnight, and is worth buying only above about {breakEvenBest} orders a year — nearer {breakEvenWorst} on standard delivery. Below that it is a fee for nothing. {gating}",
         },
 
         { type: "h2", text: "The three questions" },

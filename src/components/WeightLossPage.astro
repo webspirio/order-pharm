@@ -437,7 +437,7 @@ const thresholds = w.eligibility.thresholds.map((item, index) => ({
           <p class="label text-brand-300">{w.eligibility.eyebrow}</p>
           <h2 class="display-2 mt-4 text-brand-50">{w.eligibility.title}</h2>
           <p class="mt-4 max-w-2xl text-[1.0625rem] leading-relaxed text-brand-50/65">
-            {w.eligibility.lead}<sup class="ml-0.5 text-brand-50/50">*</sup>
+            {w.eligibility.lead}<sup class="ml-0.5 text-brand-50/60">*</sup>
           </p>
         </div>
 
@@ -460,7 +460,7 @@ const thresholds = w.eligibility.thresholds.map((item, index) => ({
             <h3 class="label text-brand-300">{w.eligibility.countsTitle}</h3>
             <ul class="mt-4 flex flex-col">
               {
-                w.eligibility.counts.map((item) => (
+                Object.values(d.programs.conditions).map((item) => (
                   <li class="flex items-start gap-3 border-t border-brand-50/12 py-3 text-[0.9375rem] text-brand-50/85">
                     <Check className="mt-1 size-3.5 shrink-0 text-brand-300" />
                     <span>{item}</span>
@@ -475,7 +475,7 @@ const thresholds = w.eligibility.thresholds.map((item, index) => ({
               {
                 w.eligibility.rulesOut.map((item) => (
                   <li class="flex items-start gap-3 border-t border-brand-50/12 py-3 text-[0.9375rem] text-brand-50/85">
-                    <X className="mt-1 size-3.5 shrink-0 text-brand-50/45" />
+                    <X className="mt-1 size-3.5 shrink-0 text-brand-50/60" />
                     <span>{item}</span>
                   </li>
                 ))

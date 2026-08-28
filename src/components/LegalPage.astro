@@ -35,6 +35,7 @@ import {
   partners,
   usd,
   usdMonthly,
+  membershipBreakEven,
 } from "@/config/pricing";
 import Layout from "@/layouts/Layout.astro";
 import SeoHead from "@/components/SeoHead.astro";
@@ -151,6 +152,8 @@ const tokens: Record<string, string> = {
   remote: figure(usd(shipping.remoteSurcharge)),
   memberMonthly: figure(usdMonthly(fees.membershipMonthly)),
   memberYearly: figure(usd(fees.membershipYearly)),
+  breakEvenBest: figure(String(membershipBreakEven.best)),
+  breakEvenWorst: figure(String(membershipBreakEven.worst)),
   minAge: figure(String(eligibility.minAge)),
   minAgeSermorelin: figure(String(eligibility.minAgeSermorelin)),
   states: `${figure(String(coverage.states))} states${

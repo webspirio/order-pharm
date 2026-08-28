@@ -38,7 +38,9 @@ const d = t(locale);
   <div class="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-24">
     <div class="max-w-2xl">
       <p class="label text-brand-300">{d.cta.eyebrow}</p>
-      <h2 class="display-2 mt-4 text-brand-50">{d.cta.title}</h2>
+      <h2 class="display-2 mt-4 text-brand-50">
+        {d.cta.title.replace("{minutes}", String(sla.intakeMinutes))}
+      </h2>
       <p class="mt-5 text-base leading-relaxed text-brand-50/80">{d.cta.lead}</p>
 
       <div class="mt-8 flex flex-wrap items-center gap-3">

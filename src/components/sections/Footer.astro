@@ -87,7 +87,7 @@ const pharmacyNames = partners.pharmacies.map((p) => p.name).join(", ");
               <span class="flex items-start gap-2 text-brand-50/55">
                 <MapPin className="mt-0.5 size-3.5 shrink-0" />
                 <span>
-                  <span class="label block text-[0.5625rem] text-brand-50/40">
+                  <span class="label block text-[0.5625rem] text-brand-50/60">
                     {d.footer.address}
                   </span>
                   {site.addressStreet}, {site.addressLocality} {site.addressRegion}{" "}
@@ -100,15 +100,17 @@ const pharmacyNames = partners.pharmacies.map((p) => p.name).join(", ");
 
         <div class="mt-6 border-t border-brand-50/10 pt-4">
           <p class="figure text-xs text-brand-50/70">{d.footer.supportHours}</p>
-          <p class="mt-1 text-xs text-brand-50/45">{d.footer.supportNote}</p>
+          <p class="mt-1 text-xs text-brand-50/60">{d.footer.supportNote}</p>
         </div>
       </div>
 
       {
         columns.map((column) => (
           <div>
-            <h2 class="label text-brand-50/40">{column.title}</h2>
-            <nav class="mt-4 flex flex-col gap-2.5 text-sm text-brand-50/70">
+            <h2 class="label text-brand-50/60">{column.title}</h2>
+            {/* Named, because a screen reader listing landmarks otherwise
+                announces four anonymous "navigation" regions per page. */}
+            <nav aria-label={column.title} class="mt-4 flex flex-col gap-2.5 text-sm text-brand-50/70">
               {column.links.map((link) => (
                 <a href={link.href} class="w-fit hover:text-brand-50">
                   {link.label}
@@ -123,7 +125,7 @@ const pharmacyNames = partners.pharmacies.map((p) => p.name).join(", ");
     {/* The load-bearing disclosure. Not small print, not a link to small
         print — the sentence itself, at reading size, above the copyright. */}
     <div class="mt-12 border-t border-brand-50/10 pt-8">
-      <h2 class="label text-brand-50/40">{d.footer.disclosures}</h2>
+      <h2 class="label text-brand-50/60">{d.footer.disclosures}</h2>
       <p class="mt-3 max-w-4xl text-sm leading-relaxed text-brand-50/60">
         {site.legalName} does not provide medical services and is not a pharmacy. All professional
         medical services are provided by clinicians licensed in your state and affiliated with{" "}
@@ -131,7 +133,7 @@ const pharmacyNames = partners.pharmacies.map((p) => p.name).join(", ");
         independent, state-licensed pharmacies — {pharmacyNames}. Using this site does not create a
         clinician-patient relationship with {site.shortName}.
       </p>
-      <p class="mt-3 max-w-4xl text-sm leading-relaxed text-brand-50/45">
+      <p class="mt-3 max-w-4xl text-sm leading-relaxed text-brand-50/60">
         {d.compliance.emergency}
       </p>
     </div>
@@ -141,7 +143,7 @@ const pharmacyNames = partners.pharmacies.map((p) => p.name).join(", ");
     >
       {/* No literal period after legalName — it may already end in one. */}
       <span>© {year} {site.legalName} · {d.footer.rights}</span>
-      <nav class="flex flex-wrap items-center gap-x-6 gap-y-2">
+      <nav aria-label={d.footer.columns.legal} class="flex flex-wrap items-center gap-x-6 gap-y-2">
         <a href={localizedPath(locale, "/terms/")} class="hover:text-brand-50">
           {d.footer.terms}
         </a>

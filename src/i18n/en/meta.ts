@@ -12,17 +12,17 @@ const meta = {
   home: {
     title: "Ellery Health — GLP-1 and longevity treatment, coordinated",
     description:
-      "Ellery coordinates GLP-1 and longevity treatment between you, an independent licensed clinician, and a US mail-order pharmacy. Every fee, every handoff and every hour, published.",
+      "Ellery coordinates GLP-1 and longevity treatment between you, an independent clinician and a US mail-order pharmacy. Every fee and every handoff, published.",
   },
   weightLoss: {
     title: "Weight loss — compounded semaglutide and tirzepatide | Ellery",
     description:
-      "Compounded semaglutide and tirzepatide, coordinated end to end, with the titration schedule and the itemised cost shown before you pay. Prescription only if a licensed clinician decides it is appropriate.",
+      "Compounded semaglutide and tirzepatide, with the titration schedule and the itemised cost shown before you pay. Prescription only if a clinician agrees.",
   },
   longevity: {
     title: "Longevity — NAD+, sermorelin, glutathione, MIC + B12 | Ellery",
     description:
-      "Compounded NAD+, sermorelin, glutathione and MIC + B12, with what each is studied for stated plainly and no outcome promised. Prescription only if a licensed clinician decides it is appropriate.",
+      "Compounded NAD+, sermorelin, glutathione and MIC + B12 — what each is studied for, and where the evidence stops. Prescription only if a clinician agrees.",
   },
   howItWorks: {
     title: "How it works — the four handoffs, on the clock | Ellery",
@@ -32,7 +32,7 @@ const meta = {
   pricing: {
     title: "Pricing — every line item, and who it goes to | Ellery",
     description:
-      "A fixed administration fee, medication at pharmacy cost with no markup, and the clinician review fee refunded if you are not approved. The whole receipt, before you start.",
+      "A fixed administration fee, medication at pharmacy cost with no markup, and the review fee refunded if you are not approved. The whole receipt, up front.",
   },
   start: {
     title: "Start your intake — about eight minutes | Ellery",
@@ -42,7 +42,7 @@ const meta = {
   learn: {
     title: "Learn — straight answers on GLP-1s and peptides | Ellery",
     description:
-      "What these medications do, what they cost without insurance, and what the evidence actually supports. Written plainly, reviewed by a licensed clinician, and not medical advice.",
+      "What these medications do, what they cost without insurance, and what the evidence supports. Written plainly, clinically reviewed, and not medical advice.",
   },
   faq: {
     title: "Questions — eligibility, cost, shipping, refunds | Ellery",
@@ -52,7 +52,7 @@ const meta = {
   contact: {
     title: "Contact — a person answers | Ellery",
     description:
-      "Reach Ellery by phone or email, with published support hours. Clinical questions go to the affiliated practice, and dispensing questions go to the pharmacy — this page says which is which.",
+      "Phone and email, with published support hours, and a table saying which questions go to Ellery, which to the clinical practice and which to the pharmacy.",
   },
   terms: {
     title: "Terms of use | Ellery Health",
@@ -62,7 +62,7 @@ const meta = {
   privacy: {
     title: "Privacy policy | Ellery Health",
     description:
-      "What Ellery collects, what it passes to the affiliated clinical practice and the partner pharmacies, and where HIPAA applies and where state consumer health data law applies instead.",
+      "What Ellery collects, what it passes to the clinical practice and the pharmacies, and where HIPAA applies — and where state health-data law applies instead.",
   },
   notFound: {
     title: "Page not found | Ellery Health",
@@ -78,7 +78,7 @@ const meta = {
     "glp-1-cost-without-insurance": {
       title: "GLP-1 cost without insurance: the 2026 numbers | Ellery",
       description:
-        "What brand-name and compounded GLP-1s cost when you are paying cash, which fees sit on top, and the three questions that tell you whether a quoted price is the whole price.",
+        "What brand-name and compounded GLP-1s cost when you pay cash, which fees sit on top, and the three questions that reveal whether a quote is the whole price.",
     },
     "nad-injections-explained": {
       title: "NAD+ injections, explained | Ellery",

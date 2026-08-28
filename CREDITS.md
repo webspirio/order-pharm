@@ -10,8 +10,12 @@ rather than a portrait — attaching a written quotation to a stranger's face
 would imply exactly that. Do not reintroduce portraits there without licensed,
 consented images of real patients.
 
-`vial.jpg` has been cropped from its 2000x3000 original to 4:3 and
-desaturated to 68% to sit correctly in the cool default palette.
+Several sources were cropped from portrait to the aspect ratio the layout
+actually renders. A 2000x3000 portrait inside an `aspect-[21/9]` band is two
+thirds decoded and discarded, and `weight-loss-hero.jpg` was emitting a
+1,129 KB WebP derivative because of it. Cropped: `weight-loss-hero.jpg`,
+`learn-03.jpg`, `contact.jpg`. `vial.jpg` was additionally desaturated to 68%
+to sit correctly in the cool default palette.
 
 | File | Source | Licence |
 | --- | --- | --- |

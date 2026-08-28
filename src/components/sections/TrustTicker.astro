@@ -40,10 +40,25 @@ const items = d.ticker.items.map((item) =>
 ---
 
 <div
-  class="border-b border-brand-50/10 bg-brand-800 text-brand-50"
+  class="ticker-region relative border-b border-brand-50/10 bg-brand-800 text-brand-50"
   role="region"
   aria-label={d.a11y.ticker}
 >
+  {/* WCAG 2.2.2 (Pause, Stop, Hide): content that moves automatically for
+      more than five seconds alongside other content needs a mechanism to
+      pause it. A checkbox rather than a button so it needs no JavaScript on
+      a page that otherwise ships none — `:has()` on the region reads its
+      state. It is `sr-only` until focused, so keyboard and screen-reader
+      users reach it on the first Tab of the page while it stays out of the
+      visual design; pointer users get the `:hover` pause below, which is not
+      sufficient on its own but is the courteous behaviour. */}
+  <label class="ticker-pause label absolute left-2 top-1/2 z-10 -translate-y-1/2">
+    <input type="checkbox" class="sr-only" />
+    <span class="sr-only-until-focus cursor-pointer bg-brand-50 px-2 py-1 text-brand-800"
+      >{d.a11y.pauseTicker}</span
+    >
+  </label>
+
   <div class="ticker-mask overflow-hidden">
     <div class="ticker-track flex w-max items-center">
       {
@@ -68,6 +83,31 @@ const items = d.ticker.items.map((item) =>
 <style>
   .ticker-track {
     animation: ticker-scroll 48s linear infinite;
+  }
+
+  /* The pause control's own visibility: collapsed to a screen-reader-only box
+     until it is focused, then shown in place. */
+  .sr-only-until-focus {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .ticker-pause:focus-within .sr-only-until-focus {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+    border-radius: 3px;
+  }
+
+  /* Paused by the control, and courteously while a pointer rests on the bar. */
+  .ticker-region:hover .ticker-track,
+  .ticker-region:has(input:checked) .ticker-track {
+    animation-play-state: paused;
   }
 
   @keyframes ticker-scroll {

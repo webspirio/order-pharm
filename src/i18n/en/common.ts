@@ -8,9 +8,9 @@
  * - Numbers persuade; adjectives do not. Where a claim has a figure, import
  *   the figure from `src/config/pricing.ts` in the component rather than
  *   typing it here — that is why almost no number appears in this file.
- * - Concede before the reader objects. "Not everyone qualifies." "Worth it
- *   only if you order more than once a quarter." Confidence reads as candour
- *   in a category full of overclaiming.
+ * - Concede before the reader objects. "Not everyone qualifies." "Membership
+ *   is often not worth it." Confidence reads as candour in a category full of
+ *   overclaiming.
  *
  * COMPLIANCE, non-negotiable in every string on this site:
  * - Never a possessive over clinicians or pharmacies. Not "our doctors",
@@ -75,10 +75,25 @@ const common = {
     long: "Prices are shown so you can plan. Nothing here is an offer of medication. A clinician licensed in your state reviews your intake and decides independently whether treatment is appropriate, and may decide it is not.",
   },
 
+  /**
+   * THE REFUND RULE, in one place.
+   *
+   * It was hand-written on nineteen surfaces and had already drifted into
+   * three wordings, one of which (/terms/) refunded the administration fee
+   * while the others refunded only the review fee. The generous reading is
+   * also the defensible one — an administration fee for an order that never
+   * existed is indefensible — so that is the policy, and this is the sentence.
+   */
+  refund: {
+    label: "If a clinician says no",
+    rule: "If no prescription is issued, the review fee is refunded in full, automatically, to the card you paid with — no form and no phone call. The administration fee and the medication are never charged at all, because there is no order to administer.",
+    short: "Refunded in full if no prescription is issued.",
+  },
+
   cta: {
     eyebrow: "Start",
-    title: "The intake takes about eight minutes.",
-    lead: "You will not be asked for payment until you have seen the full itemised cost. If a clinician decides treatment is not appropriate for you, the review fee is refunded in full.",
+    title: "The intake takes about {minutes} minutes.",
+    lead: "You will not be asked for payment until you have seen the full itemised cost, and a clinician — not Ellery — decides whether treatment is appropriate.",
     primary: "Start your intake",
     secondary: "See the full pricing",
     reassure: "No appointment. No phone call. No insurance.",
@@ -150,7 +165,12 @@ const common = {
     langNav: "Language",
     close: "Close",
     openMenu: "Open menu",
+    /** Names the mobile sheet itself. Distinct from `primaryNav`, which names
+        the <nav> inside it — using one string for both made the dialog
+        announce as "Primary". */
+    menu: "Site menu",
     ticker: "Site announcements",
+    pauseTicker: "Pause the announcements",
   },
 };
 

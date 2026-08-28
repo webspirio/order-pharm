@@ -26,7 +26,7 @@ const home = {
     ctaPrimary: "Start your intake",
     ctaSecondary: "See what it costs",
     /** Sits under the buttons. Removes the two objections that stop a click. */
-    note: "About eight minutes. No appointment, and no payment until you have seen the whole cost.",
+    note: "About {minutes} minutes. No appointment, and no payment until you have seen the whole cost.",
   },
 
   /**
@@ -152,12 +152,18 @@ const home = {
       },
       {
         item: "Ellery administration",
-        dest: "Ellery. Fixed per order. Not a percentage, not per dose, not per prescription.",
+        dest: "Ellery. Fixed per order. Not a percentage, not per dose, not per prescription — and not charged at all unless a prescription is transmitted.",
       },
     ],
     membership: {
       title: "Membership is optional, and often not worth it",
-      body: "Membership waives the administration fee and upgrades shipping to overnight. It pays for itself if you order more than once a quarter. If you do not, do not buy it — and nothing on this site will ask you twice.",
+      /**
+       * `{orders}` is substituted by Receipt.astro from
+       * `membershipBreakEvenOrders()`, the same function /pricing/ calls. This
+       * sentence used to say "more than once a quarter" — four orders a year —
+       * while /pricing/ computed seven from the same constants.
+       */
+      body: "Membership waives the administration fee and upgrades shipping to overnight. It is worth buying only above about {best} orders a year, and only if you would have paid for overnight every time — on standard delivery the figure is nearer {worst}. Below that, do not buy it, and nothing on this site will ask you twice.",
     },
     cta: "Full pricing, including dose tiers",
   },

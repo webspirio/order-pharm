@@ -174,7 +174,7 @@ const faq = {
         },
         {
           q: "Is membership worth it?",
-          a: "Often not, and we would rather say so here than sell it twice. It waives the administration fee and upgrades shipping to overnight, which pays for itself if you order more than once a quarter and loses you money if you do not. Buy it after your second order rather than before your first. There is no cancellation fee and no retention call.",
+          a: "Often not, and we would rather say so here than sell it twice. It waives the administration fee and upgrades shipping to overnight, so it is worth buying only above about {breakEvenBest} orders a year — and nearer {breakEvenWorst} if you would have taken standard delivery anyway. Most people on a three-month supply order four times a year, which is below both. Buy it after your second order rather than before your first. There is no cancellation fee and no retention call.",
         },
       ],
     },
@@ -186,7 +186,7 @@ const faq = {
       items: [
         {
           q: "How long does delivery take, and what does shipping cost?",
-          a: "Standard shipping is included on every order and arrives in {standardDays} once the pharmacy dispatches; orders approved before {cutoff} dispatch the same day, and after that on the next business day. Overnight costs extra, or is included with membership. Alaska, Hawaii and the US territories take {remoteDays} and carry a carrier surcharge, shown as its own line rather than averaged into everyone else's price. Every amount is on the pricing page before you are asked for a card.",
+          a: "Standard shipping is included on every order and arrives in {standardDays} once the pharmacy dispatches; orders approved before {cutoff} dispatch the same day, and after that on the next business day. Overnight costs extra, or is included with membership. Alaska and Hawaii take {remoteDays} and carry a carrier surcharge, shown as its own line rather than averaged into everyone else's price. Every amount is on the pricing page before you are asked for a card.",
         },
         {
           q: "What happens if the pharmacy ships late?",

@@ -13,7 +13,7 @@
  */
 import { type Locale, t, localizedPath } from "@/i18n";
 import { anchors } from "@/config/site";
-import { fees, shipping, usd, usdMonthly } from "@/config/pricing";
+import { fees, membershipBreakEven, shipping, usd, usdMonthly } from "@/config/pricing";
 import { ArrowRight } from "lucide-react";
 
 interface Props {
@@ -105,7 +105,11 @@ const rows = d.home.receipt.rows.map((row, index) => ({
         <h3 class="subhead mt-3 text-lg">{d.home.receipt.membership.title}</h3>
         <p class="figure mt-4 text-2xl text-foreground">{usdMonthly(fees.membershipMonthly)}</p>
         <p class="mt-4 text-sm leading-relaxed text-muted-foreground">
-          {d.home.receipt.membership.body}
+          {
+            d.home.receipt.membership.body
+              .replaceAll("{best}", String(membershipBreakEven.best))
+              .replaceAll("{worst}", String(membershipBreakEven.worst))
+          }
         </p>
       </aside>
     </div>

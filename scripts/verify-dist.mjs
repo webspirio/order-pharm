@@ -187,6 +187,24 @@ for (const page of pages) {
     }
   }
 
+  /* --- meta description ------------------------------------------------ */
+  // Google truncates a description in the SERP at roughly 155-160 characters,
+  // so anything past ~165 loses its ending. On this site several descriptions
+  // END on the prescription-gating condition, which is exactly the clause that
+  // must not be the part that gets cut. Seven of fifteen exceeded it on the
+  // first pass; this keeps them from creeping back.
+  const descriptions = root.querySelectorAll('meta[name="description"]');
+  if (descriptions.length === 0) fail(`${where} no <meta name="description">`);
+  if (descriptions.length > 1) {
+    fail(`${where} ${descriptions.length} meta descriptions, expected 1`);
+  }
+  for (const meta of descriptions) {
+    const content = meta.getAttribute("content") ?? "";
+    if (content.length > 165) {
+      fail(`${where} meta description is ${content.length} chars, over the 165 ceiling`);
+    }
+  }
+
   /* --- placeholders ---------------------------------------------------- */
   for (const pattern of PLACEHOLDER_PATTERNS) {
     if (pattern.test(page.html)) {

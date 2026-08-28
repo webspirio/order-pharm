@@ -91,7 +91,7 @@ const howItWorks = {
         action: "Delivered",
         what: "The carrier moves the parcel from the pharmacy's bench to your door, tracked the whole way, in plain packaging with nothing clinical printed on the outside. Anything that needs refrigeration travels cold-packed, with a temperature indicator inside.",
         who: "The carrier. Ellery watches the tracking and calls you if it stops moving. The pharmacy is the only party that can reship.",
-        takesNote: "In transit, after dispatch. Alaska, Hawaii and the US territories run slower, and that window is published below rather than averaged into this one.",
+        takesNote: "In transit, after dispatch. Alaska and Hawaii run slower, and that window is published below rather than averaged into this one.",
         receive: "The tracking number when the label is printed, an alert when the parcel is out for delivery, and a delivery confirmation.",
         failure: {
           trigger: "The parcel is late, damaged, or arrives warm.",
@@ -184,7 +184,7 @@ const howItWorks = {
       { option: "Standard", note: "On every order, including the first. Not a promotion, and not withdrawn later." },
       { option: "Overnight", note: "Charged per order, or included on membership." },
       {
-        option: "Alaska, Hawaii and US territories",
+        option: "Alaska and Hawaii",
         note: "Carriers charge more on these lanes. The surcharge is passed through at cost and the window is genuinely longer.",
       },
     ],
@@ -256,7 +256,7 @@ const howItWorks = {
     header: { what: "What moves", who: "Where it goes", law: "Under which law" },
     rows: [
       {
-        what: "Your intake answers, your state, your date of birth",
+        what: "Your intake answers, your state, your age",
         who: "The clinician reviewing it, at the affiliated practice",
         law: "HIPAA. The practice is the covered entity; Ellery handles this as its business associate, under a written agreement.",
       },

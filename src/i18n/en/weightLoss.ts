@@ -119,14 +119,8 @@ const weightLoss = {
       { label: "Minimum age", note: "no exceptions, and age is the first thing verified" },
     ],
     countsTitle: "Conditions that count toward the lower threshold",
-    counts: [
-      "High blood pressure",
-      "Type 2 diabetes, or prediabetes",
-      "High cholesterol or raised triglycerides",
-      "Obstructive sleep apnoea",
-      "Cardiovascular disease",
-      "Non-alcoholic fatty liver disease",
-    ],
+    /* The list itself is `d.programs.conditions` — see the note there. This
+       page used to keep its own copy, and the two drifted. */
     rulesOutTitle: "Histories that rule this treatment out",
     rulesOut: [
       "A personal or family history of medullary thyroid carcinoma (MTC)",

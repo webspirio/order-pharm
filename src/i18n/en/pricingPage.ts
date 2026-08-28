@@ -193,7 +193,7 @@ const pricingPage = {
         note: "Chosen per order, or included on membership.",
       },
       {
-        option: "Alaska, Hawaii and US territories",
+        option: "Alaska and Hawaii",
         note: "A surcharge on top of the option you choose, because the carriers charge more to those addresses. It is published here rather than added at checkout.",
       },
     ],

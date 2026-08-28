@@ -545,9 +545,13 @@
   .relay-on-light {
     --relay-line: var(--border);
   }
+  /* Both custom properties carry a fallback, so a `.relay-step` also works
+     standalone — /how-it-works/ lays its own steps out in a grid without the
+     `.relay` wrapper, and without the fallbacks `background: var(--relay-tick)`
+     resolved to nothing and the amber ticks rendered invisible. */
   .relay-step {
     position: relative;
-    border-top: 1px solid var(--relay-line);
+    border-top: 1px solid var(--relay-line, var(--border));
     padding-top: 1.625rem;
   }
   /* The tick: a short vertical stroke dropping from the rule, plus a dot
@@ -560,7 +564,7 @@
     left: 0;
     width: 1px;
     height: 0.625rem;
-    background: var(--relay-tick);
+    background: var(--relay-tick, var(--color-glow-500));
   }
   .relay-step::after {
     content: "";
@@ -570,7 +574,7 @@
     width: 5px;
     height: 5px;
     border-radius: 50%;
-    background: var(--relay-tick);
+    background: var(--relay-tick, var(--color-glow-500));
   }
 }
 

@@ -36,6 +36,7 @@ import {
   monthlyEquivalent,
   usd,
   usdMonthly,
+  membershipBreakEvenOrders,
   type ProgramId,
 } from "@/config/pricing";
 import Layout from "@/layouts/Layout.astro";
@@ -140,7 +141,10 @@ const membershipRows = m.rows.map((row, index) => ({ ...row, ...membershipValues
 const withOvernight = fees.admin + shipping.overnightCost;
 const yearlyCost = fees.membershipYearly;
 const monthlyCost = fees.membershipMonthly * 12;
-const breakEvenOrders = Math.ceil(yearlyCost / withOvernight);
+// Same arithmetic as the homepage's membership card, from one shared function
+// in pricing.ts rather than repeated here — the two surfaces previously
+// disagreed (four orders a year vs seven).
+const breakEvenOrders = membershipBreakEvenOrders();
 const breakEvenCaseValues = [
   Math.ceil(monthlyCost / withOvernight),
   Math.ceil(yearlyCost / fees.admin),
@@ -672,7 +676,7 @@ const eligibilityRows = c.eligibility.rows.map((row, index) => ({
               {
                 c.boundaries.notIncluded.items.map((item) => (
                   <li class="flex gap-3 border-t border-brand-50/12 py-4 first:border-t-0 first:pt-0">
-                    <Minus className="mt-1 size-4 shrink-0 text-brand-50/40" />
+                    <Minus className="mt-1 size-4 shrink-0 text-brand-50/60" />
                     <span class="text-[0.9375rem] leading-relaxed text-brand-50/75">{item}</span>
                   </li>
                 ))
