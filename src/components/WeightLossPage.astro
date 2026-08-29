@@ -102,7 +102,6 @@ const thresholds = w.eligibility.thresholds.map((item, index) => ({
 
 <Layout locale={locale} title={d.meta.weightLoss.title} description={d.meta.weightLoss.description}>
   <SeoHead slot="head" locale={locale} path="/weight-loss/" />
-  <TrustTicker locale={locale} />
   <Header locale={locale} />
 
   <main id="main" tabindex="-1" class="outline-none">
@@ -112,7 +111,7 @@ const thresholds = w.eligibility.thresholds.map((item, index) => ({
         photograph is a 21/9 band under the type rather than a full-bleed
         hero: the figures are the thing to read first here.
         --------------------------------------------------------------- */}
-    <section class="pb-14 pt-14 sm:pb-16 sm:pt-16">
+    <section class="page-top pb-14 sm:pb-16">
       <div class="shell">
         <p class="label text-brand-700 dark:text-brand-400">{w.header.eyebrow}</p>
         <h1 class="display-1 mt-5 max-w-4xl">{w.header.title}</h1>
@@ -161,6 +160,11 @@ const thresholds = w.eligibility.thresholds.map((item, index) => ({
         </div>
       </div>
     </section>
+
+    {/* The ticker closes the head block, the same slot it takes under the
+        hero on the homepage. It cannot sit above the nav any more: the
+        header floats. */}
+    <TrustTicker locale={locale} />
 
     {/* ---------------------------------------------------------------
         THE LADDER. Two instances of one prop-driven component, stacked,

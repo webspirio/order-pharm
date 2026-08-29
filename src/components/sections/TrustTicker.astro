@@ -149,16 +149,30 @@ const items = d.ticker.items.map((item) =>
 
   /* Fade the cut edges so items enter and leave rather than being sliced. */
   .ticker-mask {
+    --fade: 8rem;
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent,
+      black var(--fade),
+      black calc(100% - var(--fade)),
+      transparent
+    );
     mask-image: linear-gradient(
       to right,
       transparent,
-      black 3rem,
-      black calc(100% - 3rem),
+      black var(--fade),
+      black calc(100% - var(--fade)),
       transparent
     );
   }
+  @media (max-width: 640px) {
+    .ticker-mask {
+      --fade: 3rem;
+    }
+  }
   @media (prefers-reduced-motion: reduce) {
     .ticker-mask {
+      -webkit-mask-image: none;
       mask-image: none;
     }
   }

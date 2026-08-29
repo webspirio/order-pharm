@@ -271,13 +271,12 @@ const related = [
 
 <Layout locale={locale} title={meta.title} description={meta.description}>
   <SeoHead slot="head" locale={locale} path={path} />
-  <TrustTicker locale={locale} />
   <Header locale={locale} />
   <main id="main" tabindex="-1" class="outline-none">
     {/* Masthead. The effective date is mono because it is a figure with legal
         force, and it is repeated at the foot of the document, which is where
         the text itself refers to it. */}
-    <section class="bg-card pb-14 pt-14 sm:pb-16 sm:pt-16">
+    <section class="bg-card page-top pb-14 sm:pb-16">
       <div class="shell">
         <p class="label text-brand-700 dark:text-brand-400">{docData.eyebrow}</p>
         <h1 class="display-1 mt-5 max-w-4xl">{docData.title}</h1>
@@ -320,6 +319,11 @@ const related = [
         </div>
       </div>
     </section>
+
+    {/* The ticker closes the head block, the same slot it takes under the
+        hero on the homepage. It cannot sit above the nav any more: the
+        header floats. */}
+    <TrustTicker locale={locale} />
 
     <section class="bg-background py-14 sm:py-16">
       <div class="shell">

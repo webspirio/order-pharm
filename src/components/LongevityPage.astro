@@ -94,13 +94,12 @@ const headerFigures = c.header.figures.map((figure, index) => ({
   description={d.meta.longevity.description}
 >
   <SeoHead slot="head" locale={locale} path="/longevity/" />
-  <TrustTicker locale={locale} />
   <Header locale={locale} />
 
   <main id="main" tabindex="-1" class="outline-none">
     {/* 1 — the header block. The H1 promises nothing; it states the rule the
         rest of the page follows. */}
-    <section class="bg-background pb-14 pt-14 sm:pb-16 sm:pt-16">
+    <section class="bg-background page-top pb-14 sm:pb-16">
       <div class="shell">
         <p class="label text-brand-700 dark:text-brand-400">{c.header.eyebrow}</p>
         {/* The break in the title is a rhetorical one — two clauses, one per
@@ -133,6 +132,11 @@ const headerFigures = c.header.figures.map((figure, index) => ({
         </dl>
       </div>
     </section>
+
+    {/* The ticker closes the head block, the same slot it takes under the
+        hero on the homepage. It cannot sit above the nav any more: the
+        header floats. */}
+    <TrustTicker locale={locale} />
 
     {/* The wide photographic band, with the disclosure as its caption rather
         than as small print somewhere below. The aspirational picture and the

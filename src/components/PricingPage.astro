@@ -193,11 +193,10 @@ const eligibilityRows = c.eligibility.rows.map((row, index) => ({
 
 <Layout locale={locale} title={d.meta.pricing.title} description={d.meta.pricing.description}>
   <SeoHead slot="head" locale={locale} path="/pricing/" />
-  <TrustTicker locale={locale} />
   <Header locale={locale} />
   <main id="main" tabindex="-1" class="outline-none">
     {/* 1. HEADER ------------------------------------------------------- */}
-    <section class="bg-background pb-14 pt-14 sm:pb-16 sm:pt-16">
+    <section class="bg-background page-top pb-14 sm:pb-16">
       <div class="shell">
         <p class="label text-brand-700 dark:text-brand-400">{c.header.eyebrow}</p>
         <h1 class="display-1 mt-5 max-w-4xl">{c.header.title}</h1>
@@ -232,6 +231,11 @@ const eligibilityRows = c.eligibility.rows.map((row, index) => ({
         </p>
       </div>
     </section>
+
+    {/* The ticker closes the head block, the same slot it takes under the
+        hero on the homepage. It cannot sit above the nav any more: the
+        header floats. */}
+    <TrustTicker locale={locale} />
 
     {/* 2. THE RECEIPT, IN FULL ---------------------------------------- */}
     <section id={anchors.pricing} class="bg-card section">

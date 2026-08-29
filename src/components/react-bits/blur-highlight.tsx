@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useState, useMemo } from "react";
-import { motion, useInView } from "motion/react";
+import { motion, useInView, useReducedMotion } from "motion/react";
 import type { Transition } from "motion/react";
 import { cn } from "@/lib/utils";
 
@@ -14,7 +14,20 @@ export interface HighlightBit {
 
 export interface BlurHighlightProps {
   /** Text content to display */
-  children: React.ReactNode;
+  children?: React.ReactNode;
+
+  /**
+   * LOCAL EDIT (Ellery). Plain-text content, taking precedence over
+   * `children`.
+   *
+   * The upstream component only reads `children` and only understands a
+   * string or a one-level-deep element. Astro serialises an island's children
+   * as `<astro-slot>` markup, so the text extraction returns "" and the
+   * paragraph renders empty and zero-height — which is silent, because
+   * nothing throws. Passing the sentence as a prop is the fix, and it is also
+   * the honest shape: this component highlights substrings of a string.
+   */
+  text?: string;
 
   /** Array of text strings or objects to highlight */
   highlightedBits?: (string | HighlightBit)[];
@@ -70,6 +83,7 @@ export const BlurHighlight = React.forwardRef<
   (
     {
       children,
+      text,
       highlightedBits = [],
       highlightColor = "hsl(80, 100%, 50%)",
       highlightClassName,
@@ -95,7 +109,16 @@ export const BlurHighlight = React.forwardRef<
       margin: "-20%",
     });
 
-    const isActive = manualTrigger || inViewport;
+    /**
+     * LOCAL EDIT (Ellery). The component as shipped animates regardless of
+     * `prefers-reduced-motion`: the site-wide CSS clamp in global.css only
+     * shortens CSS transitions and does nothing to a JS-driven animation. A
+     * word-by-word blur-up over a whole paragraph is exactly the kind of
+     * motion that setting exists to switch off, so when it is set the text
+     * renders finished and the highlight is painted rather than swept.
+     */
+    const reduced = useReducedMotion();
+    const isActive = reduced || manualTrigger || inViewport;
 
     React.useImperativeHandle(ref, () => ({
       trigger: () => setManualTrigger(true),
@@ -104,7 +127,9 @@ export const BlurHighlight = React.forwardRef<
 
     const processedContent = useMemo(() => {
       const textContent =
-        typeof children === "string"
+        typeof text === "string"
+          ? text
+          : typeof children === "string"
           ? children
           : React.Children.toArray(children)
               .map((child) => {
@@ -201,7 +226,7 @@ export const BlurHighlight = React.forwardRef<
       }
 
       return { parts };
-    }, [children, highlightedBits]);
+    }, [children, text, highlightedBits]);
 
     const getBackgroundMetrics = () => {
       switch (highlightDirection) {
@@ -240,21 +265,27 @@ export const BlurHighlight = React.forwardRef<
 
     const metrics = getBackgroundMetrics();
 
-    const highlightTransition: Transition = {
-      type: "spring",
-      duration: highlightDuration,
-      delay: highlightDelay,
-      bounce: 0,
-    };
+    const highlightTransition: Transition = reduced
+      ? { duration: 0 }
+      : {
+          type: "spring",
+          duration: highlightDuration,
+          delay: highlightDelay,
+          bounce: 0,
+        };
 
     return (
       <motion.span
         ref={containerRef}
         style={{ display: "block" }}
-        initial={{
-          opacity: 0,
-          filter: `blur(${blurAmount}px)`,
-        }}
+        initial={
+          reduced
+            ? { opacity: 1, filter: "blur(0px)" }
+            : {
+                opacity: 0,
+                filter: `blur(${blurAmount}px)`,
+              }
+        }
         animate={
           isActive
             ? { opacity: 1, filter: "blur(0px)" }
@@ -281,11 +312,13 @@ export const BlurHighlight = React.forwardRef<
             children: React.ReactNode;
           }) => {
             const highlightRef = useRef<HTMLSpanElement>(null);
-            const highlightInView = useInView(highlightRef, {
+            const inView = useInView(highlightRef, {
               once: false,
               initial: false,
               amount: 0.1,
             });
+            // LOCAL EDIT (Ellery): painted, not swept, under reduced motion.
+            const highlightInView = reduced || inView;
 
             const highlightStyles: React.CSSProperties = {
               backgroundImage: `linear-gradient(${highlightColor}, ${highlightColor})`,

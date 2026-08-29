@@ -1,0 +1,67 @@
+---
+/**
+ * THE THESIS — one paragraph, resolving as you read it.
+ *
+ * This is the slot the reference template gives its scroll-blur statement,
+ * and it is the one place on the site where a React Bits component ships
+ * rather than being read as a structural reference. `BlurHighlight` earns it:
+ * the paragraph blurs up as it enters the viewport and two phrases are swept
+ * with the signal colour as they resolve — a per-phrase highlight synced to
+ * scroll position, which is the thing CSS cannot do cleanly.
+ *
+ * `client:visible`, so it is never in the critical path. The component's
+ * `initial` state is `opacity: 0`, so:
+ *   - reduced motion is handled inside the component (a local edit; the
+ *     site-wide CSS clamp cannot reach a JS-driven animation), and
+ *   - the `<noscript>` rule below forces the finished state, because a
+ *     paragraph that is invisible without JavaScript is a broken paragraph,
+ *     not a subtle one.
+ *
+ * The two highlighted phrases are the two claims the rest of the page then
+ * has to earn, and they live in the dictionary beside the sentence so a
+ * translator moves both together.
+ */
+import { type Locale, t } from "@/i18n";
+import BlurHighlight from "@/components/react-bits/blur-highlight";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const d = t(locale);
+---
+
+<section class="thesis bg-background section">
+  <div class="shell">
+    <p class="thesis-body max-w-4xl text-[1.5rem] leading-[1.35] tracking-[-0.025em] sm:text-[2rem] lg:text-[2.5rem]">
+      {/* The sentence goes in as a PROP, not as a child: Astro serialises an
+          island's children as `<astro-slot>` markup, and the component's text
+          extraction silently returns "" for that — an empty, zero-height
+          paragraph with nothing thrown. See the local edit in the component. */}
+      <BlurHighlight
+        client:visible
+        text={d.home.thesis.body}
+        highlightedBits={d.home.thesis.highlights}
+        highlightColor="var(--color-signal-300)"
+        highlightClassName="px-1 -mx-1 text-foreground"
+        blurAmount={7}
+        inactiveOpacity={0.18}
+        blurDuration={0.7}
+        highlightDelay={0.35}
+        viewportOptions={{ once: true, amount: 0.35 }}
+      />
+    </p>
+  </div>
+</section>
+
+<noscript>
+  <style>
+    /* Motion writes the initial `opacity: 0` inline during SSR. Without a
+       runtime to animate it away, the paragraph would never appear. */
+    .thesis-body span {
+      opacity: 1 !important;
+      filter: none !important;
+    }
+  </style>
+</noscript>

@@ -11,6 +11,7 @@ import { type Locale, t, localizedPath } from "@/i18n";
 import Layout from "@/layouts/Layout.astro";
 import SeoHead from "@/components/SeoHead.astro";
 import Header from "@/components/sections/Header.astro";
+import ComplianceBand from "@/components/sections/ComplianceBand.astro";
 import Footer from "@/components/sections/Footer.astro";
 import { ArrowRight } from "lucide-react";
 
@@ -44,7 +45,7 @@ const links = [
   <SeoHead slot="head" locale={locale} path="/404.html" selfOnly />
   <Header locale={locale} />
   <main id="main" tabindex="-1" class="outline-none">
-    <div class="mx-auto max-w-3xl px-4 py-24 sm:px-6 sm:py-32">
+    <section class="page-top shell pb-20 sm:pb-24">
       <p class="figure text-sm text-brand-700 dark:text-brand-400">{d.notFound.code}</p>
       <h1 class="display-2 mt-4">{d.notFound.title}</h1>
       <p class="lead mt-4">{d.notFound.body}</p>
@@ -69,7 +70,12 @@ const links = [
       </ul>
 
       <a href={localizedPath(locale, "/")} class="btn-outline mt-10">{d.notFound.backHome}</a>
-    </div>
+    </section>
+
+    {/* Every route resolves all eight footnote symbols — /404 included.
+        A page that renders a superscript with nowhere to land is the
+        defect this band exists to prevent. */}
+    <ComplianceBand locale={locale} />
   </main>
   <Footer locale={locale} />
 </Layout>

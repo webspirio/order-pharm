@@ -100,10 +100,9 @@ const faqJsonLd = {
 
 <Layout locale={locale} title={d.meta.faq.title} description={d.meta.faq.description}>
   <SeoHead slot="head" locale={locale} path="/faq/" />
-  <TrustTicker locale={locale} />
   <Header locale={locale} />
   <main id="main" tabindex="-1" class="outline-none">
-    <section class="bg-background pb-14 pt-14 sm:pb-16 sm:pt-16">
+    <section class="bg-background page-top pb-14 sm:pb-16">
       <div class="shell">
         <p class="label text-brand-700 dark:text-brand-400">{d.faq.header.eyebrow}</p>
         <h1 class="display-1 mt-5 max-w-4xl">{d.faq.header.title}</h1>
@@ -126,6 +125,11 @@ const faqJsonLd = {
         </p>
       </div>
     </section>
+
+    {/* The ticker closes the head block, the same slot it takes under the
+        hero on the homepage. It cannot sit above the nav any more: the
+        header floats. */}
+    <TrustTicker locale={locale} />
 
     {/* The load-bearing four, on the page's one fixed-dark band, between the
         header and the long pale set. A reader who scrolls no further still

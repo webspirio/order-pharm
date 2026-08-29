@@ -78,10 +78,9 @@ const facts = d.start.header.facts.map((fact, index) => ({
 
 <Layout locale={locale} title={d.meta.start.title} description={d.meta.start.description}>
   <SeoHead slot="head" locale={locale} path="/start/" />
-  <TrustTicker locale={locale} />
   <Header locale={locale} />
   <main id="main" tabindex="-1" class="outline-none">
-    <section class="bg-background pt-14 pb-14 sm:pt-16 sm:pb-16">
+    <section class="bg-background page-top pb-14 sm:pb-16">
       <div class="shell">
         <p class="label text-brand-700 dark:text-brand-400">{d.start.header.eyebrow}</p>
         <h1 class="display-1 mt-5 max-w-4xl">{d.start.header.title}</h1>
@@ -112,6 +111,11 @@ const facts = d.start.header.facts.map((fact, index) => ({
         </p>
       </div>
     </section>
+
+    {/* The ticker closes the head block, the same slot it takes under the
+        hero on the homepage. It cannot sit above the nav any more: the
+        header floats. */}
+    <TrustTicker locale={locale} />
 
     <section class="bg-card section">
       <div class="shell">

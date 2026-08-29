@@ -34,6 +34,18 @@ const home = {
   },
 
   /**
+   * THE THESIS. One paragraph between the hero and the programs, in the slot
+   * the reference template gives its scroll-blur statement. It restates the
+   * whole argument in the site's own voice, and the two phrases marked for
+   * highlighting are the two claims the rest of the page then has to earn.
+   */
+  thesis: {
+    body: "Three parties touch your order, and only one of them is Ellery. A clinician licensed in your state decides. A state-licensed pharmacy dispenses. Ellery runs the intake, moves the file and answers the phone — and publishes what every step costs and how long it has, including the steps it does not control.",
+    /** Substrings of `body`, highlighted as the paragraph resolves. */
+    highlights: ["only one of them is Ellery", "including the steps it does not control"],
+  },
+
+  /**
    * THE RELAY — the site's signature element. Four custody handoffs on one
    * tick-marked track. Rendered as a measurement scale rather than three
    * rounded cards, because the order of the steps and the time each one takes

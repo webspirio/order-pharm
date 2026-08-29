@@ -46,3 +46,6 @@ references/
 
 # Licensed React Bits Pro source cache (not redistributable)
 .rb-source/
+
+# Rebuild scouting output (working notes, not shipped)
+.rebuild-plans/

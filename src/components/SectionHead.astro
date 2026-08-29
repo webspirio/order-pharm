@@ -1,0 +1,90 @@
+---
+/**
+ * The head of a section: eyebrow, heading, lead, and an optional trailing
+ * link. Every section on the site opens with some subset of these, and before
+ * this component each one wrote its own — which is how a page ends up with
+ * four heading sizes and three eyebrow colours.
+ *
+ * ONE heading size for the whole site (`display-2`), and it is the ceiling:
+ * nothing outside a page's single `h1` may be larger. ONE alignment: left,
+ * everywhere, following the hero.
+ *
+ * `on` picks the ground so the three text tones resolve correctly:
+ *   "paper"  the ordinary page (bg-background / bg-card)
+ *   "slab"   the fixed petrol band
+ *   "plate"  the amber CTA surface
+ */
+import { ArrowRight } from "lucide-react";
+
+interface Props {
+  eyebrow?: string;
+  title: string;
+  lead?: string;
+  /** A trailing link, rendered to the right on wide viewports. */
+  actionHref?: string;
+  actionLabel?: string;
+  on?: "paper" | "slab" | "plate";
+  /** Heading level. `h2` unless the section is a page's masthead. */
+  as?: "h2" | "h3";
+  class?: string;
+}
+
+const {
+  eyebrow,
+  title,
+  lead,
+  actionHref,
+  actionLabel,
+  on = "paper",
+  as: Tag = "h2",
+  class: className = "",
+} = Astro.props;
+
+const tone = {
+  paper: {
+    eyebrow: "text-signal-700 dark:text-signal-500",
+    title: "text-foreground",
+    lead: "text-muted-foreground",
+    action: "text-foreground hover:text-signal-700 dark:hover:text-signal-500",
+  },
+  slab: {
+    eyebrow: "text-signal-500",
+    title: "text-brand-50",
+    lead: "text-brand-50/70",
+    action: "text-brand-50 hover:text-signal-500",
+  },
+  plate: {
+    eyebrow: "text-[#0c1412]/60",
+    title: "text-[#0c1412]",
+    lead: "text-[#0c1412]/75",
+    action: "text-[#0c1412] hover:text-[#0c1412]/70",
+  },
+}[on];
+
+const headingClass = Tag === "h2" ? "display-2" : "display-3";
+---
+
+<div class:list={["reveal", className]}>
+  <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between lg:gap-12">
+    <div class="max-w-2xl">
+      {eyebrow && <p class:list={["label", tone.eyebrow]}>{eyebrow}</p>}
+      <Tag class:list={[headingClass, tone.title, eyebrow && "mt-4"]}>{title}</Tag>
+      {lead && <p class:list={["lead mt-5", tone.lead]}>{lead}</p>}
+    </div>
+
+    {
+      actionHref && actionLabel && (
+        <a
+          href={actionHref}
+          class:list={[
+            "group inline-flex shrink-0 items-center gap-2 text-[0.9375rem] font-semibold transition-colors",
+            tone.action,
+          ]}
+        >
+          {actionLabel}
+          <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+        </a>
+      )
+    }
+  </div>
+</div>

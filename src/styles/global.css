@@ -206,7 +206,8 @@
   --border: #dde3e1;
   --hairline: #e9edec;
   --input: #c3ccc9;
-  --ring: #e8a33d;
+  --ring: #0c1412;
+  --focus: #0c1412;
   --radius: 0.75rem;
   --radius-card: 1.5rem;
   --radius-slab: 2.5rem;
@@ -237,7 +238,8 @@
   --border: #242e2b;
   --hairline: #1a2220;
   --input: #33403c;
-  --ring: #e8a33d;
+  --ring: #e8edeb;
+  --focus: #e8edeb;
 }
 
 /* Palette: indigo — near-white cool ground, deep indigo ink. */
@@ -260,7 +262,8 @@
   --border: #dcdff1;
   --hairline: #e9ebf7;
   --input: #bcc3e6;
-  --ring: #ec7f62;
+  --ring: #12152f;
+  --focus: #12152f;
 }
 .dark[data-palette="indigo"] {
   --background: #0a0c1d;
@@ -281,7 +284,8 @@
   --border: #262c58;
   --hairline: #1a1e45;
   --input: #38407a;
-  --ring: #ec7f62;
+  --ring: #eef0fa;
+  --focus: #eef0fa;
 }
 
 /* Palette: clay — warm cream ground, deep clay ink. */
@@ -304,7 +308,8 @@
   --border: #e5dbcc;
   --hairline: #f0e9dd;
   --input: #d3c3ae;
-  --ring: #9fb469;
+  --ring: #2a1610;
+  --focus: #2a1610;
 }
 .dark[data-palette="clay"] {
   --background: #171010;
@@ -325,7 +330,8 @@
   --border: #38271f;
   --hairline: #2c1e18;
   --input: #4d372c;
-  --ring: #9fb469;
+  --ring: #f8f1eb;
+  --focus: #f8f1eb;
 }
 
 @layer base {
@@ -410,10 +416,14 @@
     background: var(--color-signal-500);
     color: #0c1412;
   }
-  /* One focus treatment everywhere, and it is the signal colour, so keyboard
-     focus is the same visual event as a primary action. */
+  /* ONE focus treatment everywhere, and it is INK, not the accent.
+     Amber is the obvious choice and it is wrong: #e8a33d against the paper
+     ground is 1.94:1, and WCAG 2.4.11 wants 3:1 against what surrounds it, so
+     an amber ring is a focus indicator a low-vision keyboard user cannot see.
+     The reference template ships that exact failure. Ink clears 15:1 here;
+     on the dark slab and the amber plate the token flips, below. */
   :focus-visible {
-    outline: 2px solid var(--color-signal-500);
+    outline: 2px solid var(--focus);
     outline-offset: 2px;
     border-radius: 2px;
   }
@@ -870,6 +880,56 @@
     border-color: var(--hairline);
   }
 
+  /* Clearance for the floating header, on the first in-flow section of every
+     page that is not the homepage. The homepage hero deliberately runs UNDER
+     the header — that is the whole point of a floating pill — so it opts out
+     by simply not carrying this class. */
+  .page-top {
+    padding-top: 7.5rem;
+  }
+  @media (min-width: 850px) {
+    .page-top {
+      padding-top: 9.5rem;
+    }
+  }
+
+  /* ===============================================================
+     THE ONE SCROLL REVEAL, and it costs nothing.
+
+     Everything below the fold arrives with this and nothing else:
+     one idea, one duration, applied per section rather than per
+     element. It is a scroll-driven CSS animation, so there is no
+     IntersectionObserver, no hydrated island, and no animation
+     library anywhere on the site.
+
+     The base state IS the final state. The animation only exists
+     inside `@supports`, so a browser without scroll-driven
+     animations — and a reader with reduced motion — sees finished,
+     readable content rather than an element stuck at opacity 0.
+     That is the failure mode of every `whileInView` block in the
+     React Bits library when it is rendered without a client:*
+     directive, and it is why this is CSS.
+     =============================================================== */
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .reveal {
+        animation: reveal-up linear both;
+        animation-timeline: view();
+        animation-range: entry 5% cover 26%;
+      }
+      @keyframes reveal-up {
+        from {
+          opacity: 0;
+          transform: translateY(1.25rem);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+    }
+  }
+
   /* ===============================================================
      THE OVERLAP — the reference template's best structural moment.
 
@@ -913,8 +973,13 @@
   .on-plate .btn-solid:hover {
     background: #24302d;
   }
-  .on-plate :focus-visible {
-    outline-color: #0c1412;
+  /* The two grounds that are not the page: the focus token flips with them,
+     so there is still exactly one focus rule on the site. */
+  .on-slab {
+    --focus: var(--color-signal-500);
+  }
+  .on-plate {
+    --focus: #0c1412;
   }
 
   /* The tick scale. A row of hairline ticks along an edge, borrowed from the
@@ -945,6 +1010,47 @@ a {
     color 0.2s ease,
     background-color 0.2s ease,
     border-color 0.2s ease;
+}
+
+/* -----------------------------------------------------------------------
+   PRINT. /terms/ and /privacy/ are the two pages people actually print, and
+   without this they print a full-bleed petrol slab, a solid amber plate and a
+   fixed header stamped over the first paragraph.
+   ----------------------------------------------------------------------- */
+@media print {
+  .site-header,
+  .ticker-region {
+    display: none;
+  }
+  .slab,
+  .plate,
+  .plate-soft,
+  .panel,
+  .panel-invert,
+  .panel-flat {
+    background: transparent !important;
+    color: #000 !important;
+    border-color: #999 !important;
+    box-shadow: none !important;
+  }
+  .band-overlap {
+    margin-bottom: 0;
+  }
+  .band-under,
+  .band-overlap + .band-under {
+    padding-top: 1.5rem;
+  }
+  .page-top {
+    padding-top: 0;
+  }
+  .section {
+    padding-block: 1.25rem;
+  }
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.75em;
+    word-break: break-all;
+  }
 }
 
 /* Shadows appear in three places only — the floating header, the mobile

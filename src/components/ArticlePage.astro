@@ -324,13 +324,12 @@ const breadcrumbJsonLd = {
     is:inline
     set:html={JSON.stringify(breadcrumbJsonLd)}
   />
-  <TrustTicker locale={locale} />
   <Header locale={locale} />
   <main id="main" tabindex="-1" class="outline-none">
     <article>
       {/* Header block: the article's own metadata, then the disclaimer —
           prominent, above the first paragraph, not in small print. */}
-      <section class="bg-background pb-12 pt-10 sm:pb-14 sm:pt-12">
+      <section class="page-top bg-background pb-12 sm:pb-14">
         <div class="shell">
           <nav aria-label="Breadcrumb">
             <ol class="label flex flex-wrap items-center gap-2.5 text-muted-foreground">
@@ -377,6 +376,11 @@ const breadcrumbJsonLd = {
           </aside>
         </div>
       </section>
+
+    {/* The ticker closes the head block, the same slot it takes under the
+        hero on the homepage. It cannot sit above the nav any more: the
+        header floats. */}
+    <TrustTicker locale={locale} />
 
       {/* The article itself, with the table of contents in a rail that sticks
           on lg and simply sits above the prose below it. */}
