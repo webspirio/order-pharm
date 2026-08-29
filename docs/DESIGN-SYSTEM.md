@@ -111,9 +111,17 @@ disappears.
 | Any figure | `figure` | mono, tabular, tight |
 | One accent word | `wonk` | Fraunces italic WONK 1, in the signal colour |
 
-**`display-2` is the ceiling.** Nothing outside an `<h1>` may be larger.
-A big figure caps at `figure text-[1.75rem]`, or `text-[2.5rem]` where it is
-genuinely the section's subject; never at `display-1`'s size.
+**The `h1` is the largest thing on its page, and nothing else comes close.**
+That is the rule; `display-1` is only how a landing page satisfies it. The
+three articles set their `h1` at `display-2` instead, because a 5.5rem headline
+over an eight-minute read is a poster, not an article — and on those pages
+nothing else exceeds 1.3rem, so the hierarchy still holds. What is never
+allowed is a section heading, a figure or a decorative numeral matching or
+beating the `h1`.
+
+**`display-2` is the ceiling for everything below the `h1`.** A big figure caps
+at `figure text-[1.75rem]`, or `text-[2.5rem]` where it is genuinely the
+section's subject.
 
 **`wonk` appears at most once per page**, inside the `h1`, via
 `Headline.astro`'s `{accent}` token. A pull quote may use it instead — never
@@ -140,6 +148,12 @@ One container, two section rhythms, two radius families.
 | Surface radius | `rounded-2xl` / `.panel` | 24px — cards, tiles, media, tables |
 | Furniture radius | `--radius-slab` | 40px — frame fillets, header sweep, slab tops |
 | Circle | `rounded-full` | dots, ticks, avatar slots **only** |
+
+**Framed media nests one step in.** A card at `rounded-2xl` with `p-2` holds
+its image at `rounded-[calc(var(--radius-card)-0.5rem)]` — the outer radius
+minus the padding, so the two curves are concentric. It is written as the
+calculation rather than as `16px` so it follows `--radius-card` if that ever
+moves, and it is the same family, not a third one.
 
 **The control family scales below 24px.** A 16px checkbox cannot carry the
 12px control radius without reading as a circle, so controls smaller than 24px
