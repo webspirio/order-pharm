@@ -459,10 +459,28 @@ rather than markers sprinkled through the body.
 
 ## Deployment
 
-**Live on GitHub Pages** at `https://webspirio.github.io/order-pharm/`, built
-and published by `.github/workflows/deploy.yml` on push to `main` (or by
-`workflow_dispatch` from any branch). It runs the same `pnpm verify` gate CI
-runs before it uploads, so a build that fails the gate is never published.
+**Live on GitHub Pages** at `https://webspirio.github.io/order-pharm/`, served
+straight from the root of the **`gh-pages`** branch — branch mode, no Actions
+workflow (`build_type: legacy`).
+
+`gh-pages` is a build artifact with orphan history: it contains the contents of
+`dist/` and no source. **Never edit it by hand** — every deploy force-pushes
+over it.
+
+```sh
+pnpm deploy      # verify -> build -> force-push dist/ to gh-pages
+```
+
+`scripts/deploy-pages.sh` exists rather than a three-line README snippet for two
+reasons. Pages is in **branch mode**, so nothing runs the ship gate on the way
+to production — the script runs `pnpm verify` and refuses to publish without it.
+And it copies with `dist/.`, never `dist/*`: the glob silently misses
+`.nojekyll`, and without that file Pages runs Jekyll, drops every directory
+whose name starts with an underscore, and 404s the whole of `_astro/`. The
+script fails loudly if the file is missing.
+
+`.github/workflows/ci.yml` still runs `pnpm verify` on pull requests and on push
+to `main`. That is the safety net for the source branch, not for the deploy.
 
 ### The base path, and why it is threaded through exactly two functions
 

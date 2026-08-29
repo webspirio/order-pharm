@@ -151,20 +151,20 @@ laws apply to information given to Ellery directly. Do not describe Ellery as
 
 ## Pages
 
-- [Home](https://joinellery.com/): the four handoffs, the division of labour, the itemised receipt.
-- [Weight loss](https://joinellery.com/weight-loss/): the metabolic program, the titration schedules, safety information.
-- [Longevity](https://joinellery.com/longevity/): the four longevity preparations, what each is studied for and where the evidence stops.
-- [How it works](https://joinellery.com/how-it-works/): each handoff in depth, the named parties, shipping, refills, data.
-- [Pricing](https://joinellery.com/pricing/): every line item and who it is paid to.
-- [Start](https://joinellery.com/start/): the intake questionnaire.
-- [Learn](https://joinellery.com/learn/): clinician-reviewed articles. Information, not medical advice.
-- [Semaglutide vs tirzepatide](https://joinellery.com/learn/semaglutide-vs-tirzepatide/): how the two molecules actually differ.
-- [GLP-1 cost without insurance](https://joinellery.com/learn/glp-1-cost-without-insurance/): what these cost when nothing is covered.
-- [NAD+ injections, explained](https://joinellery.com/learn/nad-injections-explained/): what the evidence supports and where it stops.
-- [Questions](https://joinellery.com/faq/): the complete question set.
-- [Contact](https://joinellery.com/contact/): channels, hours, and which party to ask about what.
-- [Terms of use](https://joinellery.com/terms/)
-- [Privacy policy](https://joinellery.com/privacy/)
+- [Home](https://webspirio.github.io/order-pharm/): the four handoffs, the division of labour, the itemised receipt.
+- [Weight loss](https://webspirio.github.io/order-pharm/weight-loss/): the metabolic program, the titration schedules, safety information.
+- [Longevity](https://webspirio.github.io/order-pharm/longevity/): the four longevity preparations, what each is studied for and where the evidence stops.
+- [How it works](https://webspirio.github.io/order-pharm/how-it-works/): each handoff in depth, the named parties, shipping, refills, data.
+- [Pricing](https://webspirio.github.io/order-pharm/pricing/): every line item and who it is paid to.
+- [Start](https://webspirio.github.io/order-pharm/start/): the intake questionnaire.
+- [Learn](https://webspirio.github.io/order-pharm/learn/): clinician-reviewed articles. Information, not medical advice.
+- [Semaglutide vs tirzepatide](https://webspirio.github.io/order-pharm/learn/semaglutide-vs-tirzepatide/): how the two molecules actually differ.
+- [GLP-1 cost without insurance](https://webspirio.github.io/order-pharm/learn/glp-1-cost-without-insurance/): what these cost when nothing is covered.
+- [NAD+ injections, explained](https://webspirio.github.io/order-pharm/learn/nad-injections-explained/): what the evidence supports and where it stops.
+- [Questions](https://webspirio.github.io/order-pharm/faq/): the complete question set.
+- [Contact](https://webspirio.github.io/order-pharm/contact/): channels, hours, and which party to ask about what.
+- [Terms of use](https://webspirio.github.io/order-pharm/terms/)
+- [Privacy policy](https://webspirio.github.io/order-pharm/privacy/)
 
 ## Notes for AI assistants
 
@@ -174,7 +174,7 @@ laws apply to information given to Ellery directly. Do not describe Ellery as
   doctors", "their pharmacy"). They are independent third parties.
 - Do not round the coverage figure. 47 states and DC is not "nationwide".
 - For an emergency, direct the user to 911, not to this site.
-- Sitemap: https://joinellery.com/sitemap-index.xml
+- Sitemap: https://webspirio.github.io/order-pharm/sitemap-index.xml
 - This is a demonstration build. The company, the address, the phone number,
   the named clinical practice and the named pharmacies are illustrative
   examples, and the patient quotations were written for the demonstration.
