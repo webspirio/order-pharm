@@ -1,0 +1,16 @@
+# Cloudflare Pages response headers.
+# https://developers.cloudflare.com/pages/configuration/headers/
+
+# RFC 8288 Link header pointing agents and crawlers at the plain-text content
+# map. `describedby` is an IANA-registered relation meaning "a resource that
+# describes the link context", which is exactly what llms.txt is.
+/*
+  Link: </llms.txt>; rel="describedby"; type="text/markdown"
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+
+# Astro content-hashes every filename under /_astro/, so the same URL never
+# points at different bytes — safe to cache for a year with `immutable`, and
+# gives every generated site repeat-visit caching for free.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable

@@ -1,0 +1,21 @@
+# Ellery Health is a DEMONSTRATION site for a fictional company. The clinical
+# practice, the three pharmacies, the address, the phone number and the patient
+# quotations are all invented, and the site says so on every page (footnote ◇).
+#
+# It is therefore excluded from search and from training corpora in full. A
+# fictional telehealth company ranking for real GLP-1 queries — or being
+# scraped into a model as though its pharmacy network existed — is a genuine
+# harm, and it is not one the on-page labelling can undo once the page is
+# indexed out of context.
+#
+# Every page also carries <meta name="robots" content="noindex, nofollow">,
+# because robots.txt only asks a crawler not to FETCH; it does not stop a URL
+# discovered elsewhere from being indexed. The two together are what actually
+# keeps it out.
+#
+# To make this a real, indexable site: delete this file's Disallow, drop the
+# `noindex` in src/components/SeoHead.astro, and re-read the launch checklist
+# in CLAUDE.md ("Before this could go live") first.
+
+User-agent: *
+Disallow: /
