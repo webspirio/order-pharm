@@ -10,6 +10,7 @@ export {
 } from "@/config/locales";
 
 import { locales, localeSegment, type Locale } from "@/config/locales";
+import { site } from "@/config/site";
 
 /**
  * The default-locale dictionary is the type source of truth. `en.ts` is
@@ -29,12 +30,19 @@ export function t(locale: Locale): Dictionary {
  * Build a localized in-site path. `path` is always the default-locale-root
  * path, e.g. "/" or "/pricing/". Paths carry trailing slashes; a mismatch
  * silently breaks language switching, which is why this is unit-tested.
+ *
+ * THE DEPLOYMENT BASE IS PREPENDED HERE, and only here. This site is served
+ * from a GitHub Pages project path (`site.basePath`), so every internal link
+ * has to carry the repo name. Astro's own `base` rewrites the assets it
+ * generates but not a hand-written href, so routing it through this one
+ * function is what makes the rule "build every internal link with
+ * localizedPath()" load-bearing rather than a style preference.
  */
 export function localizedPath(locale: Locale, path = "/"): string {
   const clean = path === "" ? "/" : path.startsWith("/") ? path : `/${path}`;
   const segment = localeSegment[locale];
-  if (segment === "") return clean;
-  return clean === "/" ? `/${segment}/` : `/${segment}${clean}`;
+  const localized = segment === "" ? clean : clean === "/" ? `/${segment}/` : `/${segment}${clean}`;
+  return `${site.basePath}${localized}`;
 }
 
 /**
@@ -44,6 +52,15 @@ export function localizedPath(locale: Locale, path = "/"): string {
  * page declaring its own path.
  */
 export function unlocalizedPath(pathname: string): string {
+  // Strip the deployment base first, so the locale-prefix match below sees the
+  // same shape it would on a domain-root deployment. Without this the whole
+  // function is off by one segment on a project site and `aria-current` never
+  // matches, which is silent — the nav simply stops marking the current page.
+  const base = site.basePath;
+  if (base && (pathname === base || pathname.startsWith(`${base}/`))) {
+    pathname = pathname.slice(base.length) || "/";
+  }
+
   const prefixes = locales
     .map((locale) => localeSegment[locale])
     .filter((segment) => segment !== "");

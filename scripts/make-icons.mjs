@@ -24,6 +24,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import sharp from "sharp";
+import { site } from "../src/config/site.ts";
 
 const OUT_DIR = fileURLToPath(new URL("../public/", import.meta.url));
 
@@ -139,5 +140,45 @@ const ogSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${OG_W}" height="$
 const og = await sharp(Buffer.from(ogSvg)).jpeg({ quality: 88, mozjpeg: true }).toBuffer();
 await writeFile(path.join(OUT_DIR, "og-image.jpg"), og);
 console.log("wrote og-image.jpg");
+
+/**
+ * site.webmanifest.
+ *
+ * Generated rather than hand-kept because every path inside it — `start_url`
+ * and both icon `src` values — has to carry the deployment's base path, and a
+ * manifest is the one place a wrong path fails silently: the browser installs
+ * the app, then opens a 404 and shows a broken icon. Deriving it from
+ * `src/config/site.ts` means moving to a custom domain (basePath "") fixes the
+ * manifest in the same edit as everything else.
+ *
+ * Colours are read from the default palette in src/styles/global.css. They are
+ * literals here for the same reason the mark's are: a build script cannot
+ * resolve a CSS custom property.
+ */
+const manifest = {
+  name: site.name,
+  short_name: site.shortName,
+  description:
+    "GLP-1 and longevity treatment, coordinated between you, an independent " +
+    "licensed clinician and a US mail-order pharmacy. Every fee, every handoff " +
+    "and every hour, published.",
+  start_url: `${site.basePath}/`,
+  scope: `${site.basePath}/`,
+  display: "standalone",
+  background_color: "#f1f3f2", // --background, specimen palette
+  theme_color: "#0b2a31", // brand-800, the slab
+  icons: [192, 512].map((size) => ({
+    src: `${site.basePath}/web-app-manifest-${size}x${size}.png`,
+    sizes: `${size}x${size}`,
+    type: "image/png",
+    purpose: "any maskable",
+  })),
+};
+
+await writeFile(
+  path.join(OUT_DIR, "site.webmanifest"),
+  JSON.stringify(manifest, null, 2) + "\n",
+);
+console.log("wrote site.webmanifest");
 
 console.log("\nIcons generated from the four-step mark, default 'specimen' palette.");

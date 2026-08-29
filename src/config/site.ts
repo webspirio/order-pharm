@@ -22,11 +22,33 @@ export const site = {
   /** Founder or responsible person. Not named on a demo build. */
   owner: "",
   /**
-   * Canonical origin, no trailing slash. Single source of truth for the
-   * site's domain — `astro.config.ts` imports this file and sets
-   * `site: site.domain` from it, so the two can never drift.
+   * Canonical ORIGIN, no trailing slash and no path. Single source of truth —
+   * `astro.config.ts` imports this file and sets `site: site.domain`, so the
+   * two can never drift.
+   *
+   * This is a GitHub Pages project site, so the origin is the github.io host
+   * and the repository name is a path prefix — see `basePath` below. The pair
+   * is what every canonical, hreflang, sitemap entry and the JSON-LD `@id` is
+   * built from, which is why they live together.
    */
-  domain: "https://joinellery.com",
+  domain: "https://webspirio.github.io",
+
+  /**
+   * Path prefix, with a leading slash and NO trailing slash; "" for a site
+   * served from a domain root.
+   *
+   * A GitHub Pages project site serves at `<user>.github.io/<repo>/`, so every
+   * absolute path the site emits has to carry the repo name. Rather than
+   * sprinkle that through the markup it is threaded in exactly two places:
+   * `localizedPath()` prepends it to every internal link, and `assetPath()`
+   * prepends it to the handful of `/public` references in `Layout.astro`.
+   * `astro.config.ts` also reads it as Astro's own `base`, which is what
+   * rewrites the built asset URLs.
+   *
+   * Moving to a custom domain is therefore a one-line change: set this to ""
+   * and point `domain` at the new origin.
+   */
+  basePath: "/order-pharm",
 
   /**
    * schema.org type for the primary entity. Deliberately `Organization`, NOT
@@ -106,6 +128,20 @@ export const site = {
   /** Social share image (1200x630), served from /public. */
   ogImage: "/og-image.jpg",
 };
+
+/**
+ * Prefix a `/public` path with the deployment's base path.
+ *
+ * Astro rewrites asset URLs it generates itself (imported images, the CSS and
+ * JS bundles), but a hand-written `href="/favicon.svg"` in markup is opaque to
+ * it and would resolve against the domain root — 404 on a project site. This
+ * is the one helper for those, and `verify-dist.mjs` fails the build if a
+ * built page links to a path that is neither a route nor a real file, so a
+ * missed call cannot ship silently.
+ */
+export const assetPath = (file: string): string =>
+  `${site.basePath}${file.startsWith("/") ? file : `/${file}`}`;
+
 
 /** In-page anchor ids, shared by header nav, sections, and footer. */
 export const anchors = {

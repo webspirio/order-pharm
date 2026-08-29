@@ -28,6 +28,11 @@ const sitemapI18n =
 
 export default defineConfig({
   site: site.domain,
+  // GitHub Pages project site: served from `<user>.github.io/<repo>/`. This is
+  // what rewrites the URLs Astro generates itself (the CSS/JS bundles and every
+  // optimised image). Hand-written hrefs are Astro's blind spot and go through
+  // `localizedPath()` / `assetPath()` in src/config/site.ts instead.
+  base: site.basePath,
   output: "static",
   // Every internal path is built with a trailing slash by localizedPath();
   // enforcing it here makes the dev server agree with the built output.

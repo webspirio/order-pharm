@@ -25,6 +25,7 @@
  */
 import { type Locale, locales, defaultLocale, htmlLang, localizedPath, t } from "@/i18n";
 import { site } from "@/config/site";
+import { assetPath } from "@/config/site";
 
 interface Props {
   locale: Locale;
@@ -54,7 +55,10 @@ const alternates = selfOnly
     }));
 const xDefault = new URL(localizedPath(defaultLocale, path), site.domain).href;
 const canonical = canonicalHref;
-const ogImage = new URL(site.ogImage, site.domain).href;
+// `site.ogImage` is a /public path, so it needs the deployment base before it
+// is made absolute — `new URL("/og-image.jpg", origin)` would drop the project
+// path and point at a 404 on the github.io root.
+const ogImage = new URL(assetPath(site.ogImage), site.domain).href;
 
 /**
  * Recursively drop empty values so a site without an address, VAT id or
@@ -157,6 +161,12 @@ const jsonLd = compact({
 });
 ---
 
+{/* DEMONSTRATION SITE. robots.txt asks crawlers not to fetch; it does not
+    stop a URL discovered elsewhere from being indexed, and only this meta tag
+    does that. A fictional telehealth company with an invented pharmacy network
+    must not surface for real medical queries. Remove both together — see the
+    note at the top of public/robots.txt. */}
+<meta name="robots" content="noindex, nofollow" />
 <link rel="canonical" href={canonical} />
 {alternates.map((a) => <link rel="alternate" hreflang={a.hreflang} href={a.href} />)}
 <link rel="alternate" hreflang="x-default" href={xDefault} />

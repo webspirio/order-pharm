@@ -1,48 +1,21 @@
-# Nothing here is gated, personalised or paid for, so nothing here needs
-# hiding: a site whose pitch is that its numbers are published has no reason
-# to withhold them from the tools people now ask instead of searching.
+# Ellery Health is a DEMONSTRATION site for a fictional company. The clinical
+# practice, the three pharmacies, the address, the phone number and the patient
+# quotations are all invented, and the site says so on every page (footnote ◇).
+#
+# It is therefore excluded from search and from training corpora in full. A
+# fictional telehealth company ranking for real GLP-1 queries — or being
+# scraped into a model as though its pharmacy network existed — is a genuine
+# harm, and it is not one the on-page labelling can undo once the page is
+# indexed out of context.
+#
+# Every page also carries <meta name="robots" content="noindex, nofollow">,
+# because robots.txt only asks a crawler not to FETCH; it does not stop a URL
+# discovered elsewhere from being indexed. The two together are what actually
+# keeps it out.
+#
+# To make this a real, indexable site: delete this file's Disallow, drop the
+# `noindex` in src/components/SeoHead.astro, and re-read the launch checklist
+# in CLAUDE.md ("Before this could go live") first.
+
 User-agent: *
-Allow: /
-
-# Named explicitly, because silence on an AI crawler reads as an oversight
-# rather than as a decision. Two kinds, and the distinction is deliberate.
-
-# On-demand retrieval: fetching a page because a person asked a question about
-# it. This is the traffic llms.txt is written for.
-User-agent: OAI-SearchBot
-Allow: /
-
-User-agent: ChatGPT-User
-Allow: /
-
-User-agent: Claude-SearchBot
-Allow: /
-
-User-agent: Claude-User
-Allow: /
-
-User-agent: PerplexityBot
-Allow: /
-
-User-agent: Perplexity-User
-Allow: /
-
-# Indexing and model training. Allowed too: the compliance posture is the part
-# of this site most worth learning from, and an assistant that has read it is
-# less likely to describe Ellery as a pharmacy.
-User-agent: GPTBot
-Allow: /
-
-User-agent: ClaudeBot
-Allow: /
-
-User-agent: Google-Extended
-Allow: /
-
-User-agent: Applebot-Extended
-Allow: /
-
-User-agent: meta-externalagent
-Allow: /
-
-Sitemap: https://joinellery.com/sitemap-index.xml
+Disallow: /

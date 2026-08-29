@@ -23,6 +23,9 @@ vi.mock("@/config/locales", () => ({
  * Widen the signatures for this file, where the module is deliberately backed
  * by a different locale set than the one the project ships.
  */
+const { site } = await import("@/config/site");
+const B = site.basePath;
+
 const { localizedPath, unlocalizedPath } = (await import("@/i18n")) as {
   localizedPath: (locale: string, path?: string) => string;
   unlocalizedPath: (pathname: string) => string;
@@ -30,46 +33,46 @@ const { localizedPath, unlocalizedPath } = (await import("@/i18n")) as {
 
 describe("localizedPath with multiple locales", () => {
   it("leaves default-locale paths at the root", () => {
-    expect(localizedPath("en", "/imprint/")).toBe("/imprint/");
-    expect(localizedPath("en", "/")).toBe("/");
+    expect(localizedPath("en", "/imprint/")).toBe(`${B}/imprint/`);
+    expect(localizedPath("en", "/")).toBe(`${B}/`);
   });
 
   it("prefixes by URL segment, not by locale code", () => {
     // The whole point of the split: locale "uk" serves from "/ua/".
-    expect(localizedPath("uk", "/imprint/")).toBe("/ua/imprint/");
-    expect(localizedPath("uk", "/")).toBe("/ua/");
+    expect(localizedPath("uk", "/imprint/")).toBe(`${B}/ua/imprint/`);
+    expect(localizedPath("uk", "/")).toBe(`${B}/ua/`);
   });
 
   it("prefixes a locale whose segment equals its code", () => {
-    expect(localizedPath("pl", "/imprint/")).toBe("/pl/imprint/");
-    expect(localizedPath("pl", "/")).toBe("/pl/");
+    expect(localizedPath("pl", "/imprint/")).toBe(`${B}/pl/imprint/`);
+    expect(localizedPath("pl", "/")).toBe(`${B}/pl/`);
   });
 });
 
 describe("unlocalizedPath with multiple locales", () => {
   it("strips a locale segment", () => {
-    expect(unlocalizedPath("/ua/imprint/")).toBe("/imprint/");
-    expect(unlocalizedPath("/pl/imprint/")).toBe("/imprint/");
+    expect(unlocalizedPath(`${B}/ua/imprint/`)).toBe("/imprint/");
+    expect(unlocalizedPath(`${B}/pl/imprint/`)).toBe("/imprint/");
   });
 
   it("maps a bare locale root back to the site root", () => {
-    expect(unlocalizedPath("/ua/")).toBe("/");
+    expect(unlocalizedPath(`${B}/ua/`)).toBe("/");
   });
 
   it("handles a locale segment with no trailing slash", () => {
     // Exercises the `$` alternative of the (/|$) boundary group.
-    expect(unlocalizedPath("/ua")).toBe("/");
+    expect(unlocalizedPath(`${B}/ua`)).toBe("/");
   });
 
   it("does not strip a segment that merely starts with a locale segment", () => {
     // THE case the boundary group exists for: "pl" is a real prefix here, and
     // "plaza" starts with it. Without (/|$) this would return "/aza/".
-    expect(unlocalizedPath("/plaza/")).toBe("/plaza/");
-    expect(unlocalizedPath("/uater/")).toBe("/uater/");
+    expect(unlocalizedPath(`${B}/plaza/`)).toBe("/plaza/");
+    expect(unlocalizedPath(`${B}/uater/`)).toBe("/uater/");
   });
 
   it("leaves an unprefixed path alone", () => {
-    expect(unlocalizedPath("/imprint/")).toBe("/imprint/");
+    expect(unlocalizedPath(`${B}/imprint/`)).toBe("/imprint/");
   });
 });
 

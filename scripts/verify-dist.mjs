@@ -100,12 +100,16 @@ if (!existsSync(DIST)) {
  * stops loading, that is a hard stop rather than a skipped check.
  */
 let common;
+let site;
 try {
   common = (await import(new URL("../src/i18n/en/common.ts", import.meta.url).href)).default;
+  // The deployment base, read from the same file the site builds from, so the
+  // gate cannot disagree with the pages about where they are served.
+  ({ site } = await import(new URL("../src/config/site.ts", import.meta.url).href));
 } catch (error) {
   console.error(
-    "could not load src/i18n/en/common.ts, so the compliance checks have no " +
-      "rules to check against:\n" +
+    "could not load src/i18n/en/common.ts or src/config/site.ts, so the " +
+      "compliance and routing checks have no rules to check against:\n" +
       `  ${error.message}\n` +
       "  Node 22.18+ and Node 24 strip TypeScript types on import; on an " +
       "older Node, run this script with --experimental-strip-types.",
@@ -171,9 +175,18 @@ function htmlFiles(dir = DIST, prefix = "") {
 const files = htmlFiles();
 if (files.length === 0) fail("dist/ contains no HTML files");
 
-/** "index.html" -> "/", "imprint/index.html" -> "/imprint/" */
+/**
+ * "index.html" -> "/order-pharm/", "imprint/index.html" -> "/order-pharm/imprint/"
+ *
+ * The deployment base is folded in HERE rather than at each comparison site,
+ * because every check downstream — canonical pathname, hreflang reciprocity,
+ * internal links, sitemap coverage — compares against `builtRoutes`. Prefixing
+ * once means all four keep working on a project site with no other change, and
+ * means a link that forgot the base fails the build instead of 404ing live.
+ */
+const BASE = site.basePath;
 const routeOf = (file) =>
-  file === "index.html" ? "/" : "/" + file.replace(/index\.html$/, "");
+  BASE + (file === "index.html" ? "/" : "/" + file.replace(/index\.html$/, ""));
 
 const builtRoutes = new Set(files.map(routeOf));
 
@@ -339,7 +352,10 @@ for (const page of pages) {
     // built at dist/imprint/index.html leaves dist/imprint existing as a
     // DIRECTORY, so a link to "/imprint" would pass while pointing at a path
     // the site never serves. Only a real file (an asset) earns the carve-out.
-    const asPath = path.join(DIST, target.replace(/^\//, ""));
+    // dist/ has no base directory in it — the base is a serving prefix, not a
+    // build output path — so strip it before resolving the file.
+    const withoutBase = BASE && target.startsWith(`${BASE}/`) ? target.slice(BASE.length) : target;
+    const asPath = path.join(DIST, withoutBase.replace(/^\//, ""));
     if (existsSync(asPath) && statSync(asPath).isFile()) continue;
 
     if (builtRoutes.has(`${target}/`)) {
@@ -521,7 +537,11 @@ if (!existsSync(sitemapIndex)) {
     }
   }
   for (const route of builtRoutes) {
-    if (route.startsWith("/404")) continue;
+    // `builtRoutes` carries the deployment base, so this has to match against
+    // the route with the base removed — otherwise the 404 carve-out silently
+    // stops matching on a project site and the gate demands that /404.html be
+    // listed in the sitemap.
+    if (route.slice(BASE.length).startsWith("/404")) continue;
     if (!listed.has(route)) fail(`route ${route} is built but missing from the sitemap`);
   }
 }

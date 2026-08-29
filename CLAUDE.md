@@ -459,9 +459,53 @@ rather than markers sprinkled through the body.
 
 ## Deployment
 
-Cloudflare Workers with static assets, from `dist/`. `wrangler.jsonc` sets the
-Worker name and `assets.directory`. `.github/workflows/ci.yml` runs
-`pnpm verify` on pull requests and on push to `main`.
+**Live on GitHub Pages** at `https://webspirio.github.io/order-pharm/`, built
+and published by `.github/workflows/deploy.yml` on push to `main` (or by
+`workflow_dispatch` from any branch). It runs the same `pnpm verify` gate CI
+runs before it uploads, so a build that fails the gate is never published.
+
+### The base path, and why it is threaded through exactly two functions
+
+A Pages *project* site serves from `<user>.github.io/<repo>/`, so every
+absolute path the site emits has to carry the repo name. Astro's own `base`
+rewrites the URLs Astro generates (the CSS/JS bundles, every optimised image)
+but it is blind to a hand-written `href`. So the prefix is applied in two
+places and nowhere else:
+
+- **`localizedPath()`** in `src/i18n/index.ts` — every internal page link.
+  This is what makes the existing rule "build every internal link with
+  `localizedPath()`" load-bearing rather than a style preference.
+  `unlocalizedPath()` strips it again, so `aria-current` and the language
+  switcher keep working.
+- **`assetPath()`** in `src/config/site.ts` — the handful of `/public`
+  references (the five icons and the manifest in `Layout.astro`, and
+  `og-image.jpg` in `SeoHead.astro`).
+
+Both read `site.basePath`, which `astro.config.ts` also passes to Astro as
+`base`. **Moving to a custom domain is one edit**: set `basePath` to `""` and
+`domain` to the new origin, add `public/CNAME`, done — the tests and
+`verify-dist` are both written against `site.basePath` rather than the literal
+string, so they assert the new truth instead of failing on the old one.
+
+`scripts/verify-dist.mjs` folds the base into `routeOf()`, so the canonical,
+hreflang, internal-link and sitemap checks all compare like with like — a link
+that forgot the base fails the build rather than 404ing in production.
+
+### Two things GitHub Pages needs that nothing else does
+
+- **`public/.nojekyll`.** Pages runs Jekyll by default, and Jekyll ignores every
+  directory whose name starts with an underscore. Astro emits *all* of its
+  assets to `_astro/`. Without this empty file the site deploys and every
+  stylesheet and script 404s.
+- **`noindex` on every page, plus `Disallow: /`.** This is a demonstration site
+  for a fictional company, and Pages is public. `robots.txt` only asks a crawler
+  not to fetch; it does not stop a URL discovered elsewhere from being indexed,
+  so `SeoHead.astro` emits the meta tag too. Remove both together, and re-read
+  "Before this could go live" first.
+
+`wrangler.jsonc` is kept for the Cloudflare Workers path, which is where this
+would go for a real launch (Pages has no edge logic and no custom headers).
+It is not what currently publishes the site.
 
 ## Before this could go live
 
