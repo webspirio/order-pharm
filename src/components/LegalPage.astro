@@ -6,13 +6,31 @@
  * WHY IT IS BUILT THIS WAY. A legal page in this category is where design
  * gives up — 4,000 words of 13px grey, no navigation, an all-caps arbitration
  * wall, and a "last updated" line nobody maintains. Everything here is aimed
- * at the opposite: a numbered document with a sticky contents rail so a
- * reader can get to section six directly, real `<table>`s where the content is
- * rows of pairs (the fee schedule, the HIPAA buckets, the transmission list),
- * and the two clauses that matter most — arbitration and the class-action
- * waiver — set as a highlighted panel in ordinary sentences rather than
- * shouted in capitals. Conspicuousness is a design property; capitals stopped
- * supplying it decades ago.
+ * at the opposite: a numbered document with a contents rail so a reader can
+ * get to clause six directly, real `<table>`s where the content is rows of
+ * pairs (the fee schedule, the HIPAA buckets, the transmission list), a
+ * definition list where the content is defined terms, and the two clauses
+ * that matter most — arbitration and the class-action waiver — set on the
+ * pale signal surface in ordinary sentences rather than shouted in capitals.
+ * Conspicuousness is a design property; capitals stopped supplying it decades
+ * ago.
+ *
+ * THREE THINGS THE REBUILD ADDED, and the reason for each:
+ *
+ * 1. THE COLOPHON. The masthead is now two poles — the title and lead on the
+ *    left, a panel on the right that states the effective date, the clause
+ *    count and the length. All three are COUNTED from the document rather
+ *    than typed, so the page cannot claim a size it does not have. Telling a
+ *    reader it is four thousand words before they start is the same courtesy
+ *    as publishing the fee before the intake.
+ * 2. THE DRAWN RAIL. The contents list is ruled and ticked, one graduation
+ *    per clause — the same ruler language as the Relay and the CTA plate's
+ *    tick scale, which is what a numbered document actually is.
+ * 3. THE DEFINITION LIST. Every list in these documents is written
+ *    "Term — explanation". A `<ul>` of those is rows of pairs pretending to
+ *    be prose; where every item in a list is a pair it is rendered as a real
+ *    `<dl>`, which is both the correct semantics and the only way the terms
+ *    become skimmable. A list with any non-pair item stays a `<ul>`.
  *
  * THE DICTIONARY IS TOKENISED. Every `{token}` in `src/i18n/en/legal.ts` is
  * substituted here from `src/config/pricing.ts` and `src/config/site.ts`, and
@@ -21,6 +39,10 @@
  * time rather than rendering a brace to a visitor, and a footnote token is
  * looked up in `d.compliance.notes` so a symbol that the compliance band does
  * not define cannot ship.
+ *
+ * THESE ARE THE TWO PAGES PEOPLE PRINT. The print rules at the foot of this
+ * file drop the navigation furniture — a contents list and a "read this next"
+ * block are dead ink on paper — and keep tables and panels off page breaks.
  *
  * The sales `Cta` is deliberately absent. A page whose job is to disclose
  * should not close with a button.
@@ -105,10 +127,17 @@ const duration = (value: string) => {
   return `${figure(parts[1])}\u00a0${escapeHtml(parts[2])}`;
 };
 
+/**
+ * An inline link inside grey prose. INK, not a colour — the site has three
+ * text tones per ground and a fourth invented for links would be one too
+ * many, so the link is distinguished by weight and a rule rather than by hue.
+ * The rule warms to the signal on hover, which is the only place amber is
+ * spent inside the running text.
+ */
 const link = (href: string, label: string, mono = false) =>
   `<a href="${href}" class="${
     mono ? "figure " : ""
-  }font-medium text-brand-700 underline decoration-border decoration-1 underline-offset-4 hover:decoration-brand-500 dark:text-brand-400">${escapeHtml(
+  }font-medium text-foreground underline decoration-border decoration-1 underline-offset-4 transition-colors hover:decoration-signal-500">${escapeHtml(
     label,
   )}</a>`;
 
@@ -203,17 +232,29 @@ const render = (value: string) =>
 const paragraphs = (value: string) => render(value).split("\n\n");
 
 /**
- * List items are written "Term — explanation". The term is promoted to bold
- * foreground text, which is what turns an enumerated legal list into something
- * a reader can skim for the one line they came for.
+ * Lists are written "Term — explanation". Where EVERY item in a list is a
+ * pair, the list is rendered as a `<dl>` (see `pairsOf` below). Where one is
+ * not — the "what you may not do" list is six plain prohibitions — the list
+ * stays a `<ul>`, and any pair inside it still gets its term promoted, which
+ * is what turns an enumerated legal list into something a reader can skim.
  */
+const PAIR = " — ";
+
 const listItem = (value: string) => {
-  const split = value.indexOf(" — ");
-  if (split === -1) return render(value);
+  const at = value.indexOf(PAIR);
+  if (at === -1) return render(value);
   return `<strong class="font-semibold text-foreground">${render(
-    value.slice(0, split),
-  )}</strong> — ${render(value.slice(split + 3))}`;
+    value.slice(0, at),
+  )}</strong> — ${render(value.slice(at + PAIR.length))}`;
 };
+
+const pairsOf = (items: string[]) =>
+  items.every((item) => item.includes(PAIR))
+    ? items.map((item) => {
+        const at = item.indexOf(PAIR);
+        return { term: render(item.slice(0, at)), def: render(item.slice(at + PAIR.length)) };
+      })
+    : null;
 
 /* ------------------------------------------------------------------ */
 /* The document                                                        */
@@ -258,6 +299,35 @@ const path = doc === "terms" ? "/terms/" : "/privacy/";
 
 const index = (position: number) => String(position + 1).padStart(2, "0");
 
+/**
+ * THE LENGTH, COUNTED. Every string the reader will actually read, with the
+ * tokens resolved and the markup stripped, at a flat 200 words per minute —
+ * the ordinary convention, and deliberately not adjusted downward to make the
+ * document look shorter than it is. `tokens` is populated after it is
+ * declared because `render()` reads it at call time, and the count itself has
+ * to be rendered before it can be counted.
+ */
+const readable = (value: string) => render(value).replace(/<[^>]*>/g, " ");
+
+const documentWords = sections
+  .flatMap((section) => [
+    section.heading,
+    ...section.blocks.flatMap((block) => [
+      block.subheading ?? "",
+      block.text ?? "",
+      ...(block.items ?? []),
+      ...(block.table ? [block.table.label, ...block.table.rows.flat(), block.table.note ?? ""] : []),
+      ...(block.panel ? [block.panel.label, block.panel.title, block.panel.body] : []),
+      block.note ?? "",
+    ]),
+  ])
+  .reduce((total, value) => total + readable(value).split(/\s+/).filter(Boolean).length, 0);
+
+const readingMinutes = Math.max(1, Math.round(documentWords / 200));
+
+tokens.words = figure(documentWords.toLocaleString("en-US"));
+tokens.minutes = figure(String(readingMinutes));
+
 /** The other document first, then the pages a reader of this one asks for. */
 const related = [
   doc === "terms"
@@ -273,38 +343,60 @@ const related = [
   <SeoHead slot="head" locale={locale} path={path} />
   <Header locale={locale} />
   <main id="main" tabindex="-1" class="outline-none">
-    {/* Masthead. The effective date is mono because it is a figure with legal
+    {/* MASTHEAD. Two poles: the document on the left, what it is on the
+        right. The effective date is mono because it is a figure with legal
         force, and it is repeated at the foot of the document, which is where
         the text itself refers to it. */}
     <section class="bg-card page-top pb-14 sm:pb-16">
       <div class="shell">
-        <p class="label text-brand-700 dark:text-brand-400">{docData.eyebrow}</p>
-        <h1 class="display-1 mt-5 max-w-4xl">{docData.title}</h1>
-        <p class="lead mt-6 text-lg" set:html={render(docData.lead)} />
+        <div class="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between lg:gap-16">
+          <div class="max-w-2xl">
+            <p class="label text-signal-700 dark:text-signal-500">{docData.eyebrow}</p>
+            <h1 class="display-1 mt-5">{docData.title}</h1>
+            <p class="lead mt-6 text-lg" set:html={render(docData.lead)} />
 
-        <div
-          class="mt-9 flex flex-wrap items-center gap-x-8 gap-y-3 border-t border-border pt-6"
-        >
-          <p class="label text-muted-foreground">
-            {d.legal.effectiveLabel}
-            {" "}
-            <span class="figure text-xs tracking-normal text-foreground normal-case">
-              {docParams.effective}
-            </span>
-          </p>
-          <a
-            href={related[0].href}
-            class="inline-flex items-center gap-2 text-sm font-semibold text-brand-700 dark:text-brand-400"
-          >
-            {related[0].label}
-            <ArrowRight className="size-4" />
-          </a>
+            <a
+              href={related[0].href}
+              class="group mt-8 inline-flex items-center gap-2 text-[0.9375rem] font-semibold text-foreground transition-colors hover:text-signal-700 dark:hover:text-signal-500"
+            >
+              {related[0].label}
+              <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+            </a>
+          </div>
+
+          {/* THE COLOPHON. Three counted facts about the document itself, on
+              `bg-background` — a card the colour of the band it sits on is
+              not a card. The heading is outside the `<dl>` because `<p>` is
+              not a permitted child of one. */}
+          <div class="panel w-full shrink-0 bg-background p-6 lg:w-[19rem]">
+            <p class="label text-muted-foreground">{d.legal.spec.label}</p>
+
+            <dl class="mt-5">
+              <div class="border-t border-hairline pt-3.5">
+                <dt class="label text-muted-foreground">{d.legal.effectiveLabel}</dt>
+                <dd class="figure mt-1.5 text-[1.0625rem] text-foreground">
+                  {docParams.effective}
+                </dd>
+              </div>
+              <div class="mt-3.5 border-t border-hairline pt-3.5">
+                <dt class="label text-muted-foreground">{d.legal.spec.sectionsLabel}</dt>
+                <dd class="figure mt-1.5 text-[1.0625rem] text-foreground">{sections.length}</dd>
+              </div>
+              <div class="mt-3.5 border-t border-hairline pt-3.5">
+                <dt class="label text-muted-foreground">{d.legal.spec.lengthLabel}</dt>
+                <dd
+                  class="mt-1.5 text-[0.9375rem] text-muted-foreground"
+                  set:html={render(d.legal.spec.lengthValue)}
+                />
+              </div>
+            </dl>
+          </div>
         </div>
 
         {/* The document's status, once, designed. Not a marker sprinkled
             through the body: a reader either knows this before they start or
             the notice has failed. */}
-        <div class="panel mt-8 max-w-3xl border-l-2 border-l-brand-500 bg-background p-5 sm:p-6">
+        <div class="panel mt-10 max-w-3xl border-l-2 border-l-signal-500 bg-background p-5 sm:p-6">
           <div class="flex gap-3.5">
             <TriangleAlert className="mt-0.5 size-4 shrink-0 text-signal-700 dark:text-signal-500" />
             <div>
@@ -325,22 +417,32 @@ const related = [
         header floats. */}
     <TrustTicker locale={locale} />
 
-    <section class="bg-background py-14 sm:py-16">
+    <section class="bg-background section">
       <div class="shell">
         <div class="grid gap-10 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-14">
-          {/* The contents rail. A 4,000-word document without one is a
-              document you are expected not to read. */}
-          <nav aria-labelledby="toc-label" class="hidden lg:sticky lg:top-24 lg:block lg:self-start">
+          {/* THE CONTENTS RAIL, drawn. A 4,000-word document without one is a
+              document you are expected not to read. The rule with a
+              graduation per clause is the same ruler the Relay and the CTA
+              plate use — a numbered document is a scale, and this is what it
+              looks like when you admit that. */}
+          <nav
+            aria-labelledby="toc-label"
+            class="legal-toc hidden lg:sticky lg:top-32 lg:block lg:self-start"
+          >
             <p id="toc-label" class="label text-muted-foreground">{d.legal.tocLabel}</p>
-            <ol class="mt-4 flex flex-col">
+            <ol class="mt-5 border-l border-border">
               {
                 sections.map((section, position) => (
-                  <li class="border-t border-border">
+                  <li>
                     <a
                       href={`#${section.id}`}
-                      class="flex gap-3 py-2.5 text-[0.8125rem] leading-snug text-muted-foreground hover:text-brand-700 dark:hover:text-brand-400"
+                      class="group relative flex gap-3 py-2 pl-5 text-[0.8125rem] leading-snug text-muted-foreground transition-colors hover:text-foreground"
                     >
-                      <span class="figure shrink-0 text-[0.6875rem] leading-5">
+                      <span
+                        aria-hidden="true"
+                        class="absolute top-[0.95rem] left-0 h-px w-3 bg-border transition-colors group-hover:bg-signal-500"
+                      />
+                      <span aria-hidden="true" class="figure shrink-0 text-[0.6875rem] leading-5">
                         {index(position)}
                       </span>
                       <span>{section.heading}</span>
@@ -353,9 +455,9 @@ const related = [
 
           <article class="max-w-3xl">
             {/* Same contents, collapsed, below lg. */}
-            <details class="panel group mb-12 p-4 lg:hidden">
+            <details class="panel legal-toc-mobile group mb-12 p-4 lg:hidden">
               <summary
-                class="label flex cursor-pointer list-none items-center justify-between gap-4 text-muted-foreground marker:hidden"
+                class="label flex cursor-pointer list-none items-center justify-between gap-4 text-muted-foreground marker:hidden [&::-webkit-details-marker]:hidden"
               >
                 {d.legal.tocMobileLabel}
                 <ChevronDown className="size-4 transition-transform group-open:rotate-180" />
@@ -363,12 +465,12 @@ const related = [
               <ol class="mt-2 flex flex-col">
                 {
                   sections.map((section, position) => (
-                    <li class="border-t border-border">
+                    <li class="border-t border-hairline">
                       <a
                         href={`#${section.id}`}
                         class="flex gap-3 py-2.5 text-[0.8125rem] leading-snug text-muted-foreground"
                       >
-                        <span class="figure shrink-0 text-[0.6875rem] leading-5">
+                        <span aria-hidden="true" class="figure shrink-0 text-[0.6875rem] leading-5">
                           {index(position)}
                         </span>
                         <span>{section.heading}</span>
@@ -382,7 +484,7 @@ const related = [
             <div class="flex flex-col gap-14">
               {
                 sections.map((section, position) => (
-                  <section id={section.id} class="border-t border-border pt-9">
+                  <section id={section.id} class="legal-clause border-t border-border pt-9">
                     <div class="flex items-baseline gap-4">
                       <span
                         aria-hidden="true"
@@ -390,6 +492,9 @@ const related = [
                       >
                         {index(position)}
                       </span>
+                      {/* The visible numeral is aria-hidden, so the clause
+                          number reaches heading navigation through this
+                          prefix instead — "Section 6. Prescriptions…". */}
                       <h2 class="display-3">
                         <span class="sr-only">{`${d.legal.sectionLabel} ${position + 1}. `}</span>
                         {section.heading}
@@ -416,33 +521,54 @@ const related = [
                               />
                             ))}
 
-                          {block.items && (
-                            <ul class="mt-6 flex flex-col">
-                              {block.items.map((item, itemIndex) => (
-                                <li class="flex gap-4 border-t border-border py-3.5 last:border-b">
-                                  <span
-                                    aria-hidden="true"
-                                    class="figure mt-[0.15rem] shrink-0 text-[0.6875rem] text-muted-foreground"
-                                  >
-                                    {index(itemIndex)}
-                                  </span>
-                                  <p
-                                    class="text-[0.9375rem] leading-[1.72] text-muted-foreground"
-                                    set:html={listItem(item)}
-                                  />
-                                </li>
-                              ))}
-                            </ul>
-                          )}
+                          {block.items &&
+                            (pairsOf(block.items) ? (
+                              /* DEFINED TERMS. Rows of pairs, so a real
+                                 definition list: the term is the row's
+                                 heading at sm and up, and stacks above its
+                                 explanation below that, where a 13rem column
+                                 would leave four words per line. */
+                              <dl class="mt-6">
+                                {pairsOf(block.items)!.map((pair) => (
+                                  <div class="grid gap-1 border-t border-hairline py-4 last:border-b sm:grid-cols-[12rem_minmax(0,1fr)] sm:gap-6">
+                                    <dt
+                                      class="text-[0.9375rem] leading-snug font-semibold text-foreground"
+                                      set:html={pair.term}
+                                    />
+                                    <dd
+                                      class="text-[0.9375rem] leading-[1.72] text-muted-foreground"
+                                      set:html={pair.def}
+                                    />
+                                  </div>
+                                ))}
+                              </dl>
+                            ) : (
+                              <ul class="mt-6 flex flex-col">
+                                {block.items.map((item, itemIndex) => (
+                                  <li class="flex gap-4 border-t border-hairline py-3.5 last:border-b">
+                                    <span
+                                      aria-hidden="true"
+                                      class="figure mt-[0.15rem] shrink-0 text-[0.6875rem] text-muted-foreground"
+                                    >
+                                      {index(itemIndex)}
+                                    </span>
+                                    <p
+                                      class="text-[0.9375rem] leading-[1.72] text-muted-foreground"
+                                      set:html={listItem(item)}
+                                    />
+                                  </li>
+                                ))}
+                              </ul>
+                            ))}
 
                           {block.table && (
-                            <div class="mt-7">
+                            <div class="panel mt-7 overflow-hidden">
                               {/* sm and up: a real table. Below it, the same
                                   pairs as a definition list — a four-column
                                   table at 360px produces unreadable columns. */}
                               <div class="hidden overflow-x-auto sm:block">
                                 <table class="w-full border-collapse text-left">
-                                  <caption class="label pb-3 text-left text-muted-foreground">
+                                  <caption class="label px-5 pt-5 pb-4 text-left text-muted-foreground">
                                     {block.table.label}
                                   </caption>
                                   <thead>
@@ -450,7 +576,7 @@ const related = [
                                       {block.table.head.map((heading) => (
                                         <th
                                           scope="col"
-                                          class="label py-3 pr-4 align-bottom text-muted-foreground last:pr-0"
+                                          class="label px-5 py-3 align-bottom text-muted-foreground"
                                         >
                                           {heading}
                                         </th>
@@ -459,17 +585,17 @@ const related = [
                                   </thead>
                                   <tbody>
                                     {block.table.rows.map((row) => (
-                                      <tr class="border-b border-border align-top">
+                                      <tr class="border-b border-hairline align-top last:border-b-0">
                                         {row.map((cell, cellIndex) =>
                                           cellIndex === 0 ? (
                                             <th
                                               scope="row"
-                                              class="py-4 pr-4 text-[0.875rem] font-semibold leading-snug text-foreground"
+                                              class="px-5 py-4 text-[0.875rem] leading-snug font-semibold text-foreground"
                                               set:html={render(cell)}
                                             />
                                           ) : (
                                             <td
-                                              class="py-4 pr-4 text-[0.8125rem] leading-relaxed text-muted-foreground last:pr-0"
+                                              class="px-5 py-4 text-[0.8125rem] leading-relaxed text-muted-foreground"
                                               set:html={render(cell)}
                                             />
                                           ),
@@ -480,13 +606,13 @@ const related = [
                                 </table>
                               </div>
 
-                              <div class="sm:hidden">
+                              <div class="p-5 sm:hidden">
                                 <p class="label text-muted-foreground">{block.table.label}</p>
                                 <dl class="mt-2 flex flex-col">
                                   {block.table.rows.map((row) => (
-                                    <div class="border-t border-border py-4 last:border-b">
+                                    <div class="border-t border-hairline py-4 last:pb-0">
                                       <dt
-                                        class="text-[0.9375rem] font-semibold leading-snug text-foreground"
+                                        class="text-[0.9375rem] leading-snug font-semibold text-foreground"
                                         set:html={render(row[0])}
                                       />
                                       {row.slice(1).map((cell, cellIndex) => (
@@ -504,27 +630,30 @@ const related = [
                                   ))}
                                 </dl>
                               </div>
-
-                              {block.table.note && (
-                                <p
-                                  class="mt-3.5 text-[0.8125rem] leading-relaxed text-muted-foreground"
-                                  set:html={render(block.table.note)}
-                                />
-                              )}
                             </div>
                           )}
 
+                          {block.table?.note && (
+                            <p
+                              class="mt-3.5 text-[0.8125rem] leading-relaxed text-muted-foreground"
+                              set:html={render(block.table.note)}
+                            />
+                          )}
+
                           {block.panel && (
-                            <div
-                              class="panel mt-8 border-l-2 border-l-brand-500 bg-card p-5 sm:p-7"
-                            >
-                              <p class="label text-brand-700 dark:text-brand-400">
-                                {block.panel.label}
-                              </p>
+                            /* THE ONE CLAUSE THAT MUST NOT BE MISSED — the
+                               arbitration and class-action waiver in the
+                               Terms, the HIPAA split in the Privacy Policy.
+                               On the pale signal surface rather than in
+                               capitals: the category's convention is a wall
+                               of upper case, which is unreadable and stopped
+                               being conspicuous decades ago. */
+                            <div class="plate-soft mt-8 p-5 sm:p-7">
+                              <p class="label">{block.panel.label}</p>
                               <h3 class="subhead mt-3 text-lg">{block.panel.title}</h3>
                               {paragraphs(block.panel.body).map((paragraph) => (
                                 <p
-                                  class="mt-4 whitespace-pre-line text-[0.9375rem] leading-[1.72] text-muted-foreground"
+                                  class="mt-4 whitespace-pre-line text-[0.9375rem] leading-[1.72]"
                                   set:html={paragraph}
                                 />
                               ))}
@@ -550,7 +679,7 @@ const related = [
               set:html={render(d.legal.effectiveNote)}
             />
 
-            <div class="mt-12">
+            <div class="legal-related mt-12">
               <p class="label text-muted-foreground">{d.legal.relatedLabel}</p>
               <ul class="mt-4 grid gap-x-8 sm:grid-cols-2">
                 {
@@ -558,10 +687,13 @@ const related = [
                     <li class="border-b border-border">
                       <a
                         href={item.href}
-                        class="group flex items-center justify-between gap-4 py-3 text-[0.9375rem] font-medium"
+                        class="group flex items-center justify-between gap-4 py-3 text-[0.9375rem] font-medium transition-colors hover:text-signal-700 dark:hover:text-signal-500"
                       >
                         {item.label}
-                        <ArrowRight className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1" />
+                        <ArrowRight
+                          aria-hidden="true"
+                          className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1"
+                        />
                       </a>
                     </li>
                   ))
@@ -577,3 +709,35 @@ const related = [
   </main>
   <Footer locale={locale} />
 </Layout>
+
+<style>
+  /**
+   * PRINT. These are the two pages people actually print, and the global
+   * print block in global.css already flattens the slab, the plate and every
+   * panel. What is left is this document's own furniture.
+   *
+   * A contents list and a "read this next" block are navigation: on paper
+   * they are ink spent on links nobody can follow. The clause rule is kept —
+   * it is what makes the printout look like a document rather than a dump —
+   * and tables, defined-term rows and the two notice panels are held off page
+   * breaks, because a table split across a sheet loses its header row.
+   */
+  @media print {
+    .legal-toc,
+    .legal-toc-mobile,
+    .legal-related {
+      display: none;
+    }
+    .legal-clause {
+      break-inside: auto;
+    }
+    .legal-clause h2 {
+      break-after: avoid;
+    }
+    .legal-clause table,
+    .legal-clause dl > div,
+    .legal-clause .plate-soft {
+      break-inside: avoid;
+    }
+  }
+</style>

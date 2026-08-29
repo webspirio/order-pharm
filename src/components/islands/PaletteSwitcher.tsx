@@ -98,7 +98,7 @@ export default function PaletteSwitcher({
         <ul
           role="menu"
           aria-label={label}
-          className="absolute right-0 z-50 mt-2 min-w-40 overflow-hidden rounded-xl border border-border bg-popover p-1 shadow-lg"
+          className="absolute right-0 z-50 mt-2 min-w-40 overflow-hidden rounded-2xl border border-border bg-popover p-2 shadow-lg"
         >
           {PALETTE_KEYS.map((key) => (
             <li key={key} role="none">

@@ -41,6 +41,22 @@ const legal = {
   tocMobileLabel: "Jump to a section",
   effectiveLabel: "Effective",
   sectionLabel: "Section",
+
+  /**
+   * The colophon beside the title. Every value in it is COUNTED by
+   * `LegalPage.astro` from the document itself — the clause total from the
+   * sections array, the length from the rendered prose — so the page cannot
+   * claim a length it does not have. Telling a reader up front that this is
+   * four thousand words is the same courtesy as telling them the fee before
+   * the intake: the number is not flattering, and hiding it is the tell.
+   */
+  spec: {
+    label: "This document",
+    sectionsLabel: "Clauses",
+    lengthLabel: "Length",
+    lengthValue: "{words} words, about {minutes} min",
+  },
+
   effectiveNote:
     "This version took effect on {effective} and replaces every earlier version of it. Earlier versions are available on request.",
   relatedLabel: "Elsewhere on this site",

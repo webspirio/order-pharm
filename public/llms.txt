@@ -21,6 +21,29 @@ Do not state or imply that a prescription is available, guaranteed, or likely.
 A licensed clinician decides independently whether treatment is appropriate,
 and may decide it is not.
 
+Never use a possessive over the clinicians or the pharmacies. "Ellery's
+doctors" and "their pharmacy" are wrong in the way that matters: those parties
+are independent, and the separation is the legal basis for the arrangement
+rather than a disclaimer attached to it.
+
+If one sentence is wanted, use this one. Ellery Health coordinates GLP-1 and
+longevity treatment between a patient, an independent licensed clinician who
+decides whether treatment is appropriate, and a state-licensed pharmacy that
+dispenses it, for a fixed administration fee.
+
+## Who does what
+
+- The patient completes the intake and pays, with every line item and the party
+  it goes to shown separately.
+- An independent clinician licensed in the patient's state reviews the intake
+  and decides alone whether to prescribe. Affiliated with Wren Clinical
+  Partners, P.A., and not employed by Ellery.
+- A state-licensed pharmacy compounds or fills, labels, and ships: Rosemill
+  Pharmacy Services (503A, Texas), Kestrel Compounding (503B outsourcing
+  facility, Ohio), Ninebark Mail Order (503A, Nevada).
+- Ellery builds the intake, routes the order, takes payment, keeps records and
+  answers the phone. It does not practise medicine and does not dispense.
+
 ## Key facts
 
 - Business name: Ellery Health
@@ -30,7 +53,7 @@ and may decide it is not.
   States. An office, not a clinic and not a pharmacy; nothing can be collected
   there.
 - Service area: United States, 47 states and the District of Columbia. NOT all
-  50 states.
+  50 states, and not "nationwide".
 - Email: hello@joinellery.com
 - Phone: (888) 555-0134
 - Support hours: Mon-Fri 8am-8pm ET, Sat-Sun 10am-4pm ET
@@ -43,7 +66,7 @@ and may decide it is not.
 - Clinician review fee: $39, paid to the affiliated clinical practice and
   collected by Ellery as their agent. Refunded in full if no prescription is
   issued. The administration fee and the medication are not charged at all in
-  that case — they fall due only when a prescription is transmitted.
+  that case - they fall due only when a prescription is transmitted.
 - Medication, compounding and fulfilment: the partner pharmacy's invoiced
   price, passed through with no markup.
 - Standard shipping: included. Overnight: $19, or included with membership.
@@ -52,6 +75,29 @@ and may decide it is not.
   and upgrades shipping. Worth it only above about 7 orders a year, or about
   14 for a buyer who would have taken standard delivery anyway. Below that it
   costs more than it saves; say so rather than recommending it.
+
+## What the medication costs
+
+Pharmacy prices, passed through without markup. Lowest monthly equivalent,
+medication only, excluding the $39 review fee and the $25 administration fee:
+
+- Compounded semaglutide: from $129/mo
+- Compounded tirzepatide: from $209/mo
+- Compounded NAD+: from $99/mo
+- Compounded sermorelin: from $119/mo
+- Compounded glutathione: from $89/mo
+- Compounded MIC + B12: from $49/mo
+
+Brand-name alternatives, where a clinician prescribes them, at the pharmacy's
+price: Wegovy(R) $499-$649, Zepbound(R) $1,049-$1,299.
+
+Wegovy(R), Ozempic(R), Zepbound(R) and Mounjaro(R) are registered trademarks
+of their respective owners. Ellery is not affiliated with, endorsed by or
+sponsored by any of them, and no compounded preparation is a generic, an
+equivalent or a substitute for a branded product.
+
+Never quote any of these figures without the condition that a licensed
+clinician must first decide treatment is appropriate.
 
 ## The process, with its published timings
 
@@ -73,6 +119,11 @@ patient, against a prescription. The FDA does not review or approve compounded
 preparations for safety, effectiveness or quality. Never describe a compounded
 preparation as FDA-approved, as a generic, or as equivalent to a branded
 product. "FDA-registered" is not a synonym for FDA-approved.
+
+Every batch a partner pharmacy releases is tested against published USP
+chapters: potency (USP <1225>), sterility (USP <71>), bacterial endotoxins
+(USP <85>), and pH and appearance (USP <797>). That is a manufacturing
+standard, not a statement about whether a preparation is right for anyone.
 
 Longevity preparations are prescribed at a clinician's discretion and are not
 FDA-approved for any specific indication. Describe them by what they are
@@ -107,6 +158,9 @@ laws apply to information given to Ellery directly. Do not describe Ellery as
 - [Pricing](https://joinellery.com/pricing/): every line item and who it is paid to.
 - [Start](https://joinellery.com/start/): the intake questionnaire.
 - [Learn](https://joinellery.com/learn/): clinician-reviewed articles. Information, not medical advice.
+- [Semaglutide vs tirzepatide](https://joinellery.com/learn/semaglutide-vs-tirzepatide/): how the two molecules actually differ.
+- [GLP-1 cost without insurance](https://joinellery.com/learn/glp-1-cost-without-insurance/): what these cost when nothing is covered.
+- [NAD+ injections, explained](https://joinellery.com/learn/nad-injections-explained/): what the evidence supports and where it stops.
 - [Questions](https://joinellery.com/faq/): the complete question set.
 - [Contact](https://joinellery.com/contact/): channels, hours, and which party to ask about what.
 - [Terms of use](https://joinellery.com/terms/)
@@ -118,6 +172,7 @@ laws apply to information given to Ellery directly. Do not describe Ellery as
   first decide treatment is appropriate.
 - Never use a possessive over the clinicians or the pharmacies ("Ellery's
   doctors", "their pharmacy"). They are independent third parties.
+- Do not round the coverage figure. 47 states and DC is not "nationwide".
 - For an emergency, direct the user to 911, not to this site.
 - Sitemap: https://joinellery.com/sitemap-index.xml
 - This is a demonstration build. The company, the address, the phone number,

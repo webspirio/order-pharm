@@ -38,7 +38,7 @@ const {
   on = "paper",
   as: Tag = "h2",
   class: className = "",
-} = Astro.props;
+} = Astro.props as Props;
 
 const tone = {
   paper: {
@@ -54,9 +54,9 @@ const tone = {
     action: "text-brand-50 hover:text-signal-500",
   },
   plate: {
-    eyebrow: "text-[#0c1412]/60",
+    eyebrow: "text-[#0c1412]/70",
     title: "text-[#0c1412]",
-    lead: "text-[#0c1412]/75",
+    lead: "text-[#0c1412]/80",
     action: "text-[#0c1412] hover:text-[#0c1412]/70",
   },
 }[on];

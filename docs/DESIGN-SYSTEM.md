@@ -69,12 +69,18 @@ wanted, and `bg-signal-500` with `text-[#0c1412]` wherever an amber surface is.
 **On `.slab`, `text-brand-50` has an opacity floor of `/60.`** `/40` is 3.4:1,
 `/50` is 4.4:1, `/60` is 5.8:1. Borders and hairlines are decorative and exempt.
 
+**On `.plate`, `text-[#0c1412]` has an opacity floor of `/70`.** Amber is a
+light ground, so the ink ladder runs out much sooner than it does on the slab:
+`/60` is **3.7:1** and fails, `/65` is 4.2:1 and fails, `/70` is 4.74:1 and
+passes. Lighthouse caught `/60` on the CTA plate's eyebrow, its reassurance
+line and its gating sentence. Use `100 / 80 / 70` and nothing between.
+
 ### Three text tones, and no fourth
 
 - On paper: `text-foreground`, `text-muted-foreground`,
   `text-signal-700 dark:text-signal-500`.
 - On the slab: `text-brand-50`, `text-brand-50/70`, `text-signal-500`.
-- On the plate: `text-[#0c1412]`, `text-[#0c1412]/75`, `text-[#0c1412]/60`.
+- On the plate: `text-[#0c1412]`, `text-[#0c1412]/80`, `text-[#0c1412]/70`.
 
 Every other opacity step is a bug. Do not write `text-foreground/50`,
 `text-brand-50/55`, `text-brand-50/65`, `text-brand-50/75`.
@@ -135,9 +141,16 @@ One container, two section rhythms, two radius families.
 | Furniture radius | `--radius-slab` | 40px — frame fillets, header sweep, slab tops |
 | Circle | `rounded-full` | dots, ticks, avatar slots **only** |
 
-Reject `max-w-6xl`, `py-16 sm:py-20`, `rounded-md`, `rounded-sm`,
-`rounded-xl`, `rounded-3xl`, `rounded-[3px]`, `rounded-[28px]`. `max-w-3xl`
-and `max-w-2xl` *inside* a `.shell` are reading measures and are fine.
+**The control family scales below 24px.** A 16px checkbox cannot carry the
+12px control radius without reading as a circle, so controls smaller than 24px
+step down to `rounded-sm` (6px, derived from the same `--radius`). That is the
+same family at a smaller size, not a third family — which is why it is a rule
+here and not an exception someone has to argue for each time.
+
+Reject `max-w-6xl`, `py-16 sm:py-20`, `rounded-md`, `rounded-xl`,
+`rounded-3xl`, `rounded-[3px]`, `rounded-[28px]`. (`rounded-sm` is reserved for
+the sub-24px control case above and appears nowhere else.) `max-w-3xl` and
+`max-w-2xl` *inside* a `.shell` are reading measures and are fine.
 
 ### Surfaces
 
@@ -201,8 +214,18 @@ job, not a workaround. Cached source for every candidate is in `.rb-source/`.
 
 | Component | Where | Why it earns its keep |
 |---|---|---|
-| `blur-highlight` | `Thesis.astro` on `/` | The reference's word-by-word scroll blur-up, with per-word highlight and a real `respectReducedMotion` path. `client:visible`, below the fold. |
-| `scroll-stack` | `/learn/` index | Pinned cards that stack and dissolve. Zero npm dependencies. |
+| `blur-highlight` | `Thesis.astro` on `/` | The reference's word-by-word scroll blur-up with a per-phrase highlight sweep — genuinely beyond CSS. `client:visible`, below the fold, and locally patched twice (reduced motion; the sentence as a `text` prop, because Astro serialises an island's children as `<astro-slot>` markup and the upstream text extraction silently returns `""`). |
+
+**One component. That is the whole list**, and the rejections are the more
+useful record. The worked example is `scroll-stack` on `/learn/`: it was
+offered, installed, read, and removed. Its cards are `absolute inset-0`
+siblings inside a `sticky h-screen` viewport, positioned entirely by a rAF
+loop writing inline transforms — so un-hydrated it renders three articles on
+top of one another, which is rule 4 above (the base state is the final state)
+failing in the way that matters. Hydrating it would have put this route's only
+island in front of this route's only content, and cost a viewport of scroll per
+article. Three links are not worth three screens. The full note is at the foot
+of `LearnPage.astro`.
 
 Everything else was considered and rejected on cost or fit:
 

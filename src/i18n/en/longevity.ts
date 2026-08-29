@@ -27,14 +27,23 @@
 const longevity = {
   header: {
     eyebrow: "Longevity",
-    /** The page's thesis, and the whole argument for the `limits` field. */
-    title: "Where the evidence stops,\nso does the sentence.",
+    /** The page's thesis, and the whole argument for the `limits` field.
+        `\n` is a hard line break — the break is rhetorical, one clause per
+        line — and `{accent}` marks the single word set in Fraunces italic.
+        One token per page is the whole budget for that face, so it goes on
+        the verb the page is named after. */
+    title: "Where the evidence {accent},\nso does the sentence.",
+    titleAccent: "stops",
     lead: "Four compounded preparations, prescribed at an independent clinician's discretion. None is FDA-approved for any specific indication, and none is described on this page by an outcome. What each one is, what the literature has actually investigated, and the point at which the honest answer becomes that nobody knows yet — all three, in that order, for all four.",
     imageAlt:
       "A grey-haired man carrying a hiking pack, stopped on a high path, looking across a misty limestone range.",
     /** The disclosure as the hero caption rather than as small print. */
     imageNote:
       "Prescribed at a clinician's discretion. Not FDA-approved for any specific indication.",
+    /** Names the metric strip. The fourth figure in it is zero, and the
+        label is written so that reading it is the point rather than a
+        surprise. */
+    figuresLabel: "What this costs, and what is approved",
     figures: [
       { label: "Preparations", note: "coordinated in this program" },
       { label: "From", note: "monthly equivalent, medication at pharmacy cost" },
@@ -64,6 +73,11 @@ const longevity = {
       threeMonth: "3 months",
       monthlyEquivalent: "Monthly equivalent",
     },
+    /** `<caption class="sr-only">` on each preparation's price table. Four
+        two-column price grids in a row are indistinguishable to a screen
+        reader without one, so the preparation's name is substituted into
+        `{preparation}` by the component — the name is data, not copy. */
+    priceCaption: "Medication prices for {preparation}, at one month and at three.",
     /** The argument against the bigger basket, next to the better price. */
     note: "Three months at once lowers the monthly equivalent. It also commits you to three months of something nobody can promise will do anything, so buy one month first and see whether you would have bought the second.",
     items: {
@@ -108,6 +122,7 @@ const longevity = {
     title: "What we will not say",
     lead: "This category runs on sentences that cannot be supported. Here are the ones you will read elsewhere, and the exact reason each is absent here. Read it as the specification this page was written against rather than as a notice.",
     header: { claim: "The sentence you will read elsewhere", why: "Why it is not on this page" },
+    caption: "Claims common in this category, paired with the specific reason each is absent from this page.",
     rows: [
       {
         claim: "Reverses ageing",

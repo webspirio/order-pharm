@@ -5,23 +5,40 @@
  * This is the strongest differentiator available to a business whose only
  * product is coordination, and the category's own convergence says it belongs
  * somewhere plain and findable rather than in §14 of the Terms. Every
- * competitor examined either buries it or omits it entirely — Ivím has no
- * "we are not a pharmacy" statement anywhere on its site.
+ * competitor examined either buries it or omits it entirely.
  *
- * On a fixed brand-800 band, for two reasons. It is the page's thesis restated
- * as fact, so it should carry the same weight as the hero; and the homepage
- * otherwise ran eight consecutive pale sections between the hero and the
- * closing CTA, where one hairline between two identical grounds is not a
- * section break.
+ * THE PAGE'S ONE SLAB. Long pages alternate paper and card and carry exactly
+ * one fixed-dark band; on the homepage it is spent here, because this section
+ * is the hero's thesis restated as fact and should carry the hero's weight.
+ * Inset to the site frame and swept at all four corners, so it reads as a
+ * plate laid on the page rather than as a band that happens to be dark — the
+ * same treatment `ComplianceBand.astro` gives the closing slab, and the two
+ * dark bands on this page must sweep identically.
  *
- * Rendered as a real two-column table, not a card grid: each row pairs a task
- * with exactly one owner, and a table is the form that makes "no overlap"
- * visible at a glance. Below `sm` it becomes a definition list — a two-column
- * table at 360px produces twelve-character columns.
+ * TWO COLUMNS, AND NO MARKS. The obvious reference for a table like this is a
+ * capability matrix with tick / partial / cross chips across three vendor
+ * columns (React Bits `comparison-8`). It is the wrong form here and it is a
+ * compliance failure, not a taste call. This table is an ASSIGNMENT: each task
+ * has exactly one owner, and "no overlap" is the entire point. A tri-state
+ * matrix invites two marks in one row, and a tick in an Ellery column beside
+ * any clinical or dispensing task is a claim to practise medicine or operate a
+ * pharmacy — the exact claim `compliance.notes['*']` denies. Marks across
+ * columns would also read as a bake-off against the affiliated practice and
+ * the three named pharmacies, who are independent third parties and not
+ * rivals. So: two columns, one owner per row, no chips.
+ *
+ * What IS taken from the reference set is `comparison-5`'s chassis — the table
+ * wrapped in a rounded panel with a tinted header row, an `sr-only` caption,
+ * and a `<th scope="row">` carrying the line name — which is proof that the
+ * reference's panel geometry can be wrapped AROUND content that has to stay a
+ * real table rather than replacing it with a grid of divs.
+ *
+ * Below `sm` it becomes a definition list: a two-column table at 360px
+ * produces twelve-character columns.
  */
 import { type Locale, t, localizedPath } from "@/i18n";
 import { anchors } from "@/config/site";
-import { ArrowRight } from "lucide-react";
+import SectionHead from "@/components/SectionHead.astro";
 
 interface Props {
   locale: Locale;
@@ -30,73 +47,116 @@ interface Props {
 const { locale } = Astro.props;
 const d = t(locale);
 const rows = d.home.roles.rows;
+
+/**
+ * The final row is the one the table exists for — the tasks nobody at Ellery
+ * touches. It is marked typographically, at full tone against the /70 of every
+ * other answer, rather than with a chip or a tint: a badge on this row would
+ * turn a disclosure into a boast, and it is the only row whose answer is a
+ * refusal.
+ */
+const lastIndex = rows.length - 1;
 ---
 
-<section
-  id={anchors.roles}
-  class="border-b border-brand-50/10 bg-brand-800 py-16 text-brand-50 sm:py-20"
->
+<section id={anchors.roles} class="roles-band slab on-slab section">
   <div class="shell">
-    <div class="max-w-3xl">
-      <p class="label text-brand-300">{d.home.roles.eyebrow}</p>
-      <h2 class="display-2 mt-4 text-brand-50">{d.home.roles.title}</h2>
-      <p class="mt-4 max-w-2xl text-[1.0625rem] leading-relaxed text-brand-50/65">
-        {d.home.roles.lead}
-      </p>
+    <SectionHead
+      on="slab"
+      eyebrow={d.home.roles.eyebrow}
+      title={d.home.roles.title}
+      lead={d.home.roles.lead}
+      actionHref={localizedPath(locale, "/how-it-works/")}
+      actionLabel={d.home.roles.cta}
+    />
+
+    <div class="reveal mt-12 sm:mt-14">
+      {/* sm and up: the table, in the inverted chassis. */}
+      <div class="panel-invert hidden overflow-hidden sm:block">
+        <table class="w-full table-fixed border-collapse text-left">
+          {/* A screen reader announcing "table, 2 columns, 7 rows" learns
+              nothing about what the table asserts, and the heading above it is
+              a separate element the listener may never reach. */}
+          <caption class="sr-only">{d.home.roles.header.caption}</caption>
+          <thead>
+            <tr class="border-b border-brand-50/12 bg-brand-50/5">
+              <th scope="col" class="label w-[46%] px-5 py-4 text-brand-50/70 sm:px-7">
+                {d.home.roles.header.task}
+              </th>
+              <th scope="col" class="label px-5 py-4 text-brand-50/70 sm:px-7">
+                {d.home.roles.header.who}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              rows.map((row, index) => (
+                <tr class="border-b border-brand-50/12 align-top last:border-b-0">
+                  <th scope="row" class="px-5 py-6 font-normal sm:px-7">
+                    {/* Enumerative, not informative: a table already announces
+                        its row count, and "zero one" read before every task is
+                        noise. It stays visible because seeing six numbered
+                        rows is how the heading's claim gets checked. */}
+                    <span aria-hidden="true" class="figure mr-3 text-xs text-signal-500">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <span class="subhead inline text-brand-50">{row.task}</span>
+                  </th>
+                  <td
+                    class:list={[
+                      "px-5 py-6 text-[0.9375rem] leading-relaxed sm:px-7",
+                      index === lastIndex ? "text-brand-50" : "text-brand-50/70",
+                    ]}
+                  >
+                    {row.who}
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+
+      {/* Below sm: the same pairs as a definition list. */}
+      <dl class="flex flex-col sm:hidden">
+        {
+          rows.map((row, index) => (
+            <div class="border-t border-brand-50/12 py-5">
+              <dt class="subhead flex gap-3 text-brand-50">
+                <span aria-hidden="true" class="figure shrink-0 text-xs font-normal text-signal-500">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <span>{row.task}</span>
+              </dt>
+              <dd
+                class:list={[
+                  "mt-2 pl-8 text-sm leading-relaxed",
+                  index === lastIndex ? "text-brand-50" : "text-brand-50/70",
+                ]}
+              >
+                {row.who}
+              </dd>
+            </div>
+          ))
+        }
+      </dl>
     </div>
-
-    {/* sm and up: the table. */}
-    <div class="mt-10 hidden sm:block">
-      <table class="w-full border-collapse text-left">
-        <thead>
-          <tr class="border-y border-brand-50/15">
-            <th scope="col" class="label w-[46%] py-3 pr-6 text-brand-50/60">
-              {d.home.roles.header.task}
-            </th>
-            <th scope="col" class="label py-3 text-brand-50/60">{d.home.roles.header.who}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {
-            rows.map((row, index) => (
-              <tr class="border-b border-brand-50/12 align-top">
-                <th scope="row" class="py-5 pr-6 font-normal">
-                  <span class="figure mr-3 text-xs text-signal-500">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <span class="subhead inline text-brand-50">{row.task}</span>
-                </th>
-                <td class="py-5 text-[0.9375rem] leading-relaxed text-brand-50/60">{row.who}</td>
-              </tr>
-            ))
-          }
-        </tbody>
-      </table>
-    </div>
-
-    {/* Below sm: the same pairs as a definition list. */}
-    <dl class="mt-10 flex flex-col sm:hidden">
-      {
-        rows.map((row, index) => (
-          <div class="border-t border-brand-50/12 py-5">
-            <dt class="subhead flex gap-3 text-brand-50">
-              <span class="figure shrink-0 text-xs font-normal text-signal-500">
-                {String(index + 1).padStart(2, "0")}
-              </span>
-              <span>{row.task}</span>
-            </dt>
-            <dd class="mt-2 pl-8 text-sm leading-relaxed text-brand-50/60">{row.who}</dd>
-          </div>
-        ))
-      }
-    </dl>
-
-    <a
-      href={localizedPath(locale, "/how-it-works/")}
-      class="mt-9 inline-flex items-center gap-2 text-sm font-semibold text-brand-300 hover:text-brand-50"
-    >
-      {d.home.roles.cta}
-      <ArrowRight className="size-4" />
-    </a>
   </div>
 </section>
+
+<style>
+  /* Inset to the frame and swept on all four corners. Squared and full-bleed
+     below 850px, where the frame itself is hidden and a 10px inset is only a
+     bezel that eats the viewport. The mobile radius matches
+     ComplianceBand.astro's exactly — the page's two dark plates have to look
+     like the same object seen twice. */
+  .roles-band {
+    margin-inline: var(--frame-w);
+    border-radius: var(--radius-slab);
+  }
+  @media (max-width: 849px) {
+    .roles-band {
+      margin-inline: 0;
+      border-radius: 1.75rem;
+    }
+  }
+</style>

@@ -27,13 +27,20 @@
 const contact = {
   header: {
     eyebrow: "Contact",
-    title: "Reachable, and specific about it.",
+    /** `{accent}` is the page's one Fraunces-italic word; see Headline.astro. */
+    title: "Reachable, and {accent} about it.",
+    titleAccent: "specific",
     lead: "A business whose only product is coordination should be judged on whether anyone answers. So: the number, the hours a person is on it, and a table that says which of the three parties in your order owns which question.",
-    /** Labels for the mono row of published facts under the lead. */
+    /**
+     * Labels for the published-facts panel beside the lead. These four facts
+     * appear exactly once on the page; the channel rows below describe what
+     * each one is good at rather than repeating its hours.
+     */
     figures: {
       phone: "Support line",
       weekday: "Weekdays",
       weekend: "Weekends",
+      email: "Inbox",
     },
     noForm: "There is no contact form on this page. A form is a queue with a nicer typeface, and a business that will not publish a number is telling you something.",
     /** The sentence that argues against calling. Every page gets one. */
@@ -45,14 +52,13 @@ const contact = {
     eyebrow: "Three channels",
     title: "Three ways in, and they are not interchangeable",
     lead: "Each one reaches a different party and is good at a different thing. Choosing the right one is the difference between an answer today and an answer next week.",
-    hoursLabel: "Hours",
     repliesLabel: "Replies",
     whereLabel: "Where it lives",
     phone: {
       label: "Channel 01",
       title: "The phone",
       body: "A person answers, and they can see your order while you are talking. Best for anything about an order, a charge, an invoice, an address or a delay. They will not answer a clinical question and will say so rather than guess — you get told where it goes instead, and they will stay on the line while you get there.",
-      note: "Outside those hours, leave a voicemail. Calls are returned the next business morning, in the order they arrived.",
+      note: "Outside the published hours, leave a voicemail. Calls are returned the next business morning, in the order they arrived.",
     },
     email: {
       label: "Channel 02",
@@ -174,6 +180,7 @@ const contact = {
     body: "This is where the company is registered and where the support desk sits. It is not a clinic and it is not a pharmacy: nothing can be collected, dropped off or dispensed here, there is no waiting room, no dispensary and no clinician on the premises. Prescriptions are filled, labelled and shipped by the pharmacy named on your invoice, from their own licensed facility.",
     addressLabel: "Post reaches us at",
     postNote: "Legal notices and formal records requests are welcome by post. Everything else is faster by phone or email.",
+    /** Labels the two hours rows in the header panel — the one place they run. */
     hoursLabel: "Desk hours",
     mapCta: "Open in Google Maps",
   },

@@ -1,19 +1,40 @@
 ---
 /**
  * FAQ, reusable: the homepage passes its six-item subset, /faq/ passes the
- * full set. Only the page that shows the FULL set emits `FAQPage` JSON-LD —
- * two FAQPage blocks on one origin describing overlapping question sets is
- * worse than one, so `jsonLd` is opt-in rather than automatic.
+ * full set one group at a time. Only the page that shows the FULL set emits
+ * `FAQPage` JSON-LD — two FAQPage blocks on one origin describing overlapping
+ * question sets is worse than one, so `jsonLd` is opt-in rather than
+ * automatic. `scripts/verify-dist.mjs` asserts on the block it emits.
  *
- * Native `<details>`/`<summary>`, not a Radix Accordion. It is keyboard- and
- * screen-reader-correct with zero JavaScript, and this site has no reason to
- * ship an island for a disclosure widget the platform already provides. The
+ * NATIVE `<details>`/`<summary>`, NOT AN ACCORDION ISLAND. It is keyboard- and
+ * screen-reader-correct with zero JavaScript, it survives with JS disabled,
+ * and the browser's own find-in-page reaches it. Every FAQ block in the
+ * reference set replaces it with a `motion.div role="button"` driving an
+ * `AnimatePresence` height animation — which is a hydrated island, a fake
+ * button, and a panel that stays in the accessibility tree at height 0. The
  * `<h3>` inside each summary is what lets screen-reader heading navigation
  * surface every question instead of skipping past them.
+ *
+ * TWO LAYOUTS, ONE MARKUP TREE, chosen by `columns`:
+ *
+ *   2  the homepage. faq-1's and faq-6's shape: the head sticks in a narrow
+ *      left column while the questions scroll past it. This replaced a
+ *      two-column grid of `<details>`, which had a real defect — opening a
+ *      question in the left column pushed every row in the right column down,
+ *      so the answer a reader opened moved the thing they were reading.
+ *   1  /faq/, where eight instances stack inside the page's own two-column
+ *      layout. A sticky column inside a sticky column is a column too many, so
+ *      the head sits above its questions and the page's index does the sticking.
+ *
+ * The mono step index is the other thing faq-6 gets right, and it renders in
+ * the split layout only: it numbers a set the reader has been told is finite.
+ * On /faq/ the group heading already carries an index, and a second sequence
+ * restarting at 01 inside each group would compete with it.
  */
 import { type Locale } from "@/i18n";
 import { site } from "@/config/site";
-import { ChevronDown } from "lucide-react";
+import SectionHead from "@/components/SectionHead.astro";
+import { ArrowRight, ChevronDown } from "lucide-react";
 
 interface Props {
   locale: Locale;
@@ -23,11 +44,11 @@ interface Props {
   items: { q: string; a: string }[];
   /** Emit a FAQPage block. Set on the page carrying the complete set. */
   jsonLd?: boolean;
-  /** Optional "see all" link. */
+  /** Optional "see all" link, rendered under the head. */
   ctaHref?: string;
   ctaLabel?: string;
   id?: string;
-  /** Single column reads better on a dedicated /faq/ page. */
+  /** Section columns: 2 splits head from questions, 1 stacks them. */
   columns?: 1 | 2;
 }
 
@@ -42,6 +63,8 @@ const {
   id,
   columns = 2,
 } = Astro.props;
+
+const split = columns === 2;
 
 const faqJsonLd = {
   "@context": "https://schema.org",
@@ -59,47 +82,63 @@ const faqJsonLd = {
 
 <section id={id} class="bg-background section">
   <div class="shell">
-    <div class="max-w-3xl">
-      {eyebrow && <p class="label text-brand-700 dark:text-brand-400">{eyebrow}</p>}
-      <h2 class:list={["display-2", eyebrow && "mt-4"]}>{title}</h2>
-      {lead && <p class="lead mt-4">{lead}</p>}
-    </div>
-
     <div
       class:list={[
-        "mt-10 grid gap-x-12",
-        columns === 2 ? "md:grid-cols-2" : "max-w-3xl grid-cols-1",
+        "grid gap-10",
+        split && "lg:grid-cols-[minmax(0,19rem)_minmax(0,1fr)] lg:gap-16",
       ]}
     >
-      {
-        items.map((item) => (
-          <details class="group border-b border-border py-5">
-            <summary
-              class="flex cursor-pointer list-none items-start justify-between gap-4 marker:hidden"
-            >
-              <h3 class="subhead">{item.q}</h3>
-              <ChevronDown
-                className="mt-0.5 size-5 shrink-0 text-muted-foreground transition-transform group-open:rotate-180"
-              />
-            </summary>
-            <p class="mt-3 max-w-2xl text-[0.9375rem] leading-relaxed text-muted-foreground">
-              {item.a}
-            </p>
-          </details>
-        ))
-      }
-    </div>
+      <div class:list={[split && "lg:sticky lg:top-32 lg:self-start"]}>
+        <SectionHead eyebrow={eyebrow} title={title} lead={lead} />
 
-    {
-      ctaHref && ctaLabel && (
-        <a
-          href={ctaHref}
-          class="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-brand-700 dark:text-brand-400"
-        >
-          {ctaLabel}
-        </a>
-      )
-    }
+        {
+          ctaHref && ctaLabel && (
+            <a
+              href={ctaHref}
+              class="group reveal mt-8 inline-flex items-center gap-2 text-[0.9375rem] font-semibold text-foreground transition-colors hover:text-signal-700 dark:hover:text-signal-500"
+            >
+              {ctaLabel}
+              <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+            </a>
+          )
+        }
+      </div>
+
+      <div class:list={["reveal border-t border-border", !split && "max-w-3xl"]}>
+        {
+          items.map((item, index) => (
+            <details class="group border-b border-border">
+              {/* `list-none` covers Chrome and Firefox; Safari needs the
+                  webkit pseudo-element as well or it keeps the triangle. */}
+              <summary class="flex cursor-pointer list-none items-start gap-4 py-5 marker:hidden sm:gap-6 sm:py-6 [&::-webkit-details-marker]:hidden">
+                {split && (
+                  <span
+                    aria-hidden="true"
+                    class="figure mt-1 w-7 shrink-0 text-xs text-muted-foreground transition-colors group-open:text-foreground"
+                  >
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                )}
+                <h3 class="subhead flex-1">{item.q}</h3>
+                <span
+                  class="grid size-8 shrink-0 place-items-center rounded-lg border border-border text-muted-foreground transition-colors group-open:border-foreground group-open:bg-foreground group-open:text-background"
+                >
+                  <ChevronDown className="size-4 transition-transform group-open:rotate-180" />
+                </span>
+              </summary>
+              <p
+                class:list={[
+                  "max-w-2xl pb-5 text-[0.9375rem] leading-relaxed text-muted-foreground sm:pb-6",
+                  split && "pl-11 sm:pl-13",
+                ]}
+              >
+                {item.a}
+              </p>
+            </details>
+          ))
+        }
+      </div>
+    </div>
   </div>
 </section>
 

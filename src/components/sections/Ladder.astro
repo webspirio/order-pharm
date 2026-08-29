@@ -1,6 +1,6 @@
 ---
 /**
- * THE LADDER — the metabolic page's signature element.
+ * THE LADDER — the titration schedule as a stepped chart.
  *
  * The escalation schedule in `ladders` is a sequence of magnitudes: the order
  * of the steps and the size of each one are both information the reader came
@@ -10,18 +10,40 @@
  * top step and tirzepatide's top step are an order of magnitude apart in
  * milligrams and mean nothing to each other.
  *
- * Pure CSS and HTML: no chart library, no island, no JavaScript. Bar heights
- * are a percentage of the molecule's own peak dose, so each chart is internally
- * to scale and the two are deliberately NOT scaled against each other — a
- * shared axis would invite exactly the milligram-for-milligram comparison the
- * caption warns against.
+ * WHY THIS IS STILL HAND-ROLLED CSS AND NOT React Bits' `simple-graph`.
+ * The obvious swap was considered and rejected on six counts, and the first is
+ * the one that settles it: `simple-graph` is a `curved`-by-default cubic line
+ * chart, and titration is a step function — a dose is held flat for four weeks
+ * and then jumped. A smoothed line asserts a continuous ramp that no clinician
+ * prescribes, so the chart would be drawing something untrue. Beyond that: its
+ * values live in a hover tooltip, so the milligram figures vanish on touch and
+ * to a screen reader, where this chart prints every dose as text beside its own
+ * bar; `lineColor` and `dotColor` are raw hex props, i.e. "never hardcode a
+ * brand colour in a component" expressed as an API; its optional trend readout
+ * renders a green up-arrow, and a green up-arrow on a dose schedule reads as
+ * "more is better"; its `<svg>` carries no role, label or `<title>`; and it
+ * needs `motion` plus `useInView`, which would make this the only hydrated
+ * island on the page. The hand-rolled version carries magnitude AND sequence,
+ * is a real `<figure>`/`<figcaption>`, degrades to horizontal rows below `sm`,
+ * and ships zero JavaScript.
  *
- * Two layouts, one dataset, the same `Receipt`/`Roles` pattern: columns above
- * `sm`, where a bar can be 200px tall and still leave room for a week label;
- * horizontal rows below it, where five uppercase week ranges across a 390px
- * screen would be four characters wide.
+ * COLOUR. The bars are the brand petrol and the week labels are the signal
+ * amber, and that assignment is not interchangeable: on this site amber means
+ * "this measures time". The bars measure a dose. Making the bars amber because
+ * they are the loudest thing in the card would break the one rule that keeps
+ * the accent readable everywhere else.
+ *
+ * The ticks under the axis are the Relay's, at the same 1px × 0.625rem: each
+ * one marks where a dose window begins, which turns a row of captions into a
+ * time axis and ties the chart to the device the rest of the site is built on.
+ *
+ * Bar heights are a percentage of the molecule's OWN peak dose, so each chart
+ * is internally to scale and the two are deliberately not scaled against each
+ * other — a shared axis would invite exactly the milligram-for-milligram
+ * comparison the caption warns against.
  *
  * Renders as a `.panel` on `bg-background`, so it can sit on a `bg-card` band.
+ * Rendered by pages this component does not own: the prop contract is stable.
  */
 import { ladders, treatment, mg } from "@/config/pricing";
 
@@ -61,28 +83,28 @@ const meta = `${steps.length} ${stepsLabel} · ${tx.cadence}`;
 
 <figure class="panel flex flex-col bg-background p-5 sm:p-7">
   <div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
-    <h3 class="subhead text-base">
+    <h3 class="subhead">
       {tx.display}<sup class="ml-0.5 font-normal text-muted-foreground">‡§</sup>
     </h3>
-    <p class="figure text-sm whitespace-nowrap text-brand-700 dark:text-brand-400">{range}</p>
+    <p class="figure text-sm whitespace-nowrap text-foreground">{range}</p>
   </div>
   <p class="label mt-2 text-muted-foreground">{meta}</p>
 
   <p class="label mt-7 text-muted-foreground">{axisLabel}</p>
 
   {/* sm and up: the staircase. Each column is bottom-aligned in a fixed-height
-      row, so a percentage height on the bar resolves against a real number. */}
+      row, so a percentage height on the bar resolves against a real number —
+      and the row keeps its height whatever the data, so nothing reflows. */}
   <div class="mt-3 hidden sm:block">
     <div class="flex h-52 items-end gap-1.5 border-b border-border lg:h-48">
       {
         bars.map((bar) => (
           <div class="flex h-full flex-1 flex-col justify-end">
             <p class="figure mb-1.5 text-center text-[0.8125rem] text-foreground">{bar.dose}</p>
-            <div
-              class="rounded-t-[3px] bg-brand-600 dark:bg-brand-500"
-              style={`height:${bar.height}%`}
-            >
-            </div>
+            {/* Square-topped on purpose. A rounded cap on a 20px-wide bar is a
+                dome, and a chart bar is neither a control nor a surface, so it
+                belongs to neither radius family. */}
+            <div class="bg-brand-600 dark:bg-brand-500" style={`height:${bar.height}%`} />
           </div>
         ))
       }
@@ -90,17 +112,21 @@ const meta = `${steps.length} ${stepsLabel} · ${tx.cadence}`;
     <div class="flex gap-1.5">
       {
         bars.map((bar) => (
-          <p
-            class="label flex-1 pt-2.5 text-center text-[0.625rem] tracking-[0.06em] text-signal-700 dark:text-signal-500"
-          >
-            {bar.weeks}
-          </p>
+          <div class="flex-1">
+            {/* The Relay's tick, same 1px × 0.625rem, marking where this dose
+                window opens. Amber, because it measures time. */}
+            <span aria-hidden="true" class="block h-2.5 w-px bg-signal-500" />
+            <p class="label pt-2 text-center text-[0.625rem] tracking-[0.06em] text-signal-700 dark:text-signal-500">
+              {bar.weeks}
+            </p>
+          </div>
         ))
       }
     </div>
   </div>
 
-  {/* Below sm: the same bars, turned 90 degrees. */}
+  {/* Below sm: the same bars, turned 90 degrees. Five uppercase week ranges
+      across a 390px screen would be four characters wide. */}
   <ol class="mt-3 flex flex-col gap-3.5 sm:hidden">
     {
       bars.map((bar) => (
@@ -111,8 +137,12 @@ const meta = `${steps.length} ${stepsLabel} · ${tx.cadence}`;
             </p>
             <p class="figure text-[0.8125rem] text-foreground">{bar.dose}</p>
           </div>
-          <div class="mt-1.5 h-2.5 w-full bg-accent">
-            <div class="h-full bg-brand-600 dark:bg-brand-500" style={`width:${bar.width}%`}></div>
+          {/* The track is `border`, not `accent`: `--accent` is the shadcn
+              hover/selected fill that every control in the intake form reads,
+              and borrowing it here is how a chart and a form control end up
+              sharing a colour by accident. */}
+          <div class="mt-1.5 h-2.5 w-full bg-border">
+            <div class="h-full bg-brand-600 dark:bg-brand-500" style={`width:${bar.width}%`} />
           </div>
         </li>
       ))

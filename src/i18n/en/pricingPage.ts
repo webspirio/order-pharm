@@ -17,11 +17,20 @@
  * be guaranteed to agree. Where a sentence needs a number, it carries a token
  * (`{cutoff}`, `{orders}`) that the component substitutes — the same
  * mechanism `common.ticker` uses.
+ *
+ * Two key families were added in the rebuild. `header.caption` on each table
+ * is an `sr-only` `<caption>`: seven tables in a row are seven anonymous
+ * grids to a screen reader unless each one says what it is. And
+ * `titleAccent` is the page's single Fraunces word, carried beside the
+ * headline so a translator moves the token and the word together.
  */
 const pricingPage = {
   header: {
     eyebrow: "Pricing",
-    title: "The whole cost, in advance.",
+    /** `{accent}` is replaced by `titleAccent`, set in Fraunces italic — the
+        page's one and only use of that face. See Headline.astro. */
+    title: "The whole cost, in {accent}.",
+    titleAccent: "advance",
     lead: "Three parties charge you, and only one of them is Ellery: a fixed administration fee per order, the pharmacy's own invoice passed through without a markup, and a clinician review fee that is refunded in full if no prescription is issued.",
     ctaSecondary: "See the four handoffs",
     /** Three figures under the lead. Values are supplied by the component. */
@@ -41,7 +50,12 @@ const pricingPage = {
     eyebrow: "The receipt",
     title: "Four lines, and the reason each one is shaped that way",
     lead: "This is the itemisation you approve before a card is charged, and the same itemisation on the invoice afterwards. Two of the four amounts are set by someone other than Ellery, which is why they are words here rather than figures.",
-    header: { item: "Line", amount: "Amount", dest: "Paid to, and why it is that shape" },
+    header: {
+      item: "Line",
+      amount: "Amount",
+      dest: "Paid to, and why it is that shape",
+      caption: "Every line on an Ellery order, what each one pays for, and who is paid it.",
+    },
     /** Writing "$0" for something included reads as a trick, and the pharmacy
         sets the other one, so both stay words. */
     atCost: "at cost",
@@ -89,6 +103,9 @@ const pricingPage = {
       one: "One month",
       three: "Three months",
       equiv: "Per month, on three",
+      /** `{program}` is substituted with the group heading by the component,
+          so the two tables under this section announce distinctly. */
+      caption: "{program} preparations, with the cadence of each and the price at both supply lengths.",
     },
     programs: [
       {
@@ -104,7 +121,13 @@ const pricingPage = {
     brand: {
       title: "Brand-name alternatives",
       lead: "A clinician may decide an FDA-approved brand-name product is the better choice. Those are quoted here too, at the pharmacy's cash price, as a range — because the price moves with supply and with which of the three pharmacies holds it, and quoting the bottom of the range as though it were the price is the thing this page refuses to do.",
-      header: { name: "Product", molecule: "Molecule", price: "Pharmacy price, per month" },
+      header: {
+        name: "Product",
+        molecule: "Molecule",
+        price: "Pharmacy price, per month",
+        caption:
+          "Brand-name products a clinician may prescribe instead, the molecule in each, and the pharmacy's price range.",
+      },
       note: "No compounded preparation is a generic, an equivalent or a substitute for any of these products, and Ellery is not affiliated with, endorsed by or sponsored by their manufacturers. The same fixed administration fee applies, and it does not rise because the medication does.",
     },
   },
@@ -122,7 +145,12 @@ const pricingPage = {
     monthlyLabel: "Billed monthly",
     yearlyLabel: "Billed yearly",
     yearlyNote: "Two months off the monthly price.",
-    header: { row: "What you actually feel", payg: "Pay as you go", member: "Membership" },
+    header: {
+      row: "What you actually feel",
+      payg: "Pay as you go",
+      member: "Membership",
+      caption: "What membership changes, and what it leaves exactly as it is.",
+    },
     /** Cell words. Kept here so the table can say "the same" out loud where
         the honest answer is that membership changes nothing. */
     waived: "Waived",
@@ -182,7 +210,12 @@ const pricingPage = {
     eyebrow: "Delivery",
     title: "Three shipping lines, and the window each one commits to",
     lead: "Charged at what the carrier charges. The window starts when the pharmacy dispatches, not when you submit the intake, and everything before that is on the how-it-works page.",
-    header: { option: "Option", cost: "Cost", window: "Window" },
+    header: {
+      option: "Option",
+      cost: "Cost",
+      window: "Window",
+      caption: "Each shipping option, what it costs, and the window it commits to.",
+    },
     rows: [
       {
         option: "Standard",
@@ -233,7 +266,13 @@ const pricingPage = {
     eyebrow: "Before you pay",
     title: "The thresholds, so you can check yourself first",
     lead: "These are the criteria the affiliated practice applies. They are published here rather than discovered at the end of an intake, because a fee paid just before a decline is the single most common complaint in this category.",
-    header: { criterion: "Criterion", threshold: "Threshold", note: "What it means" },
+    header: {
+      criterion: "Criterion",
+      threshold: "Threshold",
+      note: "What it means",
+      caption:
+        "The criteria the affiliated practice applies, the threshold for each, and what each one means.",
+    },
     rows: [
       {
         criterion: "Body mass index, on its own",

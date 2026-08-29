@@ -1,20 +1,51 @@
 ---
 /**
- * Testimonials, deliberately without photographs.
+ * VOICES — three quotations, a sticky rail, and deliberately no faces.
  *
- * Two reasons, and the licensing one is the harder constraint: both the
- * Unsplash and Pexels licences forbid using a depicted person in a way that
- * implies their endorsement, and attaching a written quotation to a stranger's
- * face does exactly that. Stock portraits of thin smiling people are also the
- * single loudest "cheap" signal in this category.
+ * THE LICENCE IS THE HARDER CONSTRAINT, and it is why this section could not
+ * simply be re-skinned from the library. Every social-proof block considered
+ * (social-proof-5, -8, -14, -15) and the reference template's own
+ * `testimonials.tsx` is built on an Unsplash portrait beside each quotation.
+ * Both the Unsplash and the Pexels licence forbid using a depicted person in a
+ * way that implies their endorsement, and attaching a written testimonial to a
+ * stranger's face does exactly that. So the avatars are not swapped for other
+ * photographs, or moved into the rail — they are gone, and a speaker is
+ * identified by name, state and context, which is all the demo can evidence.
  *
- * What replaces them is a mono monogram, which fits the site's own visual
- * language better than a face would. The middle quotation is from someone who
- * was declined — a review that includes the failure case reads as real, and it
- * is the only place on the site where the refund rule is evidenced rather than
- * promised.
+ * WHAT WAS PORTED, from social-proof-14: the sticky intro rail beside a
+ * scrolling stack of quotations. That structure is the reason this shape was
+ * chosen over the two rotating ones — social-proof-15 and `testimonials.tsx`
+ * both show ONE quotation at a time on a ten-second timer, which on this page
+ * would bury "the review fee came back the same week the clinician said no"
+ * behind a countdown, under an h1 that reads "Nothing hidden in the middle".
+ * That is the pitch failing in the interaction model rather than in the copy.
+ * Its masonry offset was dropped too: at three cards it orphans one.
+ *
+ * ALSO DISCARDED, and each for a reason: the five filled stars and "4.9 across
+ * 2,400+ reviews" (an invented aggregate rating, and a standing temptation to
+ * emit `AggregateRating` structured data that `verify-dist` would happily pass
+ * because it checks `@id` resolution, not truth); the employer field, because
+ * Ellery's speakers are patients and a job title would invent a person; and
+ * "Read every review", which would be a link to a page that does not exist.
+ *
+ * TWO SURFACES, NOT THREE EQUAL CARDS. The middle quotation is from someone
+ * who was DECLINED — the only place on the site where the refund rule is
+ * evidenced rather than promised — so it takes the raised panel and the larger
+ * setting while the other two sit on the recessed one. The flag comes from the
+ * dictionary, not from `index === 0` as the block had it, so the emphasis
+ * follows the meaning if the quotations are ever reordered.
+ *
+ * NO FRAUNCES HERE. The obvious move is to set the featured quotation in the
+ * display italic, and the type contract allows a pull quote to be the page's
+ * one `wonk` — but the homepage has already spent it on "middle" in the h1,
+ * and the budget is one per page, not one per section. Size and surface carry
+ * the emphasis instead.
+ *
+ * NOTHING IN THIS SECTION IS FOCUSABLE, which is the point: no carousel
+ * buttons, no tablist of avatars, no live region to manage, and no `href="#"`.
  */
 import { type Locale, t } from "@/i18n";
+import SectionHead from "@/components/SectionHead.astro";
 
 interface Props {
   locale: Locale;
@@ -22,67 +53,95 @@ interface Props {
 
 const { locale } = Astro.props;
 const d = t(locale);
-
-/** "Dana R." -> "DR". Computed rather than stored, so a renamed voice cannot
-    keep someone else's initials. */
-const monogram = (name: string) =>
-  name
-    .split(/\s+/)
-    .map((part) => part[0])
-    .join("")
-    .replace(/[^A-Za-z]/g, "")
-    .slice(0, 2)
-    .toUpperCase();
 ---
 
 <section class="bg-background section">
   <div class="shell">
-    <div class="max-w-3xl">
-      <p class="label text-brand-700 dark:text-brand-400">{d.home.voices.eyebrow}</p>
-      <h2 class="display-2 mt-4">{d.home.voices.title}</h2>
-      <p class="lead mt-4">{d.home.voices.lead}</p>
+    <div class="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-16">
+      {/* THE RAIL. `lg:top-24` matches the two other sticky columns on this
+          page rather than inventing a third offset; the floating header pill
+          ends at 82px, so this clears it. */}
+      <div class="lg:sticky lg:top-24 lg:col-span-5 lg:self-start">
+        <SectionHead
+          eyebrow={d.home.voices.eyebrow}
+          title={d.home.voices.title}
+          lead={d.home.voices.lead}
+        />
+
+        {/* The disclosure sits HERE, in the slot the block gave a "read every
+            review" button, rather than in 12px grey under the last card. A
+            demonstration quotation that admits what it is at the top of the
+            section is honest; one that admits it after you have read all three
+            is a footnote hoping not to be reached. ◇ is the defined symbol for
+            it in `common.ts` and resolves in the compliance band on every
+            route — it is decorative to a screen reader only because the
+            sentence beside it already says the whole thing. */}
+        <div class="reveal panel-flat mt-8 flex gap-3 p-4">
+          <span class="figure shrink-0 text-sm text-signal-700 dark:text-signal-500" aria-hidden="true">◇</span>
+          <p class="text-[0.8125rem] leading-relaxed text-muted-foreground">
+            {d.home.voices.disclosure}
+          </p>
+        </div>
+      </div>
+
+      {/* An ordered list: the order is a decision — the declined patient is
+          placed second, between the two approved ones — and the visible
+          index says so. The index chip itself is hidden from assistive tech,
+          which already announces "2 of 3". */}
+      <ol class="reveal flex flex-col gap-4 lg:col-span-7">
+        {
+          d.home.voices.items.map((voice, index) => (
+            <li>
+              {/* figure > blockquote > figcaption. The attribution is not part
+                  of the quotation, so it belongs outside the <blockquote> —
+                  the block this came from used a bare <p> and lost the
+                  quotation semantics altogether. */}
+              <figure class:list={[voice.feature ? "panel" : "panel-flat", "p-6 sm:p-7"]}>
+                <blockquote>
+                  {/* No decorative curly quote and no quotation marks: the
+                      surface and the attribution already mark it as a quote,
+                      and a 6rem grey glyph says nothing. */}
+                  <p
+                    class:list={[
+                      "text-foreground",
+                      voice.feature
+                        ? "text-[1.25rem] leading-snug sm:text-[1.375rem]"
+                        : "text-[1.0625rem] leading-relaxed",
+                    ]}
+                  >
+                    {voice.quote}
+                  </p>
+                </blockquote>
+                <figcaption class="mt-6 flex items-center gap-3 border-t border-hairline pt-5">
+                  {/* A mono index, and never `rounded-full`: a circle in this
+                      slot IS the avatar affordance, which is the one thing the
+                      photography licence forbids implying. 12px is the
+                      control radius, so it reads as a chip. */}
+                  <span
+                    class="label flex size-9 shrink-0 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground"
+                    aria-hidden="true"
+                  >
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  {/* No `truncate`. In the old three-up grid the columns were
+                      narrow enough that it clipped the state off every
+                      attribution, and a half-cut attribution is worse than one
+                      that wraps. */}
+                  <span class="min-w-0">
+                    <span class="block text-sm font-semibold">
+                      {voice.name}
+                      <span class="font-normal text-muted-foreground"> · {voice.location}</span>
+                    </span>
+                    <span class="figure mt-0.5 block text-xs text-muted-foreground">
+                      {voice.context}
+                    </span>
+                  </span>
+                </figcaption>
+              </figure>
+            </li>
+          ))
+        }
+      </ol>
     </div>
-
-    <ul class="mt-12 grid gap-6 md:grid-cols-3 lg:gap-8">
-      {
-        d.home.voices.items.map((voice) => (
-          <li class="panel flex flex-col p-6 sm:p-7">
-            <blockquote class="flex-1">
-              {/* An em-dash-free, quote-mark-free blockquote: the panel and
-                  the attribution already mark it as a quotation, and a
-                  decorative 6rem curly quote is decoration that says nothing. */}
-              <p class="text-[1.0625rem] leading-relaxed text-foreground">{voice.quote}</p>
-            </blockquote>
-            <footer class="mt-6 flex items-center gap-3 border-t border-border pt-5">
-              <span
-                class="label flex size-9 shrink-0 items-center justify-center bg-accent text-brand-700 dark:text-brand-300"
-                style="border-radius:3px"
-                aria-hidden="true"
-              >
-                {monogram(voice.name)}
-              </span>
-              {/* No `truncate` here. In the three-up grid between 768px and
-                  ~880px the columns are narrow enough that it clipped the
-                  state off every attribution — and an attribution that has
-                  been cut in half is worse than one that wraps. */}
-              <span class="min-w-0">
-                <span class="block text-sm font-semibold">
-                  {voice.name}
-                  <span class="font-normal text-muted-foreground"> · {voice.location}</span>
-                </span>
-                <span class="figure mt-0.5 block text-xs text-muted-foreground">
-                  {voice.context}
-                </span>
-              </span>
-            </footer>
-          </li>
-        ))
-      }
-    </ul>
-
-    <p class="mt-6 text-xs text-muted-foreground">
-      {d.home.voices.disclosure}
-      <sup class="ml-0.5">◇</sup>
-    </p>
   </div>
 </section>

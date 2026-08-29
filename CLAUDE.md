@@ -54,8 +54,17 @@ The real page lives in `src/components/*Page.astro`, which composes
 `Layout.astro` + `SeoHead.astro` (passed as `slot="head"`) +
 `src/components/sections/*.astro`.
 
-Every page includes, in order: `TrustTicker`, `Header`, `<main>`, then `Cta`
-(except the legal pages), `ComplianceBand`, `Footer`.
+Every page includes, in order: `Header` (fixed, floating over the page), then
+`<main>` — whose FIRST in-flow section carries `.page-top` to clear the header,
+except the homepage, whose hero deliberately runs under it — then the head
+block, then `TrustTicker` closing it as a rail, then the page's own sections,
+then `Cta` (except the legal pages), `ComplianceBand`, `Footer`.
+
+The ticker moved out from above the nav in the rebuild, because it cannot sit
+above a header that floats. It now takes the slot the reference template gives
+its logo marquee: attached to the bottom of the hero, or of an inner page's
+head block. Ellery has no customer logos to loop and would not run borrowed
+ones if it did, so five checkable claims take that slot instead.
 
 ### One locale, machinery intact
 
@@ -127,11 +136,13 @@ Breaking these produces components that render but don't work.
    trigger with content (Select, DropdownMenu, RadioGroup, Popover) must sit
    *entirely* inside one `.tsx`. This is why the whole intake form is one file.
 3. **A `fixed` overlay inside a filtered ancestor needs a portal.**
-   `MobileMenu.tsx` renders via `createPortal` to `document.body` because it
-   sits inside `Header.astro`'s `backdrop-blur` container, and
-   `backdrop-filter` establishes a containing block for `position: fixed`
-   descendants — an un-portalled `fixed inset-0` overlay clips to the 64px
-   header. Same applies to `filter`, `transform` and `will-change` ancestors.
+   `MobileMenu.tsx` renders via `createPortal` to `document.body`. The rebuilt
+   header is opaque (no `backdrop-filter`) and its mount animation is
+   opacity-only for exactly this reason — but the portal stays, because that
+   guarantee should not be load-bearing. `filter`, `backdrop-filter`,
+   `transform` and `will-change` all establish a containing block for
+   `position: fixed` descendants, so an un-portalled `fixed inset-0` overlay
+   would clip to the header box. Reach for the portal by default.
 4. **Attribute names follow the element, not the file.** `class` on HTML
    elements in `.astro`; `className` on React components — including
    `lucide-react` icons used inside `.astro`.
@@ -151,11 +162,18 @@ reserved filename.
 
 ## The design system
 
+**Rebuilt.** The visual language is ported from the premium SaaS landing
+template in `references/saas` (Next.js 16 + Tailwind v4 + Motion + Lenis),
+onto the information design that was already here. The full, enforceable
+version is **`docs/DESIGN-SYSTEM.md`** — that file is the contract every
+section is built to, and it lists the values you are allowed to use. What
+follows is why they are those values.
+
 Tailwind v4 via `@tailwindcss/vite`; **there is no `tailwind.config.*`**.
 Everything is in `src/styles/global.css`, in three tiers:
 
 - **`@theme`** — literal, theme-independent values: the three font stacks, the
-  seven-value brand ramp, the three-value glow ramp. A new brand or font token
+  nine-value brand ramp, the five-value signal ramp. A new brand or font token
   goes here.
 - **`:root` / `.dark`** (and their `[data-palette]` variants) — the actual
   light/dark values for every semantic colour. **A new semantic colour goes
@@ -165,75 +183,195 @@ Everything is in `src/styles/global.css`, in three tiers:
   `--color-*`/`--radius-*` name Tailwind's utility generator reads. A semantic
   colour needs an entry here before `bg-*`/`text-*`/`border-*` exist for it.
 
-### Three type roles, and the mono is the one that matters
+### THE INVERSION: the sans carries the headlines now
 
-- **heading** — Fraunces, weight 400, `WONK 1`, tight tracking. Loaded from the
-  `wonk` variable file (wght + WONK, 36 KB latin), not `index.css` (wght only):
-  WONK 1 swaps in the alternate g/y/f, which is the one typographic detail
-  nobody else in this category has. Used at 24px and up only.
-- **sans** — Instrument Sans. Body, and every sub-heading below 24px, where a
-  400-weight display serif carries less ink than the paragraph it introduces.
+The old system set every `h1`/`h2`/`h3` in Fraunces. That reads editorial and
+luxurious, which is the register this whole category already occupies. The
+reference template's power comes from one thing — a very large, very tight
+grotesque — so the roles swapped:
+
+- **sans** — Instrument Sans. Headlines at **500** with `-0.03em` tracking, and
+  all body copy. Crisp humanist grotesque, deliberately not Inter and not the
+  Poppins rounding every competitor uses.
+- **heading** — Fraunces, 400, **italic**, `WONK 1`. Reserved for **one accent
+  word inside the `h1`**, and for pull quotes. Loaded from the `wonk` variable
+  file (wght + WONK, 36 KB latin) because WONK 1 swaps in the alternate g/y/f.
+  Demoting it from "all headings" to "one word" is what makes it register as a
+  decision rather than a font choice — and it is the only place in the category
+  that detail appears at all.
 - **mono** — IBM Plex Mono. **Every figure on this site.** Doses, hours,
-  prices, cutoffs, step indices, USP chapter references, dates. This is the
-  brand's most distinctive decision and the reason the "spec sheet" reading
-  holds together.
+  prices, cutoffs, step indices, USP chapter references, dates. Unchanged, and
+  still the decision the brand rests on.
 
-Component classes: `.label` (the uppercase mono micro-layer), `.figure` (a
-tabular number), `.subhead`, `.display-1/2/3`, `.lead`, `.btn-solid`,
-`.btn-outline`, `.btn-solid-invert`, `.btn-outline-invert`, `.panel`,
-`.panel-invert`, `.relay` / `.relay-step` / `.relay-on-light`, `.page-tint`.
+`Headline.astro` carries the mechanism: the dictionary string holds a
+`{accent}` token, the accent word sits beside it, and the component splits on
+words to produce both the Fraunces span and a CSS-only staggered mount reveal.
+A headline with two tokens is a bug you can grep for.
 
-### Colour
+Component classes: `.shell` (the one container), `.section` / `.section-tight`
+(the two rhythms), `.page-top` (clearance for the floating header), `.label`,
+`.figure`, `.subhead`, `.display-1/2/3`, `.wonk`, `.lead`, `.measure`,
+`.btn-solid` / `.btn-outline` / `.btn-solid-invert` / `.btn-outline-invert` /
+`.btn-split`, `.panel` / `.panel-flat` / `.panel-invert`, `.slab` + `.on-slab`,
+`.plate` / `.plate-soft` + `.on-plate`, `.band-overlap` / `.band-under`,
+`.site-frame` / `.site-corner`, `.relay` / `.relay-step` / `.relay-on-light`,
+`.tick-scale`, `.rule`, `.reveal`, `.mask-fade-b`.
+
+### Colour: two hues, and the accent is amber now
 
 Three switchable palettes via a `data-palette` attribute on `<html>`, the same
 mechanism as `.dark` (see the no-flash script in `Layout.astro` and
 `PaletteSwitcher.tsx` — change one, change the other):
 
-- **`original` "saline"** (default) — petrol/mineral teal, amber accent, cool
-  paper ground. Chosen *against the field*: all three reference sites are warm,
-  cream-grounded and light-only, so a cool mineral ground is the open position
-  that still reads clinical. It is also the only palette with a real dark mode,
-  which none of the three references has.
-- **`indigo`** — deep indigo, soft coral. Reads closer to fintech.
-- **`clay`** — deliberately the warm apothecary look the references use, kept
-  switchable so the direction can be compared rather than argued about.
+- **`original` "specimen"** (default) — cool neutral paper ground, white
+  surfaces, deep petrol slab, **amber signal**.
+- **`indigo`** — deep indigo, coral signal. Reads closer to fintech.
+- **`clay`** — deliberately the warm apothecary look the reference sites use,
+  kept switchable so the direction can be compared rather than argued about.
+  Its signal is olive, because the warm ground already carries the amber
+  register.
 
-**Amber (`glow-*`) is reserved for things that measure time** — a duration, a
-cutoff, a Relay tick, a step index. It is never decorative, never carries small
-text on its own, and there is no glow-based semantic token. That restraint is
-what keeps it readable as "this is a clock". Never hardcode a brand hex in a
-component and never use a raw Tailwind palette colour.
+**Amber was promoted, and that is the rebuild's central colour decision.** On
+the old site it was a minor second hue meaning "this measures time" — the Relay
+ticks, the review window, the dispatch cutoff. It is now *the* accent: the CTA
+plate, the featured edge, the scroll rail, the mark itself. That is honest —
+a coordination business sells a clock — and it is the open position, since the
+reference template uses lime and every site in this category is sage, cream or
+burgundy. The old petrol wash is gone: a page tinted throughout cannot carry a
+loud accent, and the accent is now the point.
 
-**On the fixed-dark `bg-brand-800` bands, `text-brand-50` has an opacity floor
-of `/60`.** Below that it fails WCAG AA against that ground: `/40` is 3.4:1,
-`/45` is 3.7:1, `/50` is 4.4:1, `/60` is 5.8:1. Lighthouse caught `/40` and
-`/45` on the footer column headings, the registered-office label and the
-compliance band's entity line. Borders and hairlines (`border-brand-50/12`)
-are decorative and exempt.
+**The signal rule, enforced by contrast rather than taste.** `signal-500` is a
+**surface** and a **rule**, never small text on a light ground:
 
-Shape: cards 8px (`.panel`), controls near-square 3px (`.btn-*`). No shadows
-except the mobile sheet. No gradients except the two photographic scrims.
+| Pairing | Ratio | |
+|---|---|---|
+| `#e8a33d` on the paper ground | **1.9:1** | never |
+| `#0c1412` on `#e8a33d` | **8.7:1** | the plate, ink on amber |
+| `signal-700` `#8a5510` on paper | **5.6:1** | amber-coloured text on light |
+| `#e8a33d` on the slab / in dark mode | **7.0:1** / **9.0:1** | fine as text |
+
+So `text-signal-700 dark:text-signal-500` wherever amber type is wanted.
+
+**Focus is ink, not amber.** One rule — `:focus-visible { outline: 2px solid
+var(--focus) }` — and `--focus` flips on `.on-slab` and `.on-plate`. An amber
+ring on the paper ground is 1.9:1 and fails WCAG 2.4.11; the reference template
+ships exactly that bug.
+
+**On the fixed `.slab` bands, `text-brand-50` has an opacity floor of `/60`.**
+`/40` is 3.4:1, `/45` is 3.7:1, `/50` is 4.4:1, `/60` is 5.8:1. Borders and
+hairlines (`border-brand-50/12`) are decorative and exempt. Never write raw
+`bg-brand-800` — write `slab on-slab`, which also flips the focus and Fraunces
+tokens with the ground.
+
+Never hardcode a brand hex in a component and never use a raw Tailwind palette
+colour.
+
+### Shape and structure
+
+**Two radius families and no third**: controls `rounded-lg` (12px), surfaces
+`rounded-2xl` / `.panel` (24px). `--radius-slab` (40px) is *furniture* — the
+frame's corner fillets, the header's bottom sweep, the slab's top corners — not
+a card radius. `rounded-full` is for dots, ticks and avatar slots only.
+
+**One container** (`.shell`, 64rem) and **two section rhythms** (`.section`,
+`.section-tight`) across all fifteen routes. A page that invents a third of
+either is the clearest tell of an assembled rather than a designed page.
+
+Shadows appear in three places (floating header, mobile sheet, the overlapping
+CTA plate) and always as a tint of the ink colour, never black. Two gradients
+(the hero scrim, the mark).
 
 ### Structural devices
 
-Three, and each encodes something true rather than decorating:
+Five now, and each encodes something true rather than decorating:
 
+- **The site frame** (`SiteFrame.astro`) — four fixed rails in the frame colour
+  plus four SVG corner fillets, and a floating pill header that grows its own
+  two fillets sideways into the top rail. Ported from the reference, and its
+  signature: the whole viewport becomes a mount and the page a specimen sitting
+  in it. Hidden below 850px, where a 10px rail is only a bezel eating the
+  viewport, and hidden in print.
 - **The Relay** (`Relay.astro`, `RelayDetail.astro`) — the four custody
   handoffs on a tick-marked track. Order *and* elapsed time are both
   information the reader came for, so a scale is the honest form and a card
-  grid would throw the time away. Horizontal on the hero, vertical in detail.
+  grid would throw the time away. **It is now the hero's product visual**,
+  occupying the slot the reference template fills with a dashboard mockup: a
+  mockup is a picture of software, the Relay is the instrument itself.
   The rule is a per-step `border-top`, not one absolute bar, which is what
   makes it re-flow correctly at `grid-cols-2` and `grid-cols-1`.
 - **The Ladder** (`Ladder.astro`) — the titration schedule as a stepped chart.
   Magnitude and sequence are both real, so a bulleted list is wrong.
+- **The overlap** (`.band-overlap` / `.band-under`) — the CTA plate straddles
+  the top edge of the compliance slab, so the page's last ask and its legal
+  ground read as one object. The overlap is a fixed 5rem on the plate and the
+  band reserves 9rem, so the join survives any plate height; the
+  adjacent-sibling rule means a page that omits the CTA (the legal pages) needs
+  no prop.
 - **Tables.** Wherever content is rows-of-pairs or a comparison, a real
   `<table>` with `.label` headers, hairline rows, mono figures, and a
   `sm:hidden` definition-list fallback. `Roles.astro` and `Receipt.astro` are
   the two patterns.
 
-Long pages alternate `bg-background` / `bg-card` and carry exactly one
-fixed-dark `bg-brand-800` band in the middle. A card inside a `bg-card` band
-needs `bg-background` on the `.panel` or it disappears.
+Long pages alternate `bg-background` / `bg-card` and carry exactly one `.slab`
+band. A card inside a `bg-card` band needs `bg-background` on the `.panel` or
+it disappears.
+
+### Motion: one idea per section, and no animation library
+
+1. **Mount animation belongs to the header and the `h1`, and nothing else.**
+   Both are CSS keyframes. The header's is opacity-only on purpose: a transform
+   would make it a containing block for `position: fixed` descendants, which is
+   the exact trap `MobileMenu.tsx` portals around.
+2. **Everything below the fold uses `.reveal`** — one scroll-driven CSS
+   animation (`animation-timeline: view()`), defined once. **The base state is
+   the final state**, and the animation only exists inside
+   `@supports (animation-timeline: view())` nested in
+   `@media (prefers-reduced-motion: no-preference)`. So no-JS, unsupported
+   browsers and reduced-motion readers all get finished, readable content.
+3. **At most one scroll-linked section per route**, and only where the content
+   genuinely is a sequence in time.
+4. **Reduced motion is a redefinition, not a shortening.** The global clamp
+   only shortens duration; `animation-fill-mode: both` still latches the
+   transform, and it cannot reach a JS-driven animation at all.
+5. The hero's mouse parallax is ~25 lines of inline script with a rAF lerp —
+   the one Motion feature that was being used, at roughly 800 bytes instead of
+   35 KB, and never started for reduced motion or a narrow viewport.
+
+### React Bits Pro: read the blocks, ship almost none of them
+
+The licence is **Ultimate**, so all 135 components, 238 marketing blocks, 300
+App UI blocks and 11 templates are available. `docs/react-bits/SKILL.md` is the
+integration guide; `docs/react-bits/CATALOG.md` is the full ground-truth
+catalog (name, description, export style, npm deps) fetched from the registry.
+
+**Marketing blocks are read, not installed.** A block is hardcoded English copy
+inside a Next.js client component; this site's copy lives in `src/i18n/` and
+its numbers in `src/config/pricing.ts`, so a block can only ever be a
+structural and motion reference — the arrangement, the grid, the hover
+behaviour — transcribed into an `.astro` section that reads the dictionary.
+That is what the SKILL calls the harmonization pass, and it is the whole job.
+
+**One component ships**, where CSS genuinely cannot do the work:
+
+- `blur-highlight` in `Thesis.astro` — the reference's scroll blur-up with a
+  per-phrase highlight sweep. `client:visible`. Locally patched twice: for
+  `prefers-reduced-motion` (the CSS clamp cannot reach a JS animation), and to
+  accept the sentence as a `text` prop, because Astro serialises an island's
+  children as `<astro-slot>` markup and the component's text extraction
+  silently returns `""` — an empty, zero-height paragraph with nothing thrown.
+`scroll-stack` was installed for `/learn/`, read, and removed: its cards are
+`absolute inset-0` siblings positioned by a rAF loop, so un-hydrated it renders
+three articles on top of one another. The full note is at the foot of
+`LearnPage.astro`, and it is the best worked example in the repo of what the
+harmonization pass actually decides.
+
+Everything else was considered and rejected. **No WebGL anywhere**: every
+shader component pulls `three` (~600 KB), and on a site whose pitch is that the
+numbers are checkable, an ambient shader buys atmosphere and spends trust.
+`staggered-text` was replaced by `Headline.astro`, which does the same word
+stagger in a CSS keyframe, keeps the `{accent}` span a `text: string` prop
+cannot hold, and costs nothing.
+
 
 ## The compliance contract
 
@@ -263,14 +401,23 @@ is. Ellery administers; it does not prescribe or dispense. Therefore:
 
 ### The JavaScript budget
 
-Three pages' worth of React ships on every route for the header's theme and
-palette controls and the mobile sheet (~180 KB raw, ~57 KB over the wire),
-plus ~170 KB more on `/start/` for the intake form's Radix primitives. Both
-are `client:idle`, so neither is in the critical path — the homepage measures
-LCP 235 ms and CLS 0.00 on the production build.
+Every route ships React for the header's theme and palette controls, the mobile
+sheet and Lenis smooth scrolling (~57 KB over the wire, plus ~10 KB for Lenis).
+`/start/` adds the intake form's Radix primitives, and `/` adds Motion for the
+one React Bits component in `Thesis.astro`. **Every one of those is
+`client:idle` or `client:visible`, so none is in the critical path.**
+
+What is NOT in the budget, deliberately:
+
+- **No animation library on thirteen of fifteen routes.** Every reveal is a
+  scroll-driven CSS animation; the hero's headline stagger and mouse parallax
+  are a CSS keyframe and ~800 bytes of inline script.
+- **No `three`, anywhere.** Every WebGL component in the React Bits library
+  costs ~600 KB, and this site's whole argument is that the numbers are
+  checkable rather than that the page is atmospheric.
 
 Rewriting the three header controls in vanilla JS would remove React from
-thirteen of fourteen routes. It was measured and deliberately not done: the
+thirteen of fifteen routes. It was measured and deliberately not done: the
 existing islands are correct, focus-trapped and portalled, and the payload is
 not on the critical path. Revisit it if the JS budget ever becomes the
 constraint — the intake form must stay React either way.
@@ -338,6 +485,15 @@ Worker name and `assets.directory`. `.github/workflows/ci.yml` runs
 - `.env`, `.envrc` and `.claude/settings.local.json` are gitignored.
 - `meeting-*.md` is gitignored — client call transcripts, not site content.
 - `.input/` is gitignored — keep source photos and mockups there.
+- `references/` is gitignored — the licensed SaaS landing template the rebuild
+  is modelled on. Its licence forbids redistribution, so it stays out of the
+  repo; read it, do not commit it.
+- `.rb-source/` is gitignored — a local cache of React Bits Pro block source,
+  fetched from the registry so blocks can be read without hitting rate limits.
+  Same licensing reason.
+- `.env.local` holds `REACTBITS_LICENSE_KEY` and is gitignored. The shadcn CLI
+  reads it to authenticate the `@reactbits-starter` and `@reactbits-pro`
+  registries declared in `components.json`.
 - Photography is Unsplash/Pexels licensed (commercial use, no attribution
   required). See `CREDITS.md`. Neither licence permits implying that a depicted
   person endorses anything, which is why the testimonials carry no portraits.

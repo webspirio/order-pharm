@@ -17,6 +17,23 @@
  * two-column table form as `Roles.astro` on the homepage, because it is the
  * same kind of content — a claim paired with exactly one owner or reason.
  *
+ * WHAT THE REBUILD CHANGED, and why:
+ *
+ * - The four header figures are hero-20's editorial metric strip — rules
+ *   above and below, hairline dividers between — and the same device carries
+ *   the four self-injection steps further down. One repeated instrument reads
+ *   as a system; two grids of bordered cards read as two lists.
+ * - The photograph is framed rather than full-bleed, and its disclosure sits
+ *   on the frame instead of inside a gradient scrim over the image. The scrim
+ *   was the third gradient on a site that allows two, and — worse — it set the
+ *   one sentence that limits the picture over the picture it limits.
+ * - Each preparation card is now two surfaces in one card, features-12's
+ *   idea: the prose on the raised ground, the spec sheet and the prices
+ *   recessed beside it. The split is real information — the left half is
+ *   argued, the right half is measured.
+ * - The refuse band is `slab on-slab`, the page's ONE dark band, and its
+ *   table sits in the inverted panel chassis rather than floating on the slab.
+ *
  * Every figure — prices, the count of preparations, the sermorelin age floor,
  * and the count of approved indications (derived, not typed: none of the four
  * is anything but compounded) — comes from `src/config/pricing.ts`.
@@ -24,17 +41,13 @@
 import { type Locale, t, localizedPath } from "@/i18n";
 import { Image } from "astro:assets";
 import longevityHero from "@/assets/longevity-hero.jpg";
-import {
-  treatmentsIn,
-  monthlyEquivalent,
-  eligibility,
-  usd,
-  usdMonthly,
-} from "@/config/pricing";
+import { treatmentsIn, monthlyEquivalent, eligibility, usd, usdMonthly } from "@/config/pricing";
 import Layout from "@/layouts/Layout.astro";
 import SeoHead from "@/components/SeoHead.astro";
 import TrustTicker from "@/components/sections/TrustTicker.astro";
 import Header from "@/components/sections/Header.astro";
+import Headline from "@/components/Headline.astro";
+import SectionHead from "@/components/SectionHead.astro";
 import Relay from "@/components/sections/Relay.astro";
 import Faq from "@/components/sections/Faq.astro";
 import Cta from "@/components/sections/Cta.astro";
@@ -65,6 +78,10 @@ const cards = items.map((tx, index) => ({
   ...tx,
   index: index + 1,
   copy: prose[tx.id],
+  /* The caption names the preparation so four adjacent two-column price
+     grids are distinguishable to a screen reader. The name is data, so it
+     is substituted rather than written into the dictionary. */
+  priceCaption: c.treatments.priceCaption.replace("{preparation}", tx.display),
   prices: [
     { label: c.treatments.labels.oneMonth, value: usd(tx.oneMonth) },
     { label: c.treatments.labels.threeMonth, value: usd(tx.threeMonth) },
@@ -88,48 +105,96 @@ const headerFigures = c.header.figures.map((figure, index) => ({
 }));
 ---
 
-<Layout
-  locale={locale}
-  title={d.meta.longevity.title}
-  description={d.meta.longevity.description}
->
+<Layout locale={locale} title={d.meta.longevity.title} description={d.meta.longevity.description}>
   <SeoHead slot="head" locale={locale} path="/longevity/" />
   <Header locale={locale} />
 
   <main id="main" tabindex="-1" class="outline-none">
-    {/* 1 — the header block. The H1 promises nothing; it states the rule the
-        rest of the page follows. */}
-    <section class="bg-background page-top pb-14 sm:pb-16">
+    {/* ---------------------------------------------------------------
+        1 — the head block. The h1 promises nothing; it states the rule the
+        rest of the page follows, and carries the page's single Fraunces
+        word on the verb it is named after.
+        --------------------------------------------------------------- */}
+    <section class="page-top pb-16 sm:pb-20">
       <div class="shell">
-        <p class="label text-brand-700 dark:text-brand-400">{c.header.eyebrow}</p>
-        {/* The break in the title is a rhetorical one — two clauses, one per
-            line — and it only helps where there is room for it. Below `sm` the
-            headline reflows normally rather than orphaning "stops," on a line
-            of its own. */}
-        <h1 class="display-1 mt-5 max-w-4xl sm:whitespace-pre-line">{c.header.title}</h1>
+        <p class="label text-signal-700 dark:text-signal-500">{c.header.eyebrow}</p>
+
+        <Headline
+          as="h1"
+          reveal
+          text={c.header.title}
+          accent={c.header.titleAccent}
+          class="display-1 hl-break-sm mt-5 max-w-4xl"
+        />
+
         <p class="lead mt-6 text-lg">{c.header.lead}</p>
 
-        <div class="mt-8 flex flex-wrap items-center gap-3">
-          <a href={localizedPath(locale, "/start/")} class="btn-solid">
-            {d.cta.primary}
-            <ArrowRight className="size-4" />
+        <div class="mt-9 flex flex-wrap items-center gap-3">
+          {/* The page's one `.btn-split`. The header pill carries the other,
+              which is the whole two-per-page budget. */}
+          <a href={localizedPath(locale, "/start/")} class="btn-split">
+            <span class="btn-split-label">{d.cta.primary}</span>
+            <span class="btn-split-tile"><ArrowRight className="size-5" /></span>
           </a>
           <a href={localizedPath(locale, "/pricing/")} class="btn-outline">{d.cta.secondary}</a>
         </div>
 
-        <dl class="mt-12 grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-4 sm:gap-x-8">
+        {/* The strip below quotes a price, so the condition every price on
+            this site is subject to is stated beside it rather than left to
+            the footnote band. */}
+        <p class="mt-7 max-w-2xl text-sm text-muted-foreground">
+          {d.gating.short}<sup class="figure ml-0.5">*</sup>
+        </p>
+
+        {/* THE METRIC STRIP — hero-20's editorial device, and the page's
+            repeated instrument (the self-injection steps use it again). Each
+            cell is a `dt`/`dd` pair in DOM order, which is the only order the
+            HTML spec allows inside a `dl > div`; `flex-col-reverse` puts the
+            figure on top, where the eye wants it. */}
+        <h2 class="label mt-14 text-muted-foreground" id="lv-figures">
+          {c.header.figuresLabel}
+        </h2>
+        <dl
+          aria-labelledby="lv-figures"
+          class="mt-5 grid grid-cols-2 gap-x-6 gap-y-8 border-y border-border py-8 sm:grid-cols-4 sm:gap-x-0 sm:gap-y-0 sm:divide-x sm:divide-border"
+        >
           {
             headerFigures.map((figure) => (
-              <div class="border-t border-border pt-4">
-                <dd class="figure text-2xl text-foreground sm:text-[1.75rem]">{figure.value}</dd>
-                <dt class="mt-2">
+              <div class="flex flex-col-reverse justify-end gap-2 sm:px-6 sm:first:pl-0 sm:last:pr-0">
+                <dt>
                   <span class="subhead block text-[0.9375rem]">{figure.label}</span>
                   <span class="mt-1 block text-sm text-muted-foreground">{figure.note}</span>
                 </dt>
+                <dd class="figure text-2xl text-foreground sm:text-[1.75rem]">{figure.value}</dd>
               </div>
             ))
           }
         </dl>
+
+        {/* FRAMED MEDIA. The card's padding is visible frame and the inner
+            radius steps down by exactly the inset, so the two curves stay
+            concentric — the value is derived from `--radius-card` rather than
+            being a new radius. The disclosure is the frame's caption: an
+            aspirational photograph and the sentence that limits it belong on
+            the same surface, and a sentence set over a photograph is a
+            sentence you have chosen to make hard to read. */}
+        <figure class="panel mt-12 bg-card p-2">
+          <div
+            class="aspect-[4/3] overflow-hidden rounded-[calc(var(--radius-card)-0.5rem)] sm:aspect-[21/9]"
+          >
+            <Image
+              src={longevityHero}
+              alt={c.header.imageAlt}
+              widths={[640, 960, 1440, 2000]}
+              sizes="(min-width: 1152px) 66rem, 100vw"
+              class="h-full w-full object-cover object-[50%_32%]"
+              loading="lazy"
+            />
+          </div>
+          <figcaption class="figure px-3 pt-4 pb-2 text-xs leading-relaxed text-muted-foreground">
+            {c.header.imageNote}<sup class="figure ml-0.5 text-signal-700 dark:text-signal-500">‡¶</sup>
+          </figcaption>
+        </figure>
       </div>
     </section>
 
@@ -138,65 +203,41 @@ const headerFigures = c.header.figures.map((figure, index) => ({
         header floats. */}
     <TrustTicker locale={locale} />
 
-    {/* The wide photographic band, with the disclosure as its caption rather
-        than as small print somewhere below. The aspirational picture and the
-        sentence that limits it belong on the same surface. */}
-    <section class="relative isolate">
-      <div class="relative aspect-[4/3] w-full overflow-hidden sm:aspect-[21/9]">
-        <Image
-          src={longevityHero}
-          alt={c.header.imageAlt}
-          widths={[640, 960, 1440, 2000]}
-          sizes="100vw"
-          class="h-full w-full object-cover object-[50%_32%]"
-          loading="lazy"
-        />
-        {/* The scrim only has to carry one line of mono at the bottom edge, so
-            it is a short, steep ramp rather than a wash over the whole photo. */}
-        <div
-          class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-brand-800/95 via-brand-800/72 to-transparent pt-20"
-        >
-          <div class="shell pb-6">
-            <p class="figure max-w-2xl text-xs leading-relaxed text-brand-50/85 sm:text-[0.8125rem]">
-              {c.header.imageNote}
-              <sup class="ml-0.5 text-signal-500">‡¶</sup>
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    {/* 2 — the four preparations. */}
+    {/* ---------------------------------------------------------------
+        2 — the four preparations. Two surfaces per card: the argued half
+        on the raised ground, the measured half recessed beside it. The
+        recessed column runs to the card's own edge rather than floating
+        inside its padding, which is what makes the split read as one card
+        with two materials instead of a card containing a box.
+        --------------------------------------------------------------- */}
     <section class="bg-card section">
       <div class="shell">
-        <div class="max-w-3xl">
-          <p class="label text-brand-700 dark:text-brand-400">{c.treatments.eyebrow}</p>
-          <h2 class="display-2 mt-4">{c.treatments.title}</h2>
-          <p class="lead mt-4">{c.treatments.lead}</p>
-        </div>
+        <SectionHead
+          eyebrow={c.treatments.eyebrow}
+          title={c.treatments.title}
+          lead={c.treatments.lead}
+        />
 
-        <div class="mt-12 flex flex-col gap-6">
+        <div class="reveal mt-12 flex flex-col gap-6">
           {
             cards.map((card) => (
-              <article class="panel bg-background p-6 sm:p-8">
-                <div class="grid gap-8 lg:grid-cols-[1fr_17rem] lg:gap-12">
-                  <div>
+              <article class="panel overflow-hidden bg-background">
+                <div class="grid lg:grid-cols-[1fr_19rem]">
+                  <div class="p-6 sm:p-8">
                     <div class="flex items-baseline gap-3">
-                      <span class="figure shrink-0 text-xs text-brand-700 dark:text-brand-400">
+                      <span class="figure shrink-0 text-xs text-signal-700 dark:text-signal-500">
                         {String(card.index).padStart(2, "0")}
                       </span>
                       <h3 class="display-3">
                         {card.display}
-                        <sup class="figure ml-0.5 text-[0.45em] text-muted-foreground">
-                          ‡¶
-                        </sup>
+                        <sup class="figure ml-0.5 text-[0.45em] text-muted-foreground">‡¶</sup>
                       </h3>
                     </div>
 
                     {/* Grouped in `div`s: HTML5 allows a `dl` of dt/dd pairs
                         or a `dl` of div groups, not a mixture of the two, and
                         the third field needs a wrapper to carry its rule. */}
-                    <dl class="mt-6">
+                    <dl class="mt-7">
                       <div>
                         <dt class="label text-muted-foreground">{c.treatments.labels.what}</dt>
                         <dd class="mt-2 max-w-2xl text-[0.9375rem] leading-relaxed text-muted-foreground">
@@ -215,9 +256,11 @@ const headerFigures = c.header.figures.map((figure, index) => ({
 
                       {/* The field the rest of the category omits. It is the
                           only one in full-strength ink, and the only one on a
-                          rule, because it is the reason the panel exists. */}
-                      <div class="mt-6 border-l-2 border-brand-600 pl-4 dark:border-brand-400 sm:pl-5">
-                        <dt class="label text-brand-700 dark:text-brand-400">
+                          rule, because it is the reason the panel exists. The
+                          rule is the signal colour: this is the sentence the
+                          page is spending its credibility on. */}
+                      <div class="mt-7 border-l-2 border-signal-500 pl-4 sm:pl-5">
+                        <dt class="label text-signal-700 dark:text-signal-500">
                           {c.treatments.labels.limits}
                         </dt>
                         <dd class="mt-2 max-w-2xl text-[0.9375rem] leading-relaxed text-foreground">
@@ -227,29 +270,33 @@ const headerFigures = c.header.figures.map((figure, index) => ({
                     </dl>
                   </div>
 
-                  <aside class="lg:border-l lg:border-border lg:pl-8">
-                    <dl class="flex flex-col">
-                      <div class="border-t border-border py-3">
+                  <aside class="border-t border-border bg-muted p-6 sm:p-8 lg:border-t-0 lg:border-l">
+                    <dl class="flex flex-col divide-y divide-hairline border-y border-hairline">
+                      <div class="py-3">
                         <dt class="label text-muted-foreground">
                           {c.treatments.labels.molecule}
                         </dt>
                         <dd class="mt-1.5 text-sm leading-relaxed">{card.molecule}</dd>
                       </div>
-                      <div class="border-t border-border py-3">
+                      <div class="py-3">
                         <dt class="label text-muted-foreground">{c.treatments.labels.form}</dt>
                         <dd class="mt-1.5 text-sm leading-relaxed">{card.form}</dd>
                       </div>
-                      <div class="border-t border-border py-3">
+                      <div class="py-3">
                         <dt class="label text-muted-foreground">{c.treatments.labels.cadence}</dt>
                         <dd class="mt-1.5 text-sm leading-relaxed">{card.cadence}</dd>
                       </div>
                     </dl>
 
-                    <table class="mt-4 w-full border-collapse text-left">
+                    <table class="mt-5 w-full border-collapse text-left">
+                      <caption class="sr-only">{card.priceCaption}</caption>
                       <tbody>
                         {card.prices.map((price) => (
-                          <tr class="border-t border-border">
-                            <th scope="row" class="label py-3 pr-3 font-semibold text-muted-foreground">
+                          <tr class="border-t border-hairline">
+                            <th
+                              scope="row"
+                              class="label py-3 pr-3 font-semibold text-muted-foreground"
+                            >
                               {price.label}
                             </th>
                             <td class="figure py-3 text-right text-base whitespace-nowrap">
@@ -260,7 +307,7 @@ const headerFigures = c.header.figures.map((figure, index) => ({
                       </tbody>
                     </table>
 
-                    <p class="mt-3 border-t border-border pt-3 text-xs leading-relaxed text-muted-foreground">
+                    <p class="mt-4 border-t border-hairline pt-4 text-xs leading-relaxed text-muted-foreground">
                       {d.gating.short}
                     </p>
                   </aside>
@@ -270,43 +317,42 @@ const headerFigures = c.header.figures.map((figure, index) => ({
           }
         </div>
 
-        <div class="mt-8 grid max-w-5xl gap-6 sm:grid-cols-2 sm:gap-10">
+        <div class="reveal mt-10 grid gap-6 border-t border-border pt-8 sm:grid-cols-2 sm:gap-10">
           <p class="text-[0.9375rem] leading-relaxed text-foreground">{c.treatments.note}</p>
           <p class="text-sm leading-relaxed text-muted-foreground">{d.gating.long}</p>
         </div>
       </div>
     </section>
 
-    {/* 3 — the dark band: the claims this page refuses to make. */}
-    <section class="border-b border-brand-50/10 bg-brand-800 py-16 text-brand-50 sm:py-20">
+    {/* ---------------------------------------------------------------
+        3 — the page's ONE dark band: the claims this page refuses to make.
+        Two columns, no marks, no third state — it is an assignment of a
+        defect to a sentence, not a comparison against anyone.
+        --------------------------------------------------------------- */}
+    <section class="slab on-slab section">
       <div class="shell">
-        <div class="max-w-3xl">
-          <p class="label text-brand-300">{c.refuse.eyebrow}</p>
-          <h2 class="display-2 mt-4 text-brand-50">{c.refuse.title}</h2>
-          <p class="mt-4 max-w-2xl text-[1.0625rem] leading-relaxed text-brand-50/65">
-            {c.refuse.lead}
-          </p>
-        </div>
+        <SectionHead on="slab" eyebrow={c.refuse.eyebrow} title={c.refuse.title} lead={c.refuse.lead} />
 
-        {/* sm and up: the table. */}
-        <div class="mt-10 hidden sm:block">
+        {/* sm and up: the table, in the inverted panel chassis. */}
+        <div class="panel-invert reveal mt-12 hidden overflow-hidden sm:block">
           <table class="w-full border-collapse text-left">
+            <caption class="sr-only">{c.refuse.caption}</caption>
             <thead>
-              <tr class="border-y border-brand-50/15">
-                <th scope="col" class="label w-[38%] py-3 pr-6 text-brand-50/60">
+              <tr class="border-b border-brand-50/15">
+                <th scope="col" class="label w-[38%] px-6 py-4 text-brand-50/70">
                   {c.refuse.header.claim}
                 </th>
-                <th scope="col" class="label py-3 text-brand-50/60">{c.refuse.header.why}</th>
+                <th scope="col" class="label px-6 py-4 text-brand-50/70">{c.refuse.header.why}</th>
               </tr>
             </thead>
             <tbody>
               {
                 c.refuse.rows.map((row) => (
-                  <tr class="border-b border-brand-50/12 align-top">
-                    <th scope="row" class="py-5 pr-6 font-normal">
+                  <tr class="border-b border-brand-50/12 align-top last:border-b-0">
+                    <th scope="row" class="px-6 py-6 font-normal">
                       <span class="subhead inline text-brand-50">{row.claim}</span>
                     </th>
-                    <td class="py-5 text-[0.9375rem] leading-relaxed text-brand-50/60">
+                    <td class="px-6 py-6 text-[0.9375rem] leading-relaxed text-brand-50/70">
                       {row.why}
                     </td>
                   </tr>
@@ -317,41 +363,49 @@ const headerFigures = c.header.figures.map((figure, index) => ({
         </div>
 
         {/* Below sm: the same pairs as a definition list. */}
-        <dl class="mt-10 flex flex-col sm:hidden">
+        <dl class="reveal mt-12 flex flex-col divide-y divide-brand-50/12 border-y border-brand-50/12 sm:hidden">
           {
             c.refuse.rows.map((row) => (
-              <div class="border-t border-brand-50/12 py-5">
+              <div class="py-5">
                 <dt class="subhead text-brand-50">{row.claim}</dt>
-                <dd class="mt-2 text-sm leading-relaxed text-brand-50/60">{row.why}</dd>
+                <dd class="mt-2 text-sm leading-relaxed text-brand-50/70">{row.why}</dd>
               </div>
             ))
           }
         </dl>
 
+        {/* The concession, at full strength. It is the loudest sentence on the
+            page and it argues against the page. */}
         <p
-          class="mt-10 max-w-3xl border-t border-brand-50/12 pt-7 text-[1.0625rem] leading-relaxed text-brand-50/80"
+          class="reveal mt-12 max-w-3xl border-t border-brand-50/12 pt-8 text-[1.0625rem] leading-relaxed text-brand-50"
         >
           {c.refuse.concede}
         </p>
       </div>
     </section>
 
-    {/* 4 — gating, interactions, and what self-injection actually involves. */}
+    {/* ---------------------------------------------------------------
+        4 — gating, interactions, and what self-injection actually
+        involves. The age floor sticks beside the rules it belongs to:
+        the reference template's sticky column, used where the left
+        column genuinely outruns the right.
+        --------------------------------------------------------------- */}
     <section class="bg-background section">
       <div class="shell">
-        <div class="max-w-3xl">
-          <p class="label text-brand-700 dark:text-brand-400">{c.gating.eyebrow}</p>
-          <h2 class="display-2 mt-4">{c.gating.title}</h2>
-          <p class="lead mt-4">{c.gating.lead}</p>
-        </div>
+        <SectionHead eyebrow={c.gating.eyebrow} title={c.gating.title} lead={c.gating.lead} />
 
-        <div class="mt-12 grid gap-10 lg:grid-cols-[1fr_20rem] lg:gap-14">
-          <div>
-            <h3 class="label text-muted-foreground">{c.gating.rulesTitle}</h3>
-            <dl class="mt-4 flex flex-col">
+        <div class="mt-12 grid gap-10 lg:grid-cols-[1fr_19rem] lg:gap-14">
+          <div class="reveal">
+            <h3 class="label text-muted-foreground" id="lv-rules">{c.gating.rulesTitle}</h3>
+            {/* Hairline-divided rows rather than bordered cards — four rules
+                that share one rule are one list, not four objects. */}
+            <dl
+              aria-labelledby="lv-rules"
+              class="mt-5 flex flex-col divide-y divide-hairline border-y border-hairline"
+            >
               {
                 c.gating.rules.map((rule) => (
-                  <div class="border-t border-border py-5">
+                  <div class="py-6">
                     <dt class="subhead">{rule.rule}</dt>
                     <dd class="mt-2 max-w-2xl text-[0.9375rem] leading-relaxed text-muted-foreground">
                       {rule.why}
@@ -362,30 +416,35 @@ const headerFigures = c.header.figures.map((figure, index) => ({
             </dl>
           </div>
 
-          <aside class="panel h-fit p-6 lg:sticky lg:top-24">
+          <aside class="panel h-fit p-6 lg:sticky lg:top-28">
             <p class="label text-muted-foreground">{c.gating.ageGate.label}</p>
-            <p class="figure mt-3 text-4xl text-foreground">{eligibility.minAgeSermorelin}</p>
-            <p class="mt-4 text-sm leading-relaxed text-muted-foreground">
-              {c.gating.ageGate.body}
+            <p class="figure mt-3 text-[1.75rem] leading-none text-foreground">
+              {eligibility.minAgeSermorelin}
             </p>
+            <p class="mt-4 text-sm leading-relaxed text-muted-foreground">{c.gating.ageGate.body}</p>
           </aside>
         </div>
 
-        <div class="panel mt-10 max-w-4xl p-6 sm:p-7">
+        <div class="panel reveal mt-12 max-w-4xl p-6 sm:p-8">
           <h3 class="subhead text-lg">{c.gating.interactions.title}</h3>
           <p class="mt-3 text-[0.9375rem] leading-relaxed text-muted-foreground">
             {c.gating.interactions.body}
           </p>
         </div>
 
-        <div class="mt-14">
+        <div class="reveal mt-16">
           <h3 class="display-3">{c.gating.injection.title}</h3>
-          <p class="lead mt-3">{c.gating.injection.lead}</p>
+          <p class="lead mt-4">{c.gating.injection.lead}</p>
 
-          <ol class="mt-8 grid gap-x-8 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
+          {/* The metric strip again, this time carrying a sequence. Using one
+              instrument twice on a page is what makes it read as an
+              instrument; two different grids would read as two lists. */}
+          <ol
+            class="mt-9 grid gap-8 border-y border-border py-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-0 lg:divide-x lg:divide-border"
+          >
             {
               c.gating.injection.steps.map((step, index) => (
-                <li class="border-t border-border pt-4">
+                <li class="lg:px-6 lg:first:pl-0 lg:last:pr-0">
                   <p class="figure text-xs text-signal-700 dark:text-signal-500">
                     {String(index + 1).padStart(2, "0")}
                   </p>
@@ -402,23 +461,17 @@ const headerFigures = c.header.figures.map((figure, index) => ({
     {/* 5 — the chain, framed for this program. */}
     <section class="bg-card section">
       <div class="shell">
-        <div class="max-w-3xl">
-          <p class="label text-brand-700 dark:text-brand-400">{c.relay.eyebrow}</p>
-          <h2 class="display-2 mt-4">{c.relay.title}</h2>
-          <p class="lead mt-4">{c.relay.lead}</p>
-        </div>
+        <SectionHead
+          eyebrow={c.relay.eyebrow}
+          title={c.relay.title}
+          lead={c.relay.lead}
+          actionHref={localizedPath(locale, "/how-it-works/")}
+          actionLabel={c.relay.cta}
+        />
 
-        <div class="mt-11">
+        <div class="reveal mt-12">
           <Relay locale={locale} variant="full" onLight />
         </div>
-
-        <a
-          href={localizedPath(locale, "/how-it-works/")}
-          class="mt-9 inline-flex items-center gap-2 text-sm font-semibold text-brand-700 dark:text-brand-400"
-        >
-          {c.relay.cta}
-          <ArrowRight className="size-4" />
-        </a>
       </div>
     </section>
 
@@ -438,3 +491,23 @@ const headerFigures = c.header.figures.map((figure, index) => ({
   </main>
   <Footer locale={locale} />
 </Layout>
+
+<style>
+  /**
+   * The h1's break is rhetorical — one clause per line — and it only helps
+   * where there is room for it. Below `sm` the headline reflows normally
+   * rather than orphaning "so does the sentence." on a line of its own.
+   *
+   * `:global()` because `Headline.astro` emits the `<br>`: Astro's scoping
+   * stamps this component's own elements, never a child component's, so a
+   * scoped selector would compile to something that can never match.
+   */
+  :global(.hl-break-sm br) {
+    display: none;
+  }
+  @media (min-width: 640px) {
+    :global(.hl-break-sm br) {
+      display: revert;
+    }
+  }
+</style>

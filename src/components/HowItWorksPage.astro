@@ -2,21 +2,37 @@
 /**
  * /how-it-works/ — the process page, and the page the site's thesis points at.
  *
- * Three structural decisions worth stating:
+ * Four structural decisions worth stating:
  *
  * 1. The Relay opens the page at `variant="full"`, inside the header block
  *    rather than in a section of its own. The four handoffs and their
  *    durations ARE the answer to the question the page title asks, so they sit
  *    above the fold instead of after an introduction to themselves.
  *
- * 2. Each handoff then gets a two-column subsection whose last element is a
- *    FAILURE panel — "what can go wrong" beside "what happens then", with the
- *    resolution stated as a figure. That pairing is the page's differentiator:
- *    no competitor publishes the unhappy path, and a process page that
- *    describes only the good day is a brochure.
+ * 2. The four handoffs then hang off a CUSTODY RAIL — a real `<ol>`, a mono
+ *    numeral per node, and a hairline drawn segment by segment as the reader
+ *    descends. Same device as `RelayDetail.astro` on the homepage, at full
+ *    length. It is this route's one scroll-linked section and it costs no
+ *    JavaScript; the reasoning is in the `<style>` block at the foot of the
+ *    file.
  *
- * 3. The data band is fixed-dark and sits at the two-thirds mark, which is
- *    both the page's rhythm break and the right weight for the one section
+ *    The reference's alternating media column was DROPPED to build it. With a
+ *    rail down the left edge, a step whose text starts 40% in breaks the
+ *    axis the rail exists to assert, and the alternation was decoration
+ *    rather than information: the photograph is never the argument on this
+ *    page, the failure panel below it is.
+ *
+ * 3. Each handoff's last element is a FAILURE panel — "what can go wrong"
+ *    beside "what happens then", with the resolution stated as a figure. That
+ *    pairing is the page's differentiator: no competitor publishes the unhappy
+ *    path, and a process page that describes only the good day is a brochure.
+ *    It is therefore in the static HTML on every step, never behind a tab or a
+ *    disclosure — three of the four React Bits candidates for this page hide
+ *    three steps out of four behind interaction, which on this page would hide
+ *    three of the four failure rows.
+ *
+ * 4. The data band is the page's one `slab` and sits at the two-thirds mark,
+ *    which is both the rhythm break and the right weight for the one section
  *    that says plainly what HIPAA does and does not cover here.
  *
  * Every figure on this page is imported. The only exception is `rxMaxDays`,
@@ -24,17 +40,11 @@
  */
 import { type Locale, t, localizedPath } from "@/i18n";
 import { site } from "@/config/site";
-import {
-  fees,
-  shipping,
-  sla,
-  coverage,
-  eligibility,
-  partners,
-  usd,
-} from "@/config/pricing";
+import { fees, shipping, sla, coverage, eligibility, partners, usd } from "@/config/pricing";
 import Layout from "@/layouts/Layout.astro";
 import SeoHead from "@/components/SeoHead.astro";
+import Headline from "@/components/Headline.astro";
+import SectionHead from "@/components/SectionHead.astro";
 import TrustTicker from "@/components/sections/TrustTicker.astro";
 import Header from "@/components/sections/Header.astro";
 import Relay from "@/components/sections/Relay.astro";
@@ -58,15 +68,17 @@ const c = d.howItWorks;
 /**
  * The ceiling on a single prescription, in days. This belongs in
  * `src/config/pricing.ts` beside `sla` and is flagged as a needed shared
- * change; that file is locked for this pass. Declared once here so the figure
- * appears exactly one time on the page and cannot drift within it.
+ * change; that file is owned elsewhere this pass. Declared once here so the
+ * figure appears exactly one time on the page and cannot drift within it.
  */
 const rxMaxDays = 90;
 
 /**
  * The same four durations `Relay.astro` and `RelayDetail.astro` render, from
  * the same constants. A second hand-typed copy is exactly how the reference
- * sites ended up quoting two review windows on one screen.
+ * sites ended up quoting two review windows on one screen — and this array
+ * being built by hand in three files is itself that risk in miniature. It
+ * wants to be one `relayDurations` export from `pricing.ts`.
  */
 const durations = [
   `~${sla.intakeMinutes} min`,
@@ -122,12 +134,12 @@ const resolutions = [
 const steps = c.steps.items.map((step, index) => ({
   ...step,
   who: step.who.replace("{practice}", partners.practice),
-  index: index + 1,
+  /** Zero-padded so the four node chips are the same width. */
+  index: String(index + 1).padStart(2, "0"),
+  isLast: index === c.steps.items.length - 1,
   duration: durations[index],
   media: media[index],
   resolution: resolutions[index],
-  /** Alternates the photograph left and right down the page. */
-  mediaLeft: index % 2 === 1,
 }));
 
 /** The thresholds the intake computes, positionally matched to the copy. */
@@ -165,28 +177,39 @@ const details = c.shipping.details.map((detail, index) => ({
 }));
 ---
 
-<Layout
-  locale={locale}
-  title={d.meta.howItWorks.title}
-  description={d.meta.howItWorks.description}
->
+<Layout locale={locale} title={d.meta.howItWorks.title} description={d.meta.howItWorks.description}>
   <SeoHead slot="head" locale={locale} path="/how-it-works/" />
   <Header locale={locale} />
   <main id="main" tabindex="-1" class="outline-none">
     {/* ---------------------------------------------------------------
-        HEADER + THE RELAY, at full strength. The clock is the first
-        thing on the page, not a reward for reading an introduction.
+        THE PAGE HEAD + THE RELAY, at full strength. The clock is the
+        first thing on the page, not a reward for reading an
+        introduction.
+
+        `page-top` clears the floating header; `section-tight` supplies
+        the bottom rhythm, because the ticker below reads as attached to
+        this block rather than as the next section. Two sanctioned
+        paddings, no third.
         --------------------------------------------------------------- */}
-    <section class="bg-background page-top pb-14 sm:pb-16">
+    <section class="bg-background page-top section-tight">
       <div class="shell">
-        <p class="label text-brand-700 dark:text-brand-400">{c.header.eyebrow}</p>
-        <h1 class="display-1 mt-5 max-w-4xl">{c.header.title}</h1>
-        <p class="lead mt-6 text-lg">{c.header.lead}</p>
+        <p class="label text-signal-700 dark:text-signal-500">{c.header.eyebrow}</p>
+        <Headline
+          as="h1"
+          reveal
+          text={c.header.title}
+          accent={c.header.titleAccent}
+          class="display-1 mt-5 max-w-4xl"
+        />
+        <p class="lead mt-6">{c.header.lead}</p>
 
         <h2 class="label mt-14 text-muted-foreground">{c.header.clockLabel}</h2>
         <div class="mt-6">
           <Relay locale={locale} variant="full" onLight />
         </div>
+        {/* Stays adjacent to the clock on purpose: four durations in a row
+            invite reading as an average, and this is the sentence that says
+            they are ceilings. */}
         <p class="mt-8 max-w-2xl text-sm text-muted-foreground">{c.header.clockNote}</p>
       </div>
     </section>
@@ -197,158 +220,173 @@ const details = c.shipping.details.map((detail, index) => ({
     <TrustTicker locale={locale} />
 
     {/* ---------------------------------------------------------------
-        THE FOUR HANDOFFS, IN DEPTH. Text column and media column swap
-        sides per step; the failure panel closes every one of them.
+        THE FOUR HANDOFFS, IN DEPTH — on the custody rail.
         --------------------------------------------------------------- */}
-    <section class="bg-card section">
+    <section class="bg-card section" aria-label={c.steps.title}>
       <div class="shell">
-        <div class="max-w-3xl">
-          <p class="label text-brand-700 dark:text-brand-400">{c.steps.eyebrow}</p>
-          <h2 class="display-2 mt-4">{c.steps.title}</h2>
-          <p class="lead mt-4">{c.steps.lead}</p>
-        </div>
+        <SectionHead eyebrow={c.steps.eyebrow} title={c.steps.title} lead={c.steps.lead} />
 
-        <div class="mt-12 flex flex-col gap-12 sm:mt-14 sm:gap-16">
+        <ol aria-label={c.steps.railLabel} class="mt-14 flex list-none flex-col p-0 sm:mt-16">
           {
             steps.map((step) => (
-              <article class="border-t border-border pt-8 lg:pt-10">
-                {/* Text and media alternate sides down the page; the failure
-                    panel below spans both, because it is the row the reader
-                    came for and two cramped cells would bury it. */}
-                <div
-                  class:list={[
-                    "grid items-start gap-8 lg:gap-12",
-                    step.mediaLeft ? "lg:grid-cols-[1fr_1.4fr]" : "lg:grid-cols-[1.4fr_1fr]",
-                  ]}
-                >
-                  <div class:list={[step.mediaLeft && "lg:order-2"]}>
-                    <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-                      <p class="label text-muted-foreground">
-                        <span class="text-brand-700 dark:text-brand-400">
-                          {String(step.index).padStart(2, "0")}
-                        </span>
-                        {" · "}
-                        {step.actor}
-                      </p>
-                      <p class="figure text-sm text-signal-700 dark:text-signal-500">{step.duration}</p>
-                    </div>
-                    <h3 class="display-3 mt-2">{step.action}</h3>
+              <li class="relative grid grid-cols-[2.25rem_1fr] gap-x-5 pb-14 last:pb-0 sm:gap-x-7 sm:pb-16">
+                {/* The track segment for THIS handoff: node bottom to the top
+                    of the next node, so it re-flows with the step's own
+                    height and needs no measurement. The last step has no
+                    successor and so has no segment — a rule running past the
+                    final node would imply a fifth party. 17px + 2px straddles
+                    the 36px chip's 18px centre. */}
+                {!step.isLast && (
+                  <span
+                    aria-hidden="true"
+                    class="pointer-events-none absolute top-9 bottom-0 left-[1.0625rem] w-0.5 bg-border"
+                  >
+                    <span class="rail-fill block h-full w-full origin-top bg-signal-700 dark:bg-signal-500" />
+                  </span>
+                )}
 
-                    <dl class="mt-7 grid gap-x-10 gap-y-6 sm:grid-cols-2">
-                      <div class="border-t border-border pt-3.5">
+                {/* `.plate` is amber with near-black ink — 8.7:1 in all three
+                    palettes and both themes. Hidden from assistive tech: the
+                    digit is decoration, and the ordinal is the `<ol>`'s job.
+                    The node never changes state on scroll. A marker that
+                    pulses or ticks green beside "Clinician · Review" reads as
+                    a review running in the reader's favour, which is an
+                    implied prescription. */}
+                <span
+                  aria-hidden="true"
+                  class="plate relative z-10 flex size-9 items-center justify-center rounded-full font-mono text-[0.6875rem] font-semibold tabular-nums"
+                >
+                  {step.index}
+                </span>
+
+                <div class="min-w-0">
+                  <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                    <p class="label text-muted-foreground">{step.actor}</p>
+                    <p class="figure shrink-0 text-[0.8125rem] whitespace-nowrap text-signal-700 dark:text-signal-500">
+                      {step.duration}
+                    </p>
+                  </div>
+                  <h3 class="display-3 mt-2">{step.action}</h3>
+
+                  <div class="mt-7 grid items-start gap-8 lg:grid-cols-[1.35fr_1fr] lg:gap-12">
+                    <dl class="grid gap-x-10 gap-y-6 sm:grid-cols-2">
+                      <div class="rule border-t pt-3.5">
                         <dt class="label text-muted-foreground">{c.steps.labels.what}</dt>
                         <dd class="mt-2 text-[0.9375rem] leading-relaxed">{step.what}</dd>
                       </div>
-                      <div class="border-t border-border pt-3.5">
+                      <div class="rule border-t pt-3.5">
                         <dt class="label text-muted-foreground">{c.steps.labels.who}</dt>
                         <dd class="mt-2 text-[0.9375rem] leading-relaxed">{step.who}</dd>
                       </div>
-                      <div class="border-t border-border pt-3.5">
+                      <div class="rule border-t pt-3.5">
                         <dt class="label text-muted-foreground">{c.steps.labels.takes}</dt>
                         <dd class="mt-2 text-[0.9375rem] leading-relaxed text-muted-foreground">
                           {step.takesNote}
                         </dd>
                       </div>
-                      <div class="border-t border-border pt-3.5">
+                      <div class="rule border-t pt-3.5">
                         <dt class="label text-muted-foreground">{c.steps.labels.receive}</dt>
                         <dd class="mt-2 text-[0.9375rem] leading-relaxed text-muted-foreground">
                           {step.receive}
                         </dd>
                       </div>
                     </dl>
+
+                    {/* A photograph, or — for the intake step — the thresholds
+                        the form actually checks. The clinician photograph
+                        keeps its caption: an uncaptioned picture of a
+                        clinician inside an Ellery-branded card is a
+                        possessive by implication. */}
+                    <div class="flex flex-col gap-6">
+                      {step.media ? (
+                        <figure class="m-0">
+                          <div class="aspect-[4/3] overflow-hidden rounded-2xl border border-border">
+                            <Image
+                              src={step.media.image}
+                              alt={step.media.alt}
+                              widths={[420, 640, 900]}
+                              sizes="(min-width: 1024px) 22rem, 100vw"
+                              class="h-full w-full object-cover"
+                              loading="lazy"
+                            />
+                          </div>
+                          {step.media.caption && (
+                            <figcaption class="mt-3 text-xs leading-relaxed text-muted-foreground">
+                              {step.media.caption}
+                            </figcaption>
+                          )}
+                        </figure>
+                      ) : (
+                        <div class="panel bg-background p-6">
+                          <h4 class="label text-muted-foreground">{c.steps.intake.label}</h4>
+                          <dl class="mt-4 flex flex-col">
+                            {intakeRows.map((row) => (
+                              <div class="rule flex items-baseline justify-between gap-4 border-t py-2.5 first:border-t-0 first:pt-0 last:pb-0">
+                                <dt class="text-sm">
+                                  {row.label}
+                                  {row.symbol && <sup class="ml-0.5">{row.symbol}</sup>}
+                                </dt>
+                                <dd class="figure shrink-0 text-sm text-foreground">{row.value}</dd>
+                              </div>
+                            ))}
+                          </dl>
+                          <p class="rule mt-4 border-t pt-4 text-sm leading-relaxed text-muted-foreground">
+                            {c.steps.intake.note}
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
-                  {/* Media column: a photograph, or for the intake step the
-                      thresholds the form actually checks. */}
-                  <div class:list={["flex flex-col gap-6", step.mediaLeft && "lg:order-1"]}>
-                    {step.media ? (
-                      <figure class="m-0">
-                        <div class="aspect-[4/3] overflow-hidden rounded-lg border border-border">
-                          <Image
-                            src={step.media.image}
-                            alt={step.media.alt}
-                            widths={[420, 640, 900]}
-                            sizes="(min-width: 1024px) 26rem, 100vw"
-                            class="h-full w-full object-cover"
-                            loading="lazy"
-                          />
-                        </div>
-                        {step.media.caption && (
-                          <figcaption class="mt-3 text-xs leading-relaxed text-muted-foreground">
-                            {step.media.caption}
-                          </figcaption>
-                        )}
-                      </figure>
-                    ) : (
-                      <div class="panel bg-background p-6">
-                        <h4 class="label text-muted-foreground">{c.steps.intake.label}</h4>
-                        <dl class="mt-4 flex flex-col divide-y divide-border">
-                          {intakeRows.map((row) => (
-                            <div class="flex items-baseline justify-between gap-4 py-2.5 first:pt-0 last:pb-0">
-                              <dt class="text-sm">
-                                {row.label}
-                                {row.symbol && <sup class="ml-0.5">{row.symbol}</sup>}
-                              </dt>
-                              <dd class="figure shrink-0 text-sm text-foreground">{row.value}</dd>
-                            </div>
-                          ))}
-                        </dl>
-                        <p class="mt-4 border-t border-border pt-4 text-sm leading-relaxed text-muted-foreground">
-                          {c.steps.intake.note}
+                  {/* The failure panel. Two cells, so "what goes wrong" and
+                      "what happens then" read as the pair they are, with the
+                      resolution as a figure on the rule beneath. */}
+                  <div class="panel mt-7 bg-background p-6 sm:p-7">
+                    <div class="grid gap-5 sm:grid-cols-2 sm:gap-8">
+                      <div>
+                        <p class="label text-muted-foreground">{c.steps.labels.risk}</p>
+                        <p class="subhead mt-2.5">{step.failure.trigger}</p>
+                      </div>
+                      <div>
+                        <p class="label text-foreground">{c.steps.labels.then}</p>
+                        <p class="mt-2.5 text-sm leading-relaxed text-muted-foreground">
+                          {step.failure.response}
                         </p>
                       </div>
-                    )}
+                    </div>
+
+                    <p class="rule mt-5 flex flex-wrap items-baseline gap-x-3 gap-y-1 border-t pt-4">
+                      <span class="label text-muted-foreground">{step.resolution.key}</span>
+                      {step.resolution.href ? (
+                        <a
+                          href={step.resolution.href}
+                          class:list={["figure text-base font-medium", step.resolution.cls]}
+                        >
+                          {step.resolution.value}
+                        </a>
+                      ) : (
+                        <span class:list={["figure text-base", step.resolution.cls]}>
+                          {step.resolution.value}
+                        </span>
+                      )}
+                      {step.resolution.sub && (
+                        <span class="figure text-xs text-muted-foreground">
+                          {step.resolution.sub}
+                        </span>
+                      )}
+                    </p>
                   </div>
                 </div>
-
-                {/* The failure panel. Two cells, so "what goes wrong" and
-                    "what happens then" read as the pair they are, with the
-                    resolution as a figure on the rule beneath. */}
-                <div class="panel mt-7 bg-background p-5 sm:p-6">
-                  <div class="grid gap-5 sm:grid-cols-2 sm:gap-8">
-                    <div>
-                      <p class="label text-muted-foreground">{c.steps.labels.risk}</p>
-                      <p class="subhead mt-2.5">{step.failure.trigger}</p>
-                    </div>
-                    <div>
-                      <p class="label text-brand-700 dark:text-brand-400">
-                        {c.steps.labels.then}
-                      </p>
-                      <p class="mt-2.5 text-sm leading-relaxed text-muted-foreground">
-                        {step.failure.response}
-                      </p>
-                    </div>
-                  </div>
-
-                  <p
-                    class="mt-5 flex flex-wrap items-baseline gap-x-3 gap-y-1 border-t border-border pt-4"
-                  >
-                    <span class="label text-muted-foreground">{step.resolution.key}</span>
-                    {step.resolution.href ? (
-                      <a
-                        href={step.resolution.href}
-                        class:list={["figure text-base font-medium", step.resolution.cls]}
-                      >
-                        {step.resolution.value}
-                      </a>
-                    ) : (
-                      <span class:list={["figure text-base", step.resolution.cls]}>
-                        {step.resolution.value}
-                      </span>
-                    )}
-                    {step.resolution.sub && (
-                      <span class="figure text-xs text-muted-foreground">
-                        {step.resolution.sub}
-                      </span>
-                    )}
-                  </p>
-                </div>
-              </article>
+              </li>
             ))
           }
-        </div>
+        </ol>
 
-        <p class="mt-12 max-w-3xl border-t border-border pt-6 text-sm text-muted-foreground">
+        {/* The rail ends on "Delivered". A sequence that terminates in a
+            delivery, with no condition in view, implies the prescription in
+            the middle of it — so the long gating sentence is the last thing
+            in this section, not a footnote. */}
+        <p class="rule mt-12 max-w-3xl border-t pt-6 text-sm text-muted-foreground">
           {d.gating.long}
         </p>
       </div>
@@ -360,13 +398,9 @@ const details = c.shipping.details.map((detail, index) => ({
         --------------------------------------------------------------- */}
     <section class="bg-background section">
       <div class="shell">
-        <div class="max-w-3xl">
-          <p class="label text-brand-700 dark:text-brand-400">{c.parties.eyebrow}</p>
-          <h2 class="display-2 mt-4">{c.parties.title}</h2>
-          <p class="lead mt-4">{c.parties.lead}</p>
-        </div>
+        <SectionHead eyebrow={c.parties.eyebrow} title={c.parties.title} lead={c.parties.lead} />
 
-        <div class="mt-11 grid gap-10 lg:grid-cols-[1.15fr_1fr] lg:gap-14">
+        <div class="mt-12 grid gap-10 lg:grid-cols-[1.15fr_1fr] lg:gap-14">
           <div>
             <div class="panel p-6">
               <p class="label text-muted-foreground">{c.parties.practice.label}</p>
@@ -374,7 +408,7 @@ const details = c.shipping.details.map((detail, index) => ({
               <p class="mt-4 text-[0.9375rem] leading-relaxed text-muted-foreground">
                 {c.parties.practice.role}
               </p>
-              <p class="mt-4 border-t border-border pt-4 text-sm leading-relaxed">
+              <p class="rule mt-4 border-t pt-4 text-sm leading-relaxed">
                 {c.parties.practice.note}
               </p>
             </div>
@@ -397,7 +431,7 @@ const details = c.shipping.details.map((detail, index) => ({
               <tbody>
                 {
                   partners.pharmacies.map((pharmacy) => (
-                    <tr class="border-b border-border align-baseline">
+                    <tr class="rule border-b align-baseline">
                       <th scope="row" class="py-3.5 pr-4 text-[0.9375rem] font-medium">
                         {pharmacy.name}
                       </th>
@@ -418,7 +452,11 @@ const details = c.shipping.details.map((detail, index) => ({
             {
               c.parties.sections.map((item) => (
                 <div class="panel p-6">
-                  <p class="figure text-sm text-brand-700 dark:text-brand-400">{item.term}</p>
+                  {/* A statute section number is a figure the reader can go
+                      and check, which is the whole argument of this section.
+                      Amber on paper steps to signal-700 — signal-500 as small
+                      text on the page ground is 1.9:1. */}
+                  <p class="figure text-sm text-signal-700 dark:text-signal-500">{item.term}</p>
                   <h3 class="subhead mt-2 text-lg">{item.title}</h3>
                   <p class="mt-3 text-[0.9375rem] leading-relaxed text-muted-foreground">
                     {item.body}
@@ -426,7 +464,7 @@ const details = c.shipping.details.map((detail, index) => ({
                 </div>
               ))
             }
-            <div class="border-t border-border pt-5">
+            <div class="rule border-t pt-5">
               <h3 class="subhead">
                 {c.parties.notFdaTitle}
                 <sup class="ml-0.5 text-muted-foreground">‡</sup>
@@ -445,10 +483,13 @@ const details = c.shipping.details.map((detail, index) => ({
               {c.parties.choiceLead}
             </p>
           </div>
-          <ol class="mt-8 grid gap-8 sm:grid-cols-3 sm:gap-10">
+          {/* The Relay's own tick, reused at three columns: these are ordered
+              tests applied in sequence, so they get the same scale marker the
+              handoffs get rather than three cards. */}
+          <ol class="relay relay-on-light mt-8 gap-8 sm:grid-cols-3 sm:gap-10">
             {
               c.parties.choices.map((choice, index) => (
-                <li class="relay-step relay-on-light">
+                <li class="relay-step">
                   <p class="figure text-xs text-signal-700 dark:text-signal-500">
                     {String(index + 1).padStart(2, "0")}
                   </p>
@@ -467,17 +508,13 @@ const details = c.shipping.details.map((detail, index) => ({
 
     {/* ---------------------------------------------------------------
         SHIPPING — a real table, because cost and window per lane is
-        row-of-pairs content, with the definition-list fallback below sm.
+        rows-of-pairs content, with the definition-list fallback below sm.
         --------------------------------------------------------------- */}
     <section class="bg-card section">
       <div class="shell">
-        <div class="max-w-3xl">
-          <p class="label text-brand-700 dark:text-brand-400">{c.shipping.eyebrow}</p>
-          <h2 class="display-2 mt-4">{c.shipping.title}</h2>
-          <p class="lead mt-4">{c.shipping.lead}</p>
-        </div>
+        <SectionHead eyebrow={c.shipping.eyebrow} title={c.shipping.title} lead={c.shipping.lead} />
 
-        <div class="mt-10 hidden sm:block">
+        <div class="mt-11 hidden sm:block">
           <table class="w-full border-collapse text-left">
             <thead>
               <tr class="border-y border-border">
@@ -498,7 +535,7 @@ const details = c.shipping.details.map((detail, index) => ({
             <tbody>
               {
                 shippingRows.map((row) => (
-                  <tr class="border-b border-border align-top">
+                  <tr class="rule border-b align-top">
                     <th scope="row" class="py-5 pr-4 font-normal">
                       <span class="subhead">{row.option}</span>
                     </th>
@@ -519,7 +556,7 @@ const details = c.shipping.details.map((detail, index) => ({
         <dl class="mt-10 flex flex-col sm:hidden">
           {
             shippingRows.map((row) => (
-              <div class="border-t border-border py-5">
+              <div class="rule border-t py-5">
                 <dt class="subhead">{row.option}</dt>
                 <dd class="mt-2 flex flex-wrap items-baseline gap-x-4">
                   <span class="figure text-base">{row.cost}</span>
@@ -536,7 +573,7 @@ const details = c.shipping.details.map((detail, index) => ({
         <dl class="mt-12 grid gap-x-12 gap-y-9 sm:grid-cols-2">
           {
             details.map((detail) => (
-              <div class="border-t border-border pt-4">
+              <div class="rule border-t pt-4">
                 <dt class="flex flex-wrap items-baseline gap-x-4">
                   <span class="subhead">{detail.label}</span>
                   {detail.value && (
@@ -553,7 +590,7 @@ const details = c.shipping.details.map((detail, index) => ({
           }
         </dl>
 
-        <p class="panel mt-10 max-w-3xl bg-background p-5 text-sm leading-relaxed">
+        <p class="panel mt-10 max-w-3xl bg-background p-6 text-sm leading-relaxed">
           {c.shipping.notShipping}
         </p>
       </div>
@@ -565,14 +602,19 @@ const details = c.shipping.details.map((detail, index) => ({
         --------------------------------------------------------------- */}
     <section class="bg-background section">
       <div class="shell">
-        <div class="grid gap-10 lg:grid-cols-[23rem_1fr] lg:gap-16">
-          <div class="lg:sticky lg:top-24 lg:self-start">
-            <p class="label text-brand-700 dark:text-brand-400">{c.refills.eyebrow}</p>
-            <h2 class="display-2 mt-4">{c.refills.title}</h2>
-            <p class="lead mt-4 max-w-none">{c.refills.lead}</p>
+        <div class="grid gap-10 lg:grid-cols-[22rem_1fr] lg:gap-16">
+          {/* 7.5rem is the header clearance every `section[id]` gets as
+              `scroll-margin-top`, and the offset SmoothScroll.tsx scrolls to. */}
+          <div class="lg:sticky lg:top-[7.5rem] lg:h-fit lg:self-start">
+            <SectionHead eyebrow={c.refills.eyebrow} title={c.refills.title} lead={c.refills.lead} />
 
-            <div class="mt-8 border-t border-border pt-5">
-              <p class="figure text-3xl text-signal-700 dark:text-signal-500">{rxMaxDays} days</p>
+            <div class="rule mt-8 border-t pt-5">
+              {/* Capped at 1.75rem: nothing outside the page's single h1 may
+                  reach display-1's size, and a figure that outranks the
+                  headline is the commonest defect in an assembled page. */}
+              <p class="figure text-[1.75rem] text-signal-700 dark:text-signal-500">
+                {rxMaxDays} days
+              </p>
               <p class="label mt-2.5 text-muted-foreground">{c.refills.maxLabel}</p>
               <p class="mt-3 text-sm leading-relaxed text-muted-foreground">{c.refills.maxNote}</p>
             </div>
@@ -594,7 +636,7 @@ const details = c.shipping.details.map((detail, index) => ({
                 <tbody>
                   {
                     c.refills.rows.map((row) => (
-                      <tr class="border-b border-border align-top">
+                      <tr class="rule border-b align-top">
                         <th scope="row" class="py-5 pr-6 font-normal">
                           <span class="subhead">{row.event}</span>
                         </th>
@@ -611,7 +653,7 @@ const details = c.shipping.details.map((detail, index) => ({
             <dl class="flex flex-col sm:hidden">
               {
                 c.refills.rows.map((row) => (
-                  <div class="border-t border-border py-5">
+                  <div class="rule border-t py-5">
                     <dt class="subhead">{row.event}</dt>
                     <dd class="mt-2 text-sm leading-relaxed text-muted-foreground">
                       {row.consequence}
@@ -635,31 +677,24 @@ const details = c.shipping.details.map((detail, index) => ({
     </section>
 
     {/* ---------------------------------------------------------------
-        DATA — the one fixed-dark band on the page. Ellery is not a
-        covered entity, and this says so before saying anything else.
+        DATA — the page's ONE slab band. Ellery is not a covered entity,
+        and this says so before saying anything else.
         --------------------------------------------------------------- */}
-    <section class="border-b border-brand-50/10 bg-brand-800 py-16 text-brand-50 sm:py-20">
+    <section class="slab on-slab section">
       <div class="shell">
-        <div class="max-w-3xl">
-          <p class="label text-brand-300">{c.data.eyebrow}</p>
-          <h2 class="display-2 mt-4 text-brand-50">
-            {c.data.title}
-            <sup class="ml-1 text-[0.4em] text-signal-500">◆</sup>
-          </h2>
-          <p class="mt-4 text-[1.0625rem] leading-relaxed text-brand-50/65">{c.data.lead}</p>
-        </div>
+        <SectionHead eyebrow={c.data.eyebrow} title={c.data.title} lead={c.data.lead} on="slab" />
 
         <div class="mt-11 hidden sm:block">
           <table class="w-full border-collapse text-left">
             <thead>
               <tr class="border-y border-brand-50/15">
-                <th scope="col" class="label w-[26%] py-3 pr-6 text-brand-50/60">
+                <th scope="col" class="label w-[26%] py-3 pr-6 text-brand-50/70">
                   {c.data.header.what}
                 </th>
-                <th scope="col" class="label w-[22%] py-3 pr-6 text-brand-50/60">
+                <th scope="col" class="label w-[22%] py-3 pr-6 text-brand-50/70">
                   {c.data.header.who}
                 </th>
-                <th scope="col" class="label py-3 text-brand-50/60">{c.data.header.law}</th>
+                <th scope="col" class="label py-3 text-brand-50/70">{c.data.header.law}</th>
               </tr>
             </thead>
             <tbody>
@@ -669,10 +704,10 @@ const details = c.shipping.details.map((detail, index) => ({
                     <th scope="row" class="py-5 pr-6 font-normal">
                       <span class="subhead inline text-brand-50">{row.what}</span>
                     </th>
-                    <td class="py-5 pr-6 text-[0.9375rem] leading-relaxed text-brand-50/75">
+                    <td class="py-5 pr-6 text-[0.9375rem] leading-relaxed text-brand-50/70">
                       {row.who}
                     </td>
-                    <td class="py-5 text-[0.9375rem] leading-relaxed text-brand-50/60">
+                    <td class="py-5 text-[0.9375rem] leading-relaxed text-brand-50/70">
                       {row.law}
                     </td>
                   </tr>
@@ -687,8 +722,8 @@ const details = c.shipping.details.map((detail, index) => ({
             c.data.rows.map((row) => (
               <div class="border-t border-brand-50/12 py-5">
                 <dt class="subhead text-brand-50">{row.what}</dt>
-                <dd class="mt-2 text-sm leading-relaxed text-brand-50/75">{row.who}</dd>
-                <dd class="mt-1.5 text-sm leading-relaxed text-brand-50/60">{row.law}</dd>
+                <dd class="mt-2 text-sm leading-relaxed text-brand-50/70">{row.who}</dd>
+                <dd class="mt-1.5 text-sm leading-relaxed text-brand-50/70">{row.law}</dd>
               </div>
             ))
           }
@@ -696,12 +731,12 @@ const details = c.shipping.details.map((detail, index) => ({
 
         <div class="mt-12 grid gap-8 border-t border-brand-50/12 pt-9 lg:grid-cols-[1fr_16rem] lg:gap-14">
           <div>
-            <h3 class="label text-brand-300">{c.data.notTitle}</h3>
+            <h3 class="label text-brand-50/70">{c.data.notTitle}</h3>
             <ul class="mt-4 grid gap-2.5 sm:grid-cols-2 sm:gap-x-10">
               {
                 c.data.notItems.map((item) => (
-                  <li class="flex gap-3 text-[0.9375rem] leading-relaxed text-brand-50/75">
-                    <X className="mt-1 size-3.5 shrink-0 text-brand-300" />
+                  <li class="flex gap-3 text-[0.9375rem] leading-relaxed text-brand-50/70">
+                    <X className="mt-1 size-3.5 shrink-0 text-brand-50/70" />
                     <span>{item}</span>
                   </li>
                 ))
@@ -710,7 +745,7 @@ const details = c.shipping.details.map((detail, index) => ({
           </div>
           <a
             href={localizedPath(locale, "/privacy/")}
-            class="inline-flex h-fit items-center gap-2 text-sm font-semibold text-brand-300 hover:text-brand-50"
+            class="inline-flex h-fit items-center gap-2 text-sm font-semibold text-brand-50 hover:text-signal-500"
           >
             {c.data.cta}
             <ArrowRight className="size-4" />
@@ -724,20 +759,19 @@ const details = c.shipping.details.map((detail, index) => ({
         --------------------------------------------------------------- */}
     <section class="bg-card section">
       <div class="shell">
-        <div class="max-w-3xl">
-          <p class="label text-brand-700 dark:text-brand-400">{c.isNot.eyebrow}</p>
-          <h2 class="display-2 mt-4">{c.isNot.title}</h2>
-          <p class="lead mt-4">{c.isNot.lead}</p>
-        </div>
+        <SectionHead eyebrow={c.isNot.eyebrow} title={c.isNot.title} lead={c.isNot.lead} />
 
-        <div class="mt-10 grid gap-6 md:grid-cols-2 lg:gap-8">
+        <div class="mt-11 grid gap-6 md:grid-cols-2 lg:gap-8">
+          {/* Both columns list ACTIONS, never outcomes. The moment a column
+              of ticks starts listing results, it is a claim about what
+              treatment does, and this page has no business making one. */}
           <div class="panel bg-background p-6 sm:p-7">
-            <h3 class="label text-brand-700 dark:text-brand-400">{c.isNot.isTitle}</h3>
+            <h3 class="label text-foreground">{c.isNot.isTitle}</h3>
             <ul class="mt-5 flex flex-col gap-3.5">
               {
                 c.isNot.isItems.map((item) => (
                   <li class="flex gap-3 text-[0.9375rem] leading-relaxed">
-                    <Check className="mt-1 size-3.5 shrink-0 text-brand-600 dark:text-brand-400" />
+                    <Check className="mt-1 size-3.5 shrink-0 text-foreground" />
                     <span>{item}</span>
                   </li>
                 ))
@@ -771,7 +805,7 @@ const details = c.shipping.details.map((detail, index) => ({
         <div class="mt-8 flex flex-wrap items-center gap-x-8 gap-y-3">
           <a
             href={localizedPath(locale, "/pricing/")}
-            class="inline-flex items-center gap-2 text-sm font-semibold text-brand-700 dark:text-brand-400"
+            class="inline-flex items-center gap-2 text-sm font-semibold text-foreground hover:text-signal-700 dark:hover:text-signal-500"
           >
             {c.isNot.ctaPricing}
             <ArrowRight className="size-4" />
@@ -792,3 +826,44 @@ const details = c.shipping.details.map((detail, index) => ({
   </main>
   <Footer locale={locale} />
 </Layout>
+
+<style>
+  /**
+   * THE RAIL FILL — the same construction as `RelayDetail.astro`, and the one
+   * scroll-linked device on this route.
+   *
+   * Each segment is its own animation subject, so the fill advances handoff by
+   * handoff with no measurement, no scroll listener and no island. The base
+   * state IS the finished state: `scaleY(0)` is declared only inside these two
+   * guards, so no scroll-timeline support, reduced motion and JavaScript-off
+   * all resolve to one picture — a fully drawn rail. That is the same
+   * construction `.reveal` uses in global.css, for the same reason.
+   *
+   * Lenis scrolls the real document (`SmoothScroll.tsx` passes no `wrapper` or
+   * `content`), so a native scroll timeline stays in sync with it.
+   *
+   * DUPLICATED, deliberately and temporarily. `RelayDetail.astro` carries a
+   * byte-identical block. Astro scopes the selector but NOT the `@keyframes`
+   * name, and the two components never render on the same route, so the
+   * duplicate is inert — but this wants to be one `.rail-fill` rule in
+   * `global.css`, which is owned elsewhere this pass. Change one, change both.
+   */
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .rail-fill {
+        transform: scaleY(0);
+        animation: rail-draw auto linear both;
+        animation-timeline: view(block);
+        animation-range: cover 20% cover 70%;
+      }
+      @keyframes rail-draw {
+        from {
+          transform: scaleY(0);
+        }
+        to {
+          transform: scaleY(1);
+        }
+      }
+    }
+  }
+</style>

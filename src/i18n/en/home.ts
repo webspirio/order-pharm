@@ -56,6 +56,12 @@ const home = {
     eyebrow: "The chain",
     title: "Four handoffs. One clock.",
     lead: "Three licensed parties touch your order, and only one of them is Ellery. Here is what each does, and how long it has to do it.",
+    /**
+     * The accessible name of the custody rail. The rail's numerals live in
+     * decorative chips that are hidden from assistive technology — the order
+     * is carried by the `<ol>` itself — so the list needs a name of its own.
+     */
+    railLabel: "The four custody handoffs, in order",
     steps: [
       {
         actor: "You",
@@ -86,14 +92,26 @@ const home = {
     cta: "The whole process, in detail",
   },
 
-  /** Four figures under the Relay. Values come from pricing.ts. */
+  /**
+   * THE LEDGER — the four figures under the Relay.
+   *
+   * Values still come from pricing.ts; this file carries the name of each
+   * figure and the one line saying what it means. `id` is the new part, and
+   * it is a correctness fix rather than copy: StatStrip.astro used to zip
+   * this array against a parallel array of constants BY POSITION, so moving
+   * one entry here silently relabelled every number on the strip, with no
+   * type error and nothing for `pnpm check` to catch. The component now looks
+   * its constants up by id.
+   */
   stats: {
-    label: "The numbers this runs on",
+    eyebrow: "Measured",
+    title: "The four numbers the rest of the site has to match.",
+    lead: "Every one appears again elsewhere on this site, and it is the same figure there. One that drifted between two pages would tell you more about this service than the copy does.",
     items: [
-      { label: "States and DC", note: "where the platform operates" },
-      { label: "Review window", note: "from submitted intake to a decision" },
-      { label: "Dispatch cutoff", note: "approved before this ships the same day" },
-      { label: "Administration fee", note: "fixed, per order, never a share of the drug" },
+      { id: "states", label: "States and DC", note: "where the platform operates" },
+      { id: "review", label: "Review window", note: "from submitted intake to a decision" },
+      { id: "cutoff", label: "Dispatch cutoff", note: "approved before this ships the same day" },
+      { id: "admin", label: "Administration fee", note: "fixed, per order, never a share of the drug" },
     ],
   },
 
@@ -107,7 +125,18 @@ const home = {
     eyebrow: "Who does what",
     title: "Six jobs. Four parties. No overlap.",
     lead: "Corporate-practice rules mean an administrator cannot touch clinical decisions or dispensing. Rather than write that into the small print, here is the whole division of labour.",
-    header: { task: "What happens", who: "Who does it" },
+    /**
+     * `caption` is rendered `sr-only` inside the `<table>`. A screen reader
+     * announcing "table with 2 columns and 7 rows" tells the listener nothing
+     * about what the table asserts, and the heading above it is a separate
+     * element it may never reach. The caption is the one place the table can
+     * describe itself.
+     */
+    header: {
+      task: "What happens",
+      who: "Who does it",
+      caption: "Each task involved in an order, and the party responsible for it.",
+    },
     rows: [
       {
         task: "Decides whether treatment is appropriate for you",
@@ -147,7 +176,12 @@ const home = {
     eyebrow: "What it costs",
     title: "One receipt. Four lines. Nothing after the total.",
     lead: "You see this itemised before you are asked for a card, and it is the same itemisation on the invoice afterwards.",
-    header: { item: "Line", amount: "Amount", dest: "Paid to" },
+    header: {
+      item: "Line",
+      amount: "Amount",
+      dest: "Paid to",
+      caption: "Every line on an order, its amount, and who receives it.",
+    },
     /** The two amounts that are words rather than figures. Writing "$0" for
         something included reads as a trick, and the pharmacy sets the other. */
     atCost: "at cost",
@@ -171,15 +205,35 @@ const home = {
         dest: "Ellery. Fixed per order. Not a percentage, not per dose, not per prescription — and not charged at all unless a prescription is transmitted.",
       },
     ],
+    /**
+     * The optional membership, as a summary panel rather than a paragraph.
+     *
+     * Every label here names a row whose figure comes from `fees`,
+     * `shipping` or `membershipBreakEven` — the panel states what it costs,
+     * what it covers, and the threshold above which buying it stops being a
+     * waste of money. The threshold is the closing figure on purpose: the
+     * reference block this shape is taken from closes on "Total per month",
+     * and on a page arguing that most readers should not buy this, a total is
+     * the wrong ending.
+     *
+     * `{best}` and `{worst}` are substituted by Receipt.astro from
+     * `membershipBreakEven`. `best` assumes yearly billing and overnight
+     * every time; `worst` assumes monthly billing and standard delivery.
+     * Quoting only `best` halves the real threshold for the majority who take
+     * standard delivery, which is why the range is stated and `body` says
+     * which end is which.
+     */
     membership: {
       title: "Membership is optional, and often not worth it",
-      /**
-       * `{orders}` is substituted by Receipt.astro from
-       * `membershipBreakEvenOrders()`, the same function /pricing/ calls. This
-       * sentence used to say "more than once a quarter" — four orders a year —
-       * while /pricing/ computed seven from the same constants.
-       */
-      body: "Membership waives the administration fee and upgrades shipping to overnight. It is worth buying only above about {best} orders a year, and only if you would have paid for overnight every time — on standard delivery the figure is nearer {worst}. Below that, do not buy it, and nothing on this site will ask you twice.",
+      costsLabel: "What it costs",
+      monthly: "Billed monthly",
+      yearly: "Billed yearly",
+      coversLabel: "What it covers, per order",
+      adminFee: "Administration fee",
+      overnight: "Overnight shipping",
+      breakEvenLabel: "Pays for itself above",
+      breakEvenUnit: "orders a year",
+      body: "The lower figure assumes yearly billing and overnight delivery every time. Billed monthly, on standard delivery, it is the higher one. Below that, do not buy it — and nothing on this site will ask you twice.",
     },
     cta: "Full pricing, including dose tiers",
   },
@@ -203,7 +257,24 @@ const home = {
    * Testimonials without photographs, on purpose. The Unsplash and Pexels
    * licences both forbid using a depicted person in a way that implies
    * endorsement, and attaching a written quotation to a stranger's face does
-   * exactly that. A mono monogram is also simply more honest on a demo.
+   * exactly that. Every block in the reference library is built on avatars;
+   * none of them survives that licence, so Voices.astro identifies a speaker
+   * by name, state and context and by nothing else.
+   *
+   * `feature` marks the one quotation the section is really built around, and
+   * it is set here rather than derived from array position: the middle
+   * quotation earns the larger card because it is from someone who was
+   * DECLINED, which is the only place on the site where the refund rule is
+   * evidenced rather than promised. Reorder these and the emphasis follows
+   * the meaning instead of following the index. Every item carries the flag,
+   * including the false ones, so the array keeps a single element type.
+   *
+   * No figure appears inside a quotation anywhere here. A number written into
+   * a quote cannot be imported from pricing.ts and cannot be corrected when
+   * the fee changes — it would be a hand-typed price hiding inside quotation
+   * marks, which is the one drift this site is built to prevent. The third
+   * quotation makes its point about the fee being FIXED, which is the part
+   * that is actually the differentiator.
    */
   voices: {
     eyebrow: "Patients",
@@ -216,6 +287,7 @@ const home = {
         name: "Dana R.",
         location: "Ohio",
         context: "Metabolic · 7 months",
+        feature: false,
       },
       {
         quote:
@@ -223,13 +295,15 @@ const home = {
         name: "Marcus T.",
         location: "Arizona",
         context: "Reviewed, not approved",
+        feature: true,
       },
       {
         quote:
-          "Twenty-five dollars an order, with the pharmacy invoice attached. I stopped double-checking the maths after month three.",
+          "The same administration fee every order, with the pharmacy invoice attached underneath it. I stopped double-checking the maths after month three.",
         name: "Priya N.",
         location: "New Jersey",
         context: "Longevity · 11 months",
+        feature: false,
       },
     ],
     disclosure:
@@ -246,7 +320,13 @@ const home = {
 
   faq: {
     eyebrow: "Questions",
-    title: "The six that come up first",
+    /**
+     * "The six that come up first" until the rebuild, which put a hand-typed
+     * count in the one sentence nothing derives it from: adding a seventh item
+     * below would have left the heading quietly lying about the list under it.
+     * The count is visible in the list; the heading no longer duplicates it.
+     */
+    title: "The ones that come up first",
     cta: "Every question we get asked",
     items: [
       {

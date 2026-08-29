@@ -23,7 +23,14 @@
 const howItWorks = {
   header: {
     eyebrow: "The chain",
-    title: "Four handoffs, and what happens when one fails.",
+    /**
+     * `{accent}` is the page's one Fraunces word, substituted by
+     * `Headline.astro`. It sits on "fails" deliberately: the failure row is
+     * what this page has that no competitor's process page has, and the
+     * accent should land on the claim rather than on a noun.
+     */
+    title: "Four handoffs, and what happens when one {accent}.",
+    titleAccent: "fails",
     lead: "Three licensed parties touch an order, and only one of them is Ellery. This is the long version: what each party does, how long it has to do it, what you get at the end of it, and — the part nobody in this category publishes — what happens on the days it does not go to plan.",
     clockLabel: "The clock, end to end",
     clockNote: "None of these is an average. Each one is the ceiling the party is held to, and it is the same figure the ticker at the top of this page quotes, read from the same file.",
@@ -38,6 +45,12 @@ const howItWorks = {
     eyebrow: "Step by step",
     title: "Every handoff, in depth.",
     lead: "Four subsections, one per party. The last block in each is the one to read: what goes wrong at that step, what it costs you, and who tells you it happened.",
+    /**
+     * The accessible name of the custody rail these four steps hang on. The
+     * numerals in the rail's chips are decorative and hidden; the order is
+     * carried by the `<ol>`, so the list needs a name.
+     */
+    railLabel: "The four custody handoffs, in order",
     labels: {
       what: "What happens",
       who: "Who does it",

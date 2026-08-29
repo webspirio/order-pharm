@@ -1,18 +1,32 @@
 ---
 /**
- * THE RELAY — this site's signature element, used in two places: compact, on
- * the hero's lower edge, and expanded on /how-it-works/.
+ * THE RELAY, HORIZONTAL — this site's signature element, used on four pages:
+ * compact on the hero's lower edge, and `full` on /how-it-works/, /longevity/
+ * and /start/.
  *
- * It is a tick-marked measurement track, not three rounded cards with icons.
+ * It is a tick-marked measurement track, not four rounded cards with icons.
  * That is a content decision, not a stylistic one: the reader's actual
  * question in this category is "what happens between paying and a box
  * arriving, and how long does each part take". Order and elapsed time are
  * both information they came for, and a card grid preserves the order while
  * throwing the time away. A scale keeps both.
  *
- * Durations come from `sla` in `src/config/pricing.ts` — they are commitments,
- * so they are also what the ticker and /how-it-works/ quote, from the same
- * constant.
+ * WHY THIS ONE KEPT ITS TICKS while the two long surfaces got a numbered
+ * chip: at four columns inside a 640px panel there is no room for a 36px
+ * marker, and the `.relay-step` tick already reads as a scale mark. The
+ * ordinal is not lost — this is an `<ol>`, so it is carried semantically,
+ * which is also why the chips on `RelayDetail.astro` and /how-it-works/ are
+ * `aria-hidden`.
+ *
+ * TONES. Three per ground and no fourth (see DESIGN-SYSTEM.md §2): the actor
+ * is the quiet micro-label, the action is ink, the duration is the amber
+ * figure, the detail is reading grey. Amber is legible as text on the slab
+ * and in dark mode (7.0:1 / 9.0:1) but not on paper (1.9:1), which is why the
+ * light ground steps to `signal-700`.
+ *
+ * Durations come from `sla` in `src/config/pricing.ts` — they are
+ * commitments, so they are also what the ticker and /how-it-works/ quote,
+ * from the same constant.
  */
 import { type Locale, t } from "@/i18n";
 import { sla } from "@/config/pricing";
@@ -32,11 +46,17 @@ const { locale, variant = "compact", onLight = false } = Astro.props;
 const d = t(locale);
 
 /**
- * Durations, positionally matched to `d.home.relay.steps`. Kept here rather
- * than in the dictionary because each one is a number with a unit that also
- * appears in the ticker and the stat strip; a second hand-typed copy is
- * exactly how the reference sites ended up quoting two different review
- * windows on the same screen.
+ * Durations, positionally matched to `d.home.relay.steps`. Kept out of the
+ * dictionary because each one is a number with a unit that also appears in
+ * the ticker and the stat strip; a second hand-typed copy is exactly how the
+ * reference sites ended up quoting two different review windows on one
+ * screen.
+ *
+ * This array is built identically in three files (here, `RelayDetail.astro`
+ * and `HowItWorksPage.astro`) and "Same day" is a literal in all three. It
+ * wants to be one `relayDurations` export from `src/config/pricing.ts`; that
+ * file is owned elsewhere this pass, so the duplication is flagged rather
+ * than fixed. Anyone editing one of the three must edit all three.
  */
 const durations = [
   `~${sla.intakeMinutes} min`,
@@ -47,12 +67,14 @@ const durations = [
 
 const steps = d.home.relay.steps.map((step, index) => ({ ...step, duration: durations[index] }));
 
-const textMuted = onLight ? "text-muted-foreground" : "text-brand-50/55";
+const textActor = onLight ? "text-muted-foreground" : "text-brand-50/70";
 const textStrong = onLight ? "text-foreground" : "text-brand-50";
-const textActor = onLight ? "text-brand-700 dark:text-brand-400" : "text-brand-300";
+const textFigure = onLight ? "text-signal-700 dark:text-signal-500" : "text-signal-500";
+const textDetail = onLight ? "text-muted-foreground" : "text-brand-50/70";
 ---
 
 <ol
+  aria-label={d.home.relay.railLabel}
   class:list={[
     "relay grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-4 sm:gap-x-8",
     onLight && "relay-on-light",
@@ -64,12 +86,8 @@ const textActor = onLight ? "text-brand-700 dark:text-brand-400" : "text-brand-3
       <li class="relay-step">
         <p class:list={["label", textActor]}>{step.actor}</p>
         <p class:list={["subhead mt-2", textStrong]}>{step.action}</p>
-        <p class:list={["figure mt-1 text-sm", onLight ? "text-signal-700 dark:text-signal-500" : "text-signal-500"]}>
-          {step.duration}
-        </p>
-        {variant === "full" && (
-          <p class:list={["mt-3 text-sm", textMuted]}>{step.detail}</p>
-        )}
+        <p class:list={["figure mt-1 text-sm", textFigure]}>{step.duration}</p>
+        {variant === "full" && <p class:list={["mt-3 text-sm", textDetail]}>{step.detail}</p>}
       </li>
     ))
   }

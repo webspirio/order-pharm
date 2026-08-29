@@ -36,6 +36,7 @@ export const qualifyingConditions = {
 };
 
 const programs = {
+  eyebrow: "Programs",
   title: "Two programs",
   /** Re-exported on the dictionary so pages reach it as `d.programs.conditions`. */
   conditions: qualifyingConditions,
@@ -54,6 +55,14 @@ const programs = {
     /** `{visit}` and `{admin}` are substituted from pricing.ts by Programs.astro. */
     fees: "Plus {visit} for the clinician review, refunded in full if you are not approved, and the fixed {admin} administration fee.",
   },
+
+  /**
+   * The label on the strip that carries `gating.long` under the two cards.
+   * The sentence itself lives in `common.ts` and is never rewritten here —
+   * this only names it, so the strip reads as a designed part of the section
+   * rather than as small print that got left at the bottom.
+   */
+  priceCondition: "The condition on both prices",
   items: [
     {
       id: "metabolic",

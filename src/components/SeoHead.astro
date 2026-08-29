@@ -1,4 +1,28 @@
 ---
+/**
+ * Everything in <head> that a crawler reads: canonical, the hreflang set,
+ * OG/Twitter, and the one JSON-LD block that declares the primary entity.
+ *
+ * THE ENTITY IS AN `Organization`, and that is a compliance decision rather
+ * than an SEO one — `src/config/site.ts` argues it at length. Structured data
+ * is the one place on the site a human reviewer never looks, so it is where a
+ * `MedicalBusiness` or a `Pharmacy` could sit for a year saying the opposite
+ * of every visible page. `scripts/verify-dist.mjs` now rejects those types on
+ * built output, which is the only place they exist.
+ *
+ * THE @id CONTRACT: `<domain>/#business` is declared here, once per page, and
+ * referenced — never redeclared — by `Faq.astro`'s FAQPage and the articles'
+ * Article/BreadcrumbList blocks. verify-dist fails a page that references an
+ * @id nothing on it declares, so this component must stay on every route and
+ * that string must not change on one side alone.
+ *
+ * The offer catalog is the visible program copy, not a second description of
+ * it: `src/i18n/en/programs.ts` is the single source, so the machine-readable
+ * offer and the cards a reader sees cannot say different things. That copy is
+ * edited often and by whoever owns the page, so nothing here depends on its
+ * wording — only on its shape — and verify-dist asserts that each emitted
+ * offer still carries the clinician-decides condition.
+ */
 import { type Locale, locales, defaultLocale, htmlLang, localizedPath, t } from "@/i18n";
 import { site } from "@/config/site";
 
@@ -57,6 +81,11 @@ function compact(value: unknown): unknown {
 
 const hasAddress = Boolean(site.addressStreet && site.addressCountryCode);
 
+/** Read once, defensively: the dictionary module this comes from is owned by
+    whoever owns the program pages, and a head component is the wrong place to
+    throw when someone is mid-edit on a card's copy. */
+const programs = Array.isArray(d.programs?.items) ? d.programs.items : [];
+
 const jsonLd = compact({
   "@context": "https://schema.org",
   "@type": site.schemaType,
@@ -105,20 +134,26 @@ const jsonLd = compact({
    * `Service`, not `Drug` or `MedicalTherapy`: what Ellery offers is
    * coordination. Marking these up as drugs would assert in machine-readable
    * form the exact claim every page on this site disclaims.
+   *
+   * Guarded on the array rather than mapping it blind: a catalog with a name
+   * and no offers is worse than no catalog, and `compact` cannot drop it
+   * because the name alone keeps the object alive.
    */
-  hasOfferCatalog: {
-    "@type": "OfferCatalog",
-    name: d.programs.title,
-    itemListElement: d.programs.items.map((program) => ({
-      "@type": "Offer",
-      itemOffered: {
-        "@type": "Service",
-        name: program.title,
-        description: program.desc,
-        provider: { "@id": `${site.domain}/#business` },
-      },
-    })),
-  },
+  hasOfferCatalog: programs.length
+    ? {
+        "@type": "OfferCatalog",
+        name: d.programs.title,
+        itemListElement: programs.map((program) => ({
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Service",
+            name: program.title,
+            description: program.desc,
+            provider: { "@id": `${site.domain}/#business` },
+          },
+        })),
+      }
+    : undefined,
 });
 ---
 

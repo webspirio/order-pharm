@@ -62,6 +62,15 @@ export type LearnBlock =
 const learn = {
   eyebrow: "Learn",
   title: "Straight answers, before you need them",
+  /**
+   * The index h1, and the one place Fraunces appears on this route. `title`
+   * stays plain alongside it because `ArticlePage.astro` reuses it as the
+   * heading of the "keep reading" section, and a second accent word on the
+   * article page would spend a budget of one twice. The line break is
+   * deliberate: the headline turns on the comma at every width.
+   */
+  headline: "Straight answers,\n{accent} you need them",
+  headlineAccent: "before",
   lead: "What these medications do, what they cost when nobody is subsidising them, and where the evidence stops. Written plainly and reviewed by a licensed clinician.",
   /** Sits under the index heading and at the head of every article. */
   disclaimer:
@@ -69,6 +78,15 @@ const learn = {
   reviewedBy: "Clinically reviewed",
   readTime: "min read",
   updated: "Updated",
+  /**
+   * The two column headings on the index. There are three articles here. A
+   * three-up grid of equal cards is what a hub looks like when it has run out
+   * of things to say, so one piece is framed and the rest are a list, and
+   * these two labels say which is which rather than leaving the reader to
+   * infer it from the layout.
+   */
+  featuredLabel: "Start here",
+  moreLabel: "Then these",
   categories: {
     comparison: "Comparison",
     cost: "Cost",

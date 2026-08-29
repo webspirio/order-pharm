@@ -54,7 +54,7 @@ export default function LanguageSwitcher({
         aria-label={label}
         aria-haspopup="menu"
         aria-expanded={open}
-        className="inline-flex h-9 min-w-9 items-center justify-center rounded-md border border-border px-2 text-xs font-bold uppercase text-foreground/80 transition-colors hover:bg-accent hover:text-foreground"
+        className="inline-flex h-9 min-w-9 items-center justify-center rounded-lg border border-border px-2 text-xs font-bold uppercase text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
       >
         {currentLabel}
       </button>
@@ -63,7 +63,7 @@ export default function LanguageSwitcher({
         <ul
           role="menu"
           aria-label={label}
-          className="absolute right-0 z-50 mt-2 min-w-40 overflow-hidden rounded-md border border-border bg-popover p-1 shadow-lg"
+          className="absolute right-0 z-50 mt-2 min-w-40 overflow-hidden rounded-2xl border border-border bg-popover p-2 shadow-lg"
         >
           {options.map((option) => (
             <li key={option.code} role="none">
@@ -71,7 +71,7 @@ export default function LanguageSwitcher({
                 role="menuitem"
                 href={option.href}
                 hrefLang={option.code}
-                className="flex items-center justify-between gap-3 rounded-sm px-3 py-2 text-sm text-popover-foreground transition-colors hover:bg-accent"
+                className="flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm text-popover-foreground transition-colors hover:bg-muted"
               >
                 {option.name}
                 {option.code === current && <Check className="size-4" />}

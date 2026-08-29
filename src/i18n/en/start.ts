@@ -26,7 +26,9 @@ import { qualifyingConditions } from "./programs";
 const start = {
   header: {
     eyebrow: "Intake",
-    title: "Every question, and why it is asked.",
+    /** `{accent}` is the page's one Fraunces-italic word; see Headline.astro. */
+    title: "Every question, and {accent} it is asked.",
+    titleAccent: "why",
     lead: "This is the whole questionnaire, in the open, before you give anything to anyone. It asks what a clinician licensed in your state needs in order to decide, it shows the itemised cost while you are still answering, and it asks for no payment at any point.",
     /** The four figures under the lead. Values come from pricing.ts. */
     factsLabel: "What starting commits you to",
@@ -36,6 +38,8 @@ const start = {
       { label: "Refunded if declined", note: "the review fee, in full, to the card used" },
       { label: "Administration fee", note: "fixed per order, and the only thing Ellery charges" },
     ],
+    /** Footnote ◇, promoted out of a grey line and into the header's aside. */
+    demoLabel: "Demonstration",
     demo: "The intake below is a working demonstration. It runs in this browser tab, nothing is transmitted, and nothing is stored.",
   },
 

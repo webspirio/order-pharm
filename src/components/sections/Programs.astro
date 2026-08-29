@@ -2,6 +2,40 @@
 /**
  * The two program cards.
  *
+ * THE FRAME, and why the two radii nest exactly.
+ * The reference template's bento and React Bits' blog-11 both frame their
+ * media: an outer card at a large radius, a small uniform inset, and the
+ * image in an inner well. It only reads as deliberate when the inner radius
+ * is exactly the outer radius minus the inset — otherwise the two curves
+ * fight and the card looks like a mistake. This site already owns both
+ * numbers: `--radius-card` is 24px and `--radius` is 12px, so a 12px inset
+ * (`p-3`) makes the arithmetic come out on the nose with no third radius
+ * invented. Every inner box in the card — the media well and the price well —
+ * is therefore `rounded-lg`, and the frame is `.panel`.
+ *
+ * TWO SURFACES PER CARD, which is the bento's idea moved somewhere it carries
+ * information. The reference splits its grid into a loud card and a quiet one
+ * to build hierarchy between peers. These two programs are not a hierarchy —
+ * ranking them visually would be a recommendation, and Ellery does not
+ * recommend a program — so the split happens INSIDE each card instead: the
+ * raised frame says what the program is, and a recessed well says what it
+ * costs. The receipt is the part of the card a reader checks, so it gets its
+ * own surface.
+ *
+ * NO TICK LIST. The three points under each card are concessions as often as
+ * they are features ("Not everyone qualifies"), and a green check beside
+ * "not everyone qualifies" is the wrong reading. They are hairline rows, the
+ * same form the tables elsewhere on the site use. `border-border`, not
+ * `border-hairline`: the card ground here is `--background`, and the hairline
+ * token is tuned to be almost invisible on white — on this surface it
+ * disappears entirely and the rows read as loose paragraphs.
+ *
+ * THE CARD IS NOT THE LINK. See the comment on the anchor below: the whole
+ * card stays clickable, but the accessible name is the call to action rather
+ * than every word on the card. `a.panel:hover` in global.css no longer
+ * matches, so the signal-coloured edge is reproduced with `hover:` on the
+ * article itself.
+ *
  * Prices are the lowest monthly equivalent from `treatmentsIn(program)`, so a
  * card cannot advertise a number the program page then contradicts, and adding
  * a cheaper treatment updates the card by itself. The "from" price always
@@ -15,7 +49,8 @@ import { fees, treatmentsIn, usd, usdMonthly, type ProgramId } from "@/config/pr
 import { Image } from "astro:assets";
 import metabolicImg from "@/assets/program-metabolic.jpg";
 import longevityImg from "@/assets/program-longevity.jpg";
-import { ArrowRight, Check } from "lucide-react";
+import SectionHead from "@/components/SectionHead.astro";
+import { ArrowRight } from "lucide-react";
 
 interface Props {
   locale: Locale;
@@ -54,73 +89,92 @@ const cards = d.programs.items.map((program) => {
 
 <section id={anchors.programs} class="bg-card section">
   <div class="shell">
-    <div class="max-w-3xl">
-      <h2 class="display-2">{d.programs.title}</h2>
-      <p class="lead mt-4">{d.programs.lead}</p>
-    </div>
+    <SectionHead eyebrow={d.programs.eyebrow} title={d.programs.title} lead={d.programs.lead} />
 
-    <div class="mt-12 grid gap-6 lg:grid-cols-2 lg:gap-8">
+    <div class="reveal mt-12 grid gap-6 lg:mt-16 lg:grid-cols-2 lg:gap-8">
       {
         cards.map((card) => (
-          <a href={card.href} class="panel group flex flex-col overflow-hidden bg-background">
-            <div class="relative aspect-[16/9] overflow-hidden">
+          <article class="panel group relative flex flex-col bg-background p-3 transition-colors hover:border-signal-500">
+            {/* The inset media well. 24px frame − 12px inset = the 12px inner
+                radius; see the docblock. `bg-muted` shows through while the
+                image decodes, so the well never flashes as a white hole. */}
+            <div class="relative aspect-[16/10] overflow-hidden rounded-lg bg-muted">
               <Image
                 src={card.image}
                 alt=""
-                widths={[480, 768, 1024]}
-                sizes="(min-width: 1024px) 34rem, 100vw"
+                widths={[440, 640, 880]}
+                sizes="(min-width: 1024px) 28rem, (min-width: 640px) 88vw, 92vw"
                 class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                 loading="lazy"
               />
               <span
-                class="label absolute left-4 top-4 bg-brand-800/85 px-2.5 py-1.5 text-brand-50 backdrop-blur-sm"
-                style="border-radius:3px"
+                class="label absolute left-3 top-3 rounded-lg bg-background/90 px-2.5 py-1.5 text-foreground backdrop-blur-sm"
               >
                 {card.eyebrow}
               </span>
             </div>
 
-            <div class="flex flex-1 flex-col p-6 sm:p-7">
+            {/* The body is inset a further 16px inside the frame, so the media well
+                reads as the widest element on the card and the frame reads as a
+                mount rather than as a stray 12px of padding. */}
+            <div class="flex flex-1 flex-col px-4 pb-3 pt-6 sm:px-5 sm:pb-4">
               <h3 class="display-3">{card.title}</h3>
 
-              <div class="mt-4 border-y border-border py-3">
-                <p class="flex items-baseline gap-2">
+              {/* The recessed well: the card's receipt, on its own surface. */}
+              <div class="mt-5 rounded-lg bg-muted p-4">
+                <p class="flex flex-wrap items-baseline gap-x-2 gap-y-1">
                   <span class="label text-muted-foreground">{d.programs.price.from}</span>
-                  <span class="figure text-xl text-foreground">{card.from}</span>
+                  <span class="figure text-2xl text-foreground">{card.from}</span>
                   <span class="label text-muted-foreground">
                     {d.programs.price.unit}
                     <sup class="ml-0.5 tracking-normal">‡</sup>
                   </span>
                 </p>
-                <p class="mt-2 text-xs leading-relaxed text-muted-foreground">
+                <p class="mt-2.5 text-xs leading-relaxed text-muted-foreground">
                   {feeLine}
                   <sup>†</sup>
                 </p>
               </div>
 
-              <p class="mt-4 text-[0.9375rem] leading-relaxed text-muted-foreground">{card.desc}</p>
+              <p class="mt-5 text-[0.9375rem] leading-relaxed text-muted-foreground">{card.desc}</p>
 
-              <ul class="mt-5 flex flex-col gap-2.5">
+              <ul class="mt-6 flex flex-col">
                 {card.points.map((point) => (
-                  <li class="flex gap-2.5 text-sm text-muted-foreground">
-                    <Check className="mt-1 size-3.5 shrink-0 text-brand-600 dark:text-brand-400" />
-                    <span>{point}</span>
+                  <li class="border-t border-border py-2.5 text-sm leading-relaxed text-muted-foreground">
+                    {point}
                   </li>
                 ))}
               </ul>
 
-              <span
-                class="mt-6 inline-flex items-center gap-2 pt-1 text-sm font-semibold text-brand-700 dark:text-brand-400"
+              {/* The link wraps the CTA only, and `after:inset-0` stretches
+                  its hit area over the whole card. Wrapping the card in the
+                  anchor instead — which is what this was — gives the link an
+                  accessible name four hundred characters long: the title, the
+                  price, the fee sentence, the description and all three
+                  points, read out before the reader learns where it goes. */}
+              <a
+                href={card.href}
+                class="mt-auto inline-flex items-center gap-2 pt-7 text-[0.9375rem] font-semibold text-foreground after:absolute after:inset-0"
               >
                 {card.cta}
-                <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
-              </span>
+                <ArrowRight
+                  aria-hidden="true"
+                  className="size-4 transition-transform group-hover:translate-x-1"
+                />
+              </a>
             </div>
-          </a>
+          </article>
         ))
       }
     </div>
 
-    <p class="mt-8 max-w-3xl text-sm text-muted-foreground">{d.gating.long}</p>
+    {/* The quiet surface the bento spends on a testimonial tile, spent here on
+        the condition both prices are subject to. It is a designed strip rather
+        than small print under a grid, because it is the sentence that decides
+        whether either price means anything. */}
+    <div class="panel-flat reveal mt-6 p-5 sm:mt-8 sm:p-6">
+      <p class="label text-muted-foreground">{d.programs.priceCondition}</p>
+      <p class="mt-2.5 max-w-3xl text-sm leading-relaxed text-muted-foreground">{d.gating.long}</p>
+    </div>
   </div>
 </section>

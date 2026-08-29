@@ -40,11 +40,11 @@ const d = t(locale);
 
       <div class="px-7 py-12 sm:px-12 sm:py-16">
         <div class="max-w-2xl">
-          <p class="label text-[#0c1412]/60">{d.cta.eyebrow}</p>
+          <p class="label text-[#0c1412]/70">{d.cta.eyebrow}</p>
           <h2 class="display-2 mt-4 text-[#0c1412]">
             {d.cta.title.replace("{minutes}", String(sla.intakeMinutes))}
           </h2>
-          <p class="mt-5 text-base leading-relaxed text-[#0c1412]/75">{d.cta.lead}</p>
+          <p class="mt-5 text-base leading-relaxed text-[#0c1412]/80">{d.cta.lead}</p>
 
           <div class="mt-9 flex flex-wrap items-center gap-3">
             <a href={localizedPath(locale, "/start/")} class="btn-solid">
@@ -54,12 +54,12 @@ const d = t(locale);
             <a href={localizedPath(locale, "/pricing/")} class="btn-outline">{d.cta.secondary}</a>
           </div>
 
-          <p class="figure mt-7 text-xs text-[#0c1412]/60">
+          <p class="figure mt-7 text-xs text-[#0c1412]/70">
             {d.cta.reassure} · ~{sla.intakeMinutes} MIN
           </p>
           {/* Every surface that asks for the click also carries the condition
               the click is subject to. */}
-          <p class="mt-2 text-xs text-[#0c1412]/60">{d.gating.short}</p>
+          <p class="mt-2 text-xs text-[#0c1412]/70">{d.gating.short}</p>
         </div>
       </div>
     </div>

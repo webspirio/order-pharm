@@ -1,3 +1,18 @@
+/**
+ * LOCALLY EDITED shadcn primitive. Re-running `shadcn add field` reverts the
+ * two edits below, and both are contract, not taste — see docs/DESIGN-SYSTEM.md.
+ *
+ * 1. RADIUS. Two families and no third: `rounded-lg` (12px, `--radius`) for
+ *    controls, `rounded-2xl` (24px, `--radius-card`) for surfaces. The registry
+ *    ships four more — `rounded-md`, `rounded-xl`, `rounded-4xl` and a
+ *    `min(var(--radius-md), 10px)` ladder — which is what made the intake read
+ *    as a different site from the page around it.
+ * 2. FOCUS. The `has-[:focus-visible]` ring on the wrapper is gone: the inner
+ *    control already draws the global ink outline, and two indicators for one
+ *    focus is noise. The border-colour change stays, because it is the only cue
+ *    that the whole labelled card is the focused control's container.
+ */
+
 import { useMemo } from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 
@@ -104,7 +119,7 @@ function FieldLabel({
     <Label
       data-slot="field-label"
       className={cn(
-        "group/field-label peer/field-label flex w-fit gap-2 leading-snug group-data-[disabled=true]/field:opacity-50 has-data-checked:border-primary/30 has-data-checked:bg-primary/5 has-[>[data-slot=field]]:rounded-lg has-[>[data-slot=field]]:border has-[>[data-slot=field]]:not-has-[:disabled,[data-disabled]]:hover:bg-muted/50 has-[>[data-slot=field]]:has-[:focus-visible]:border-ring has-[>[data-slot=field]]:has-[:focus-visible]:ring-3 has-[>[data-slot=field]]:has-[:focus-visible]:ring-ring/50 *:data-[slot=field]:p-2.5 dark:has-data-checked:border-primary/20 dark:has-data-checked:bg-primary/10",
+        "group/field-label peer/field-label flex w-fit gap-2 leading-snug group-data-[disabled=true]/field:opacity-50 has-data-checked:border-primary/30 has-data-checked:bg-primary/5 has-[>[data-slot=field]]:rounded-lg has-[>[data-slot=field]]:border has-[>[data-slot=field]]:not-has-[:disabled,[data-disabled]]:hover:bg-muted/50 has-[>[data-slot=field]]:has-[:focus-visible]:border-ring *:data-[slot=field]:p-2.5 dark:has-data-checked:border-primary/20 dark:has-data-checked:bg-primary/10",
         "has-[>[data-slot=field]]:w-full has-[>[data-slot=field]]:flex-col",
         className
       )}

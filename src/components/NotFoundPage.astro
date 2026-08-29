@@ -4,12 +4,41 @@
  * `SeoHead` gets `selfOnly` — a generic hreflang loop would declare per-locale
  * 404s that are never built, which verify-dist.mjs correctly rejects.
  *
- * It routes rather than apologises: a visitor who mistyped a URL wants the
- * link they were looking for, not a sad illustration.
+ * IT ROUTES RATHER THAN APOLOGISES. A visitor who mistyped a URL wants the
+ * link they were looking for, not a sad illustration — and on a site whose
+ * whole subject is custody and routing, a request with nowhere to go is worth
+ * naming as exactly that. Hence the `404 · NO ROUTE` readout rather than
+ * "Oops!", and hence the closing block: a broken link inside this site is one
+ * of Ellery's own four jobs failing, so the page says so and gives the reader
+ * somewhere to report it.
+ *
+ * WHAT THE REFERENCE 404s SHIP, AND WHY NONE OF IT IS HERE. 404-7 puts an
+ * inline search form in the middle of the page; it posts nowhere on a static
+ * build, which is the same defect as a mailto: dressed up as a contact form.
+ * 404-8 wraps the whole thing in fake terminal chrome with a blinking caret
+ * and a fabricated `x-request-id`. Both set the numeral at `text-8xl` — 96px,
+ * larger than this site's own h1 on most viewports, which inverts the page's
+ * heading order for a decoration.
+ *
+ * THE NUMERAL, and the rule it is allowed to bend. It is a decoration and
+ * nothing else: `aria-hidden`, in the border token rather than an invented
+ * text tone, and clamped so it stays visibly SMALLER than the h1 at every
+ * viewport — `6.5vw` capped at 4rem against `.display-1`'s `7.4vw` capped at
+ * 5.5rem. The accessible copy of the same fact is the mono `404` in the
+ * eyebrow, which is a real `<p>`; the h1 stays the sentence, because an h1 of
+ * "404" announces the page title as a number.
+ *
+ * THE THREE CLOSING SECTIONS. `ComplianceBand` is here because every route on
+ * this site resolves all eight footnote symbols and this one used to resolve
+ * none of them. `TrustTicker` is here because the other thirteen routes carry
+ * it in this exact slot. `Cta` is deliberately NOT: a reader who followed a
+ * dead link is owed a route, not an ask, and the intake link is already in
+ * the list below. `.band-under`'s 4rem fallback exists for pages with no CTA.
  */
 import { type Locale, t, localizedPath } from "@/i18n";
 import Layout from "@/layouts/Layout.astro";
 import SeoHead from "@/components/SeoHead.astro";
+import TrustTicker from "@/components/sections/TrustTicker.astro";
 import Header from "@/components/sections/Header.astro";
 import ComplianceBand from "@/components/sections/ComplianceBand.astro";
 import Footer from "@/components/sections/Footer.astro";
@@ -45,31 +74,78 @@ const links = [
   <SeoHead slot="head" locale={locale} path="/404.html" selfOnly />
   <Header locale={locale} />
   <main id="main" tabindex="-1" class="outline-none">
-    <section class="page-top shell pb-20 sm:pb-24">
-      <p class="figure text-sm text-brand-700 dark:text-brand-400">{d.notFound.code}</p>
-      <h1 class="display-2 mt-4">{d.notFound.title}</h1>
-      <p class="lead mt-4">{d.notFound.body}</p>
+    <section class="bg-background page-top pb-14 sm:pb-16">
+      <div class="shell">
+        <div class="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between lg:gap-16">
+          <div class="max-w-2xl">
+            <p class="label text-signal-700 dark:text-signal-500">
+              <span class="figure">{d.notFound.code}</span> · {d.notFound.status}
+            </p>
+            <h1 class="display-1 mt-5">{d.notFound.title}</h1>
+            <p class="lead mt-6 text-lg">{d.notFound.body}</p>
 
-      <h2 class="label mt-12 text-muted-foreground">{d.notFound.linksLabel}</h2>
-      <ul class="mt-4 grid gap-x-8 sm:grid-cols-2">
-        {
-          links.map((link) => (
-            <li class="border-b border-border">
-              <a
-                href={link.href}
-                class="group flex items-center justify-between gap-4 py-3.5 text-[0.9375rem] font-medium"
-              >
-                {link.label}
-                <ArrowRight
-                  className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1"
-                />
-              </a>
-            </li>
-          ))
-        }
-      </ul>
+            <a href={localizedPath(locale, "/")} class="btn-outline mt-8">{d.notFound.backHome}</a>
+          </div>
 
-      <a href={localizedPath(locale, "/")} class="btn-outline mt-10">{d.notFound.backHome}</a>
+          {/* Decoration, and the docblock above says how far it is allowed to
+              go. `text-border` rather than an opacity step on the ink: the
+              border token is already the site's faintest mark and it is the
+              one that tracks all three palettes and both themes. */}
+          <p
+            aria-hidden="true"
+            class="figure hidden shrink-0 text-[clamp(2.5rem,6.5vw,4rem)] leading-none tracking-[-0.04em] text-border sm:block"
+          >
+            {d.notFound.code}
+          </p>
+        </div>
+      </div>
+    </section>
+
+    {/* The ticker closes the head block, the same slot it takes under the
+        hero on the homepage and under the head block on every other route. */}
+    <TrustTicker locale={locale} />
+
+    <section class="bg-card section">
+      <div class="shell">
+        <nav aria-labelledby="routes-label" class="reveal">
+          <h2 id="routes-label" class="label text-muted-foreground">{d.notFound.linksLabel}</h2>
+          {/* The closing rule belongs to the LIST, not to the last item: in
+              two columns the final row is two items, and `last:border-b`
+              would rule one of them and not the other. */}
+          <ul class="mt-6 grid gap-x-12 border-b border-border sm:grid-cols-2">
+            {
+              links.map((link) => (
+                <li class="border-t border-border">
+                  <a
+                    href={link.href}
+                    class="group flex items-center justify-between gap-4 py-4 text-[0.9375rem] font-medium transition-colors hover:text-signal-700 dark:hover:text-signal-500"
+                  >
+                    {link.label}
+                    <ArrowRight
+                      aria-hidden="true"
+                      className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1"
+                    />
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+
+        <div class="reveal mt-12 max-w-2xl border-t border-border pt-8">
+          <h2 class="subhead">{d.notFound.report.title}</h2>
+          <p class="mt-2.5 text-[0.9375rem] leading-relaxed text-muted-foreground">
+            {d.notFound.report.body}
+          </p>
+          <a
+            href={localizedPath(locale, "/contact/")}
+            class="group mt-5 inline-flex items-center gap-2 text-[0.9375rem] font-semibold text-foreground transition-colors hover:text-signal-700 dark:hover:text-signal-500"
+          >
+            {d.notFound.report.cta}
+            <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+          </a>
+        </div>
+      </div>
     </section>
 
     {/* Every route resolves all eight footnote symbols — /404 included.

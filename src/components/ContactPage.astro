@@ -4,32 +4,43 @@
  *
  * WHY THERE IS NO FORM. This is a static build with no endpoint, and a form
  * that posts nowhere is worse than no form; a `mailto:` dressed up as one is
- * the same lie with more markup. So the page publishes the channels instead
- * and says so in the copy. The category's premium end publishes a number and
- * its hours for exactly this reason: the top anxiety in a mail-order
- * prescription flow is "will anyone answer".
+ * the same lie with more markup. The reference block this page borrows its
+ * shape from (`.rb-source/pro/contact-11.tsx`) is a two-pole layout: routing
+ * on the left, one panel on the right holding a nine-field enquiry form and a
+ * "Send message" button. The layout is right and the panel's contents are not,
+ * so the panel keeps the slot and holds the thing that is actually true — the
+ * number, the hours a person is on it, and the address of the inbox. Everything
+ * else in that block is discarded: the four named "desks" with stock portraits
+ * would attach a face and a personal name to "clinical questions", which reads
+ * as Ellery's clinician and collapses the three-party separation this page
+ * exists to draw (and the Unsplash licence forbids implying endorsement).
  *
  * WHY THE ROUTING TABLE IS THE DARK BAND. Three licensed parties touch an
  * order and only one of them is Ellery, so the most valuable thing this page
  * can do is say which question belongs to which party. That is the same
  * argument `Roles.astro` makes on the homepage, so it gets the same treatment:
- * a real table on the one fixed-dark band, with a definition-list fallback
+ * a real table on the page's one `.slab` band, with a definition-list fallback
  * below `sm` where three columns would be twelve characters wide.
  *
  * WHY THE ACCOUNT THREAD IS NOT A LINK. It carries medical information and
  * lives behind a login this build does not have. A link to a login that does
- * not exist is the same defect as an href="#" safety link, so the panel says
+ * not exist is the same defect as an href="#" safety link, so the row says
  * where the thread lives instead of pointing at nothing.
  *
  * HOURS are derived from `site.openingHours` (weekdays, the block schema.org
- * also gets) plus the weekend half of `footer.supportHours`, so the header,
- * the phone panel and the footer cannot quote different hours.
+ * also gets) plus the weekend half of `footer.supportHours`, and they are
+ * PUBLISHED ONCE, in the header panel. They used to appear in the header row,
+ * again in the phone card and again in the office aside — three copies of one
+ * constant is how the reference sites in this category ended up quoting two
+ * different support schedules on the same page.
  */
 import { type Locale, t, localizedPath } from "@/i18n";
 import { site } from "@/config/site";
 import { partners, sla } from "@/config/pricing";
 import Layout from "@/layouts/Layout.astro";
 import SeoHead from "@/components/SeoHead.astro";
+import Headline from "@/components/Headline.astro";
+import SectionHead from "@/components/SectionHead.astro";
 import TrustTicker from "@/components/sections/TrustTicker.astro";
 import Header from "@/components/sections/Header.astro";
 import Cta from "@/components/sections/Cta.astro";
@@ -37,7 +48,7 @@ import ComplianceBand from "@/components/sections/ComplianceBand.astro";
 import Footer from "@/components/sections/Footer.astro";
 import { Image } from "astro:assets";
 import contactImage from "@/assets/contact.jpg";
-import { ArrowRight, ExternalLink, MapPin, TriangleAlert } from "lucide-react";
+import { ArrowRight, ArrowUpRight, ExternalLink, MapPin, TriangleAlert } from "lucide-react";
 
 interface Props {
   locale: Locale;
@@ -92,8 +103,6 @@ interface Channel {
   value?: string;
   where?: string;
   body: string;
-  availabilityLabel: string;
-  availabilityLines: string[];
   note: string;
 }
 
@@ -104,8 +113,6 @@ const channels: Channel[] = [
     href: site.phoneHref,
     value: site.phoneDisplay,
     body: c.channels.phone.body,
-    availabilityLabel: c.channels.hoursLabel,
-    availabilityLines: [weekdayHours, weekendHours],
     note: fill(c.channels.phone.note),
   },
   {
@@ -114,8 +121,6 @@ const channels: Channel[] = [
     href: site.mailHref,
     value: site.email,
     body: c.channels.email.body,
-    availabilityLabel: c.channels.repliesLabel,
-    availabilityLines: [],
     note: fill(c.channels.email.note),
   },
   {
@@ -123,8 +128,6 @@ const channels: Channel[] = [
     title: c.channels.thread.title,
     where: c.channels.thread.where,
     body: c.channels.thread.body,
-    availabilityLabel: c.channels.repliesLabel,
-    availabilityLines: [],
     note: fill(c.channels.thread.note),
   },
 ];
@@ -142,12 +145,6 @@ const routingRows = c.routing.rows.map((row) => ({
 
 const responseRows = c.response.rows.map((row) => ({ ...row, detail: fill(row.detail) }));
 
-const headerFacts = [
-  { value: site.phoneDisplay, href: site.phoneHref, label: c.header.figures.phone },
-  { value: weekdayHours, label: c.header.figures.weekday },
-  { value: weekendHours, label: c.header.figures.weekend },
-];
-
 const hasAddress = Boolean(site.addressStreet && site.addressCountryCode);
 ---
 
@@ -157,42 +154,65 @@ const hasAddress = Boolean(site.addressStreet && site.addressCountryCode);
   <main id="main" tabindex="-1" class="outline-none">
     <section class="bg-background page-top pb-14 sm:pb-16">
       <div class="shell">
-        <p class="label text-brand-700 dark:text-brand-400">{c.header.eyebrow}</p>
-        <h1 class="display-1 mt-5 max-w-4xl">{c.header.title}</h1>
-        <p class="lead mt-6 text-lg">{c.header.lead}</p>
+        <p class="label text-signal-700 dark:text-signal-500">{c.header.eyebrow}</p>
+        <Headline
+          as="h1"
+          reveal
+          text={c.header.title}
+          accent={c.header.titleAccent}
+          class="display-1 mt-5 max-w-3xl"
+        />
 
-        <dl class="mt-10 grid max-w-3xl gap-x-8 gap-y-6 sm:grid-cols-3">
-          {
-            headerFacts.map((fact) => (
-              <div class="border-t border-border pt-4">
-                <dd class="figure text-base text-foreground sm:text-lg">
-                  {fact.href ? (
-                    <a href={fact.href} class="hover:text-brand-700 dark:hover:text-brand-400">
-                      {fact.value}
-                    </a>
-                  ) : (
-                    fact.value
-                  )}
-                </dd>
-                <dt class="mt-1.5 text-sm text-muted-foreground">{fact.label}</dt>
-              </div>
-            ))
-          }
-        </dl>
+        <div class="mt-9 grid gap-10 lg:grid-cols-[1fr_21rem] lg:gap-14">
+          <div>
+            <p class="lead">{c.header.lead}</p>
+            <p class="mt-7 max-w-xl text-sm leading-relaxed text-muted-foreground">
+              {c.header.noForm}
+            </p>
+            <p class="mt-6 max-w-xl text-[0.9375rem] leading-relaxed">{c.header.against}</p>
+            <a
+              href={localizedPath(locale, "/pricing/")}
+              class="group mt-3 inline-flex items-center gap-2 text-sm font-semibold text-foreground hover:text-signal-700 dark:hover:text-signal-500"
+            >
+              {c.header.againstCta}
+              <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+            </a>
+          </div>
 
-        <p class="mt-8 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-          {c.header.noForm}
-        </p>
-        <p class="mt-6 max-w-3xl text-[0.9375rem] leading-relaxed text-foreground">
-          {c.header.against}
-        </p>
-        <a
-          href={localizedPath(locale, "/pricing/")}
-          class="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-brand-700 dark:text-brand-400"
-        >
-          {c.header.againstCta}
-          <ArrowRight className="size-4" />
-        </a>
+          {/* The panel the reference block fills with an enquiry form. */}
+          <aside class="panel h-fit p-6">
+            <p class="label text-muted-foreground">{c.header.figures.phone}</p>
+            <a
+              href={site.phoneHref}
+              class="figure mt-2 block text-[1.75rem] hover:text-signal-700 dark:hover:text-signal-500"
+            >
+              {site.phoneDisplay}
+            </a>
+
+            <p class="label mt-7 text-muted-foreground">{c.office.hoursLabel}</p>
+            <dl class="mt-3">
+              {
+                [
+                  { label: c.header.figures.weekday, value: weekdayHours },
+                  { label: c.header.figures.weekend, value: weekendHours },
+                ].map((row) => (
+                  <div class="flex items-baseline justify-between gap-4 border-t border-hairline py-2.5">
+                    <dt class="text-[0.8125rem] text-muted-foreground">{row.label}</dt>
+                    <dd class="figure shrink-0 text-[0.8125rem]">{row.value}</dd>
+                  </div>
+                ))
+              }
+            </dl>
+
+            <p class="label mt-7 text-muted-foreground">{c.header.figures.email}</p>
+            <a
+              href={site.mailHref}
+              class="figure mt-2 block break-words text-[0.9375rem] hover:text-signal-700 dark:hover:text-signal-500"
+            >
+              {site.email}
+            </a>
+          </aside>
+        </div>
       </div>
     </section>
 
@@ -203,103 +223,107 @@ const hasAddress = Boolean(site.addressStreet && site.addressCountryCode);
 
     <section class="bg-card section">
       <div class="shell">
-        <div class="max-w-3xl">
-          <p class="label text-brand-700 dark:text-brand-400">{c.channels.eyebrow}</p>
-          <h2 class="display-2 mt-4">{c.channels.title}</h2>
-          <p class="lead mt-4">{c.channels.lead}</p>
-        </div>
+        <SectionHead
+          eyebrow={c.channels.eyebrow}
+          title={c.channels.title}
+          lead={c.channels.lead}
+        />
 
-        <div class="mt-12 grid gap-6 lg:grid-cols-3 lg:gap-8">
+        {/* HAIRLINE ROWS, not three equal cards. The three channels are not
+            three equal things — the phone reaches Ellery, the thread reaches
+            the practice, and their explanations are of very different lengths.
+            A row lets the second column run as long as it needs to; a card
+            grid would pad two of them to match the third. Each address is one
+            link whose accessible name is the address itself, with the arrow
+            hidden from assistive tech. */}
+        <ul class="mt-12 flex flex-col">
           {
             channels.map((channel) => (
-              <div class="panel flex flex-col bg-background p-6">
-                <p class="label text-muted-foreground">{channel.label}</p>
-                <h3 class="subhead mt-3 text-lg">{channel.title}</h3>
+              <li class="grid gap-x-10 gap-y-5 border-t border-border py-8 last:border-b sm:grid-cols-[15rem_1fr] sm:py-10">
+                <div>
+                  <p class="label text-muted-foreground">{channel.label}</p>
+                  <h3 class="subhead mt-2.5">{channel.title}</h3>
 
-                {channel.href && channel.value && (
-                  <a
-                    href={channel.href}
-                    class="figure mt-4 block break-words text-lg text-foreground hover:text-brand-700 dark:hover:text-brand-400"
-                  >
-                    {channel.value}
-                  </a>
-                )}
+                  {channel.href && channel.value && (
+                    <a
+                      href={channel.href}
+                      class="figure group mt-4 inline-flex items-baseline gap-1.5 break-words text-[0.9375rem] hover:text-signal-700 dark:hover:text-signal-500"
+                    >
+                      {channel.value}
+                      <ArrowUpRight
+                        aria-hidden="true"
+                        className="size-3.5 shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                      />
+                    </a>
+                  )}
 
-                {channel.where && (
-                  <div class="mt-4">
-                    <p class="label text-muted-foreground">{c.channels.whereLabel}</p>
-                    <p class="figure mt-1.5 text-[0.8125rem] leading-relaxed text-foreground">
-                      {channel.where}
-                    </p>
-                  </div>
-                )}
-
-                <p class="mt-5 text-[0.9375rem] leading-relaxed text-muted-foreground">
-                  {channel.body}
-                </p>
-
-                <div class="mt-auto border-t border-border pt-4">
-                  <p class="label text-muted-foreground">{channel.availabilityLabel}</p>
-                  {channel.availabilityLines.map((line) => (
-                    <p class="figure mt-1.5 text-xs text-foreground">{line}</p>
-                  ))}
-                  <p class="mt-2 text-sm leading-relaxed text-muted-foreground">{channel.note}</p>
+                  {channel.where && (
+                    <div class="mt-4">
+                      <p class="label text-muted-foreground">{c.channels.whereLabel}</p>
+                      <p class="mt-1.5 text-[0.8125rem] leading-relaxed">{channel.where}</p>
+                    </div>
+                  )}
                 </div>
-              </div>
+
+                <div>
+                  <p class="text-[0.9375rem] leading-relaxed text-muted-foreground">
+                    {channel.body}
+                  </p>
+                  <p class="label mt-6 text-muted-foreground">{c.channels.repliesLabel}</p>
+                  <p class="mt-2 text-sm leading-relaxed">{channel.note}</p>
+                </div>
+              </li>
             ))
           }
-        </div>
+        </ul>
+
+        {/* THE FRAMED SPECIMEN. The photograph used to run full-bleed as its
+            own band, which made it the loudest thing on a page whose argument
+            is a table. In the frame it is what it should be — evidence for the
+            sentence beside it, mounted the way the whole site is mounted. */}
+        <figure class="panel mt-16 bg-background p-2">
+          <div class="overflow-hidden rounded-lg">
+            <Image
+              src={contactImage}
+              alt={c.plate.alt}
+              widths={[768, 1280, 1920]}
+              sizes="(min-width: 1024px) 62rem, 100vw"
+              class="aspect-[4/3] w-full object-cover sm:aspect-[21/9]"
+              loading="lazy"
+            />
+          </div>
+          <figcaption class="flex flex-col gap-3 px-4 py-5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8">
+            <p class="max-w-2xl text-sm leading-relaxed text-muted-foreground">
+              <span class="label mr-2 text-signal-700 dark:text-signal-500">{c.plate.label}</span>
+              {fill(c.plate.caption)}
+            </p>
+          </figcaption>
+        </figure>
       </div>
     </section>
 
-    {/* The plate: one wide band of photography with a cutline, rather than a
-        scrim over a headline — the page already has a dark band and this is
-        not a hero. */}
-    <section class="bg-background">
-      <div class="aspect-[4/3] w-full sm:aspect-[21/9]">
-        <Image
-          src={contactImage}
-          alt={c.plate.alt}
-          widths={[768, 1280, 1920]}
-          sizes="100vw"
-          class="h-full w-full object-cover"
-          loading="lazy"
-        />
-      </div>
-      <div class="shell py-6">
-        <div class="flex flex-col gap-3 sm:flex-row sm:items-baseline sm:justify-between">
-          <p class="max-w-2xl text-sm leading-relaxed text-muted-foreground">
-            <span class="label mr-2 text-brand-700 dark:text-brand-400">{c.plate.label}</span>
-            {fill(c.plate.caption)}
-          </p>
-          <p class="figure shrink-0 text-xs text-muted-foreground">{weekdayHours}</p>
-        </div>
-      </div>
-    </section>
-
-    {/* Routing. This table is the page. */}
-    <section class="border-b border-brand-50/10 bg-brand-800 py-16 text-brand-50 sm:py-20">
+    {/* Routing. This table is the page, and it gets the page's one slab. */}
+    <section class="slab on-slab section">
       <div class="shell">
-        <div class="max-w-3xl">
-          <p class="label text-brand-300">{c.routing.eyebrow}</p>
-          <h2 class="display-2 mt-4 text-brand-50">{c.routing.title}</h2>
-          <p class="mt-4 max-w-2xl text-[1.0625rem] leading-relaxed text-brand-50/65">
-            {c.routing.lead}
-          </p>
-        </div>
+        <SectionHead
+          on="slab"
+          eyebrow={c.routing.eyebrow}
+          title={c.routing.title}
+          lead={c.routing.lead}
+        />
 
         {/* sm and up: the table. */}
-        <div class="mt-10 hidden sm:block">
+        <div class="reveal mt-12 hidden sm:block">
           <table class="w-full border-collapse text-left">
             <thead>
               <tr class="border-y border-brand-50/15">
-                <th scope="col" class="label w-[34%] py-3 pr-6 text-brand-50/60">
+                <th scope="col" class="label w-[34%] py-3 pr-6 text-brand-50/70">
                   {c.routing.header.topic}
                 </th>
-                <th scope="col" class="label w-[20%] py-3 pr-6 text-brand-50/60">
+                <th scope="col" class="label w-[20%] py-3 pr-6 text-brand-50/70">
                   {c.routing.header.party}
                 </th>
-                <th scope="col" class="label py-3 text-brand-50/60">{c.routing.header.how}</th>
+                <th scope="col" class="label py-3 text-brand-50/70">{c.routing.header.how}</th>
               </tr>
             </thead>
             <tbody>
@@ -313,12 +337,12 @@ const hasAddress = Boolean(site.addressStreet && site.addressCountryCode);
                   >
                     <th scope="row" class="py-5 pr-6 font-normal">
                       <span class="subhead inline text-brand-50">{row.topic}</span>
-                      {row.symbols && <sup class="ml-0.5 text-brand-300">{row.symbols}</sup>}
+                      {row.symbols && <sup class="ml-0.5 text-signal-500">{row.symbols}</sup>}
                     </th>
                     <td class="py-5 pr-6">
                       <span class="flex items-baseline gap-2">
                         {row.urgent && (
-                          <TriangleAlert className="mt-0.5 size-4 shrink-0 text-brand-300" />
+                          <TriangleAlert className="mt-0.5 size-4 shrink-0 text-brand-50" />
                         )}
                         <span
                           class:list={[
@@ -330,7 +354,7 @@ const hasAddress = Boolean(site.addressStreet && site.addressCountryCode);
                         </span>
                       </span>
                     </td>
-                    <td class="py-5 text-[0.9375rem] leading-relaxed text-brand-50/60">{row.how}</td>
+                    <td class="py-5 text-[0.9375rem] leading-relaxed text-brand-50/70">{row.how}</td>
                   </tr>
                 ))
               }
@@ -339,7 +363,7 @@ const hasAddress = Boolean(site.addressStreet && site.addressCountryCode);
         </div>
 
         {/* Below sm: the same three fields, stacked. */}
-        <dl class="mt-10 flex flex-col sm:hidden">
+        <dl class="reveal mt-12 flex flex-col sm:hidden">
           {
             routingRows.map((row) => (
               <div
@@ -350,19 +374,19 @@ const hasAddress = Boolean(site.addressStreet && site.addressCountryCode);
               >
                 <dt class="subhead text-brand-50">
                   {row.topic}
-                  {row.symbols && <sup class="ml-0.5 text-brand-300">{row.symbols}</sup>}
+                  {row.symbols && <sup class="ml-0.5 text-signal-500">{row.symbols}</sup>}
                 </dt>
                 <dd class="mt-2.5">
                   <span
                     class:list={[
-                      "flex items-baseline gap-2 text-brand-300",
+                      "flex items-baseline gap-2 text-brand-50",
                       row.partyIsFigure ? "figure text-base" : "subhead text-[0.9375rem]",
                     ]}
                   >
                     {row.urgent && <TriangleAlert className="size-4 shrink-0" />}
                     {row.party}
                   </span>
-                  <span class="mt-1.5 block text-sm leading-relaxed text-brand-50/60">
+                  <span class="mt-1.5 block text-sm leading-relaxed text-brand-50/70">
                     {row.how}
                   </span>
                 </dd>
@@ -371,7 +395,7 @@ const hasAddress = Boolean(site.addressStreet && site.addressCountryCode);
           }
         </dl>
 
-        <p class="mt-9 max-w-3xl border-t border-brand-50/12 pt-6 text-sm leading-relaxed text-brand-50/55">
+        <p class="mt-10 max-w-3xl border-t border-brand-50/12 pt-6 text-sm leading-relaxed text-brand-50/70">
           {c.routing.note}
         </p>
       </div>
@@ -379,22 +403,23 @@ const hasAddress = Boolean(site.addressStreet && site.addressCountryCode);
 
     <section class="bg-background section">
       <div class="shell">
-        <div class="max-w-3xl">
-          <p class="label text-brand-700 dark:text-brand-400">{c.response.eyebrow}</p>
-          <h2 class="display-2 mt-4">{c.response.title}</h2>
-          <p class="lead mt-4">{c.response.lead}</p>
-        </div>
+        <SectionHead
+          eyebrow={c.response.eyebrow}
+          title={c.response.title}
+          lead={c.response.lead}
+        />
 
-        <table class="mt-10 w-full border-collapse text-left">
+        {/* sm and up: what / when / detail. */}
+        <table class="reveal mt-12 hidden w-full border-collapse text-left sm:table">
           <thead>
             <tr class="border-y border-border">
               <th scope="col" class="label py-3 pr-4 text-muted-foreground">
                 {c.response.header.what}
               </th>
-              <th scope="col" class="label py-3 pr-4 text-muted-foreground sm:w-[11rem] sm:pr-8">
+              <th scope="col" class="label w-[11rem] py-3 pr-8 text-muted-foreground">
                 {c.response.header.when}
               </th>
-              <th scope="col" class="label hidden py-3 text-muted-foreground sm:table-cell">
+              <th scope="col" class="label py-3 text-muted-foreground">
                 {c.response.header.detail}
               </th>
             </tr>
@@ -405,25 +430,42 @@ const hasAddress = Boolean(site.addressStreet && site.addressCountryCode);
                 <tr class="border-b border-border align-top">
                   <th scope="row" class="py-5 pr-4 font-normal">
                     <span class="subhead">{row.what}</span>
-                    {/* Below sm the detail column is dropped, so it rides
-                        under the row label instead of being lost. */}
-                    <span class="mt-1.5 block text-sm leading-relaxed text-muted-foreground sm:hidden">
-                      {row.detail}
-                    </span>
                   </th>
-                  <td class="figure py-5 pr-4 text-[0.8125rem] text-signal-700 sm:pr-8 dark:text-signal-500">
+                  {/* Amber, because this column is the only thing on the page
+                      that measures time — which is the whole of what the
+                      signal colour is allowed to mean. */}
+                  <td class="figure py-5 pr-8 text-[0.8125rem] text-signal-700 dark:text-signal-500">
                     {row.when}
                   </td>
-                  <td class="hidden py-5 text-sm leading-relaxed text-muted-foreground sm:table-cell">
-                    {row.detail}
-                  </td>
+                  <td class="py-5 text-sm leading-relaxed text-muted-foreground">{row.detail}</td>
                 </tr>
               ))
             }
           </tbody>
         </table>
 
-        <p class="mt-8 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+        {/* Below sm: the same three fields as a definition list. Three columns
+            at 360px is twelve characters wide, and dropping one of them loses
+            the window the row exists to publish. */}
+        <dl class="reveal mt-12 flex flex-col sm:hidden">
+          {
+            responseRows.map((row) => (
+              <div class="border-t border-border py-5">
+                <dt class="subhead">{row.what}</dt>
+                <dd>
+                  <span class="figure mt-2 block text-[0.9375rem] text-signal-700 dark:text-signal-500">
+                    {row.when}
+                  </span>
+                  <span class="mt-1.5 block text-sm leading-relaxed text-muted-foreground">
+                    {row.detail}
+                  </span>
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+
+        <p class="mt-9 max-w-3xl text-sm leading-relaxed text-muted-foreground">
           {c.response.note}
         </p>
       </div>
@@ -432,10 +474,10 @@ const hasAddress = Boolean(site.addressStreet && site.addressCountryCode);
     <section class="bg-card section">
       <div class="shell">
         <div class="grid gap-10 lg:grid-cols-[1fr_22rem] lg:gap-14">
-          <div>
-            <p class="label text-brand-700 dark:text-brand-400">{c.office.eyebrow}</p>
+          <div class="reveal">
+            <p class="label text-signal-700 dark:text-signal-500">{c.office.eyebrow}</p>
             <h2 class="display-2 mt-4">{c.office.title}</h2>
-            <p class="lead mt-4">{c.office.body}</p>
+            <p class="lead mt-5">{c.office.body}</p>
             <p class="mt-5 max-w-2xl text-sm leading-relaxed text-muted-foreground">
               {c.office.postNote}
             </p>
@@ -445,7 +487,7 @@ const hasAddress = Boolean(site.addressStreet && site.addressCountryCode);
             hasAddress && (
               <aside class="panel h-fit bg-background p-6">
                 <p class="label text-muted-foreground">{c.office.addressLabel}</p>
-                <address class="figure mt-3 text-[0.9375rem] not-italic leading-relaxed text-foreground">
+                <address class="figure mt-3 text-[0.9375rem] leading-relaxed not-italic">
                   <span class="block">{site.legalName}</span>
                   <span class="block">{site.addressStreet}</span>
                   <span class="block">
@@ -453,18 +495,12 @@ const hasAddress = Boolean(site.addressStreet && site.addressCountryCode);
                   </span>
                 </address>
 
-                <div class="mt-5 border-t border-border pt-4">
-                  <p class="label text-muted-foreground">{c.office.hoursLabel}</p>
-                  <p class="figure mt-1.5 text-xs text-foreground">{weekdayHours}</p>
-                  <p class="figure mt-1 text-xs text-foreground">{weekendHours}</p>
-                </div>
-
                 {site.mapHref && (
                   <a
                     href={site.mapHref}
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-brand-700 dark:text-brand-400"
+                    class="mt-6 inline-flex items-center gap-2 border-t border-hairline pt-5 text-sm font-semibold text-foreground hover:text-signal-700 dark:hover:text-signal-500"
                   >
                     <MapPin className="size-4" />
                     {c.office.mapCta}

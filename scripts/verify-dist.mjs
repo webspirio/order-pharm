@@ -3,7 +3,15 @@
  *
  * Hard failures (always): missing/duplicate canonical, incomplete or
  * non-reciprocal hreflang, unparseable JSON-LD, unresolved @id references,
- * missing sitemap entries, internal links to pages that were not built.
+ * structured data that contradicts what the pages say, a page missing any of
+ * the compliance footnotes, page text hidden behind an inline opacity: 0, a
+ * class string the rebuild retired, missing sitemap entries, internal links to
+ * pages that were not built.
+ *
+ * The four content checks are here rather than in a lint rule because none of
+ * them is visible in source: a dropped footnote band, a motion block that was
+ * never hydrated and an old utility class all typecheck, render and pass a
+ * unit test. Built output is the only place they exist.
  *
  * Placeholder content is a hard failure only once the site has been configured
  * (canonical origin is no longer https://example.com). An unconfigured template
@@ -18,6 +26,58 @@ const DIST = fileURLToPath(new URL("../dist/", import.meta.url));
 const PLACEHOLDER_ORIGIN = "https://example.com";
 const PLACEHOLDER_PATTERNS = [/example\.com/i, /\bAcme\b/, /TODO\(owner\)/];
 
+/**
+ * Class strings the rebuild retired. Each was a real value in the system that
+ * came before it — a 72rem container beside the 64rem `.shell`, the 3px
+ * control radius beside the 12/24px pair, the `glow-*` ramp before it became
+ * `signal-*` — so each is one copied line away from returning, and none of
+ * them breaks a type, a test or a render on the way back in.
+ *
+ * Matched against whole class tokens rather than against the page source: a
+ * build that inlines a stylesheet also inlines Tailwind's generated
+ * `.max-w-6xl{}` rule, and a substring scan would then fail a page that never
+ * uses the class.
+ */
+const RETIRED_CLASSES = [
+  {
+    pattern: /^max-w-6xl$/,
+    instead: "`shell` — one outer container width, 64rem (DESIGN-SYSTEM.md §4)",
+  },
+  {
+    pattern: /^rounded-\[3px\]$/,
+    instead: "`rounded-lg` for controls, `rounded-2xl` / `.panel` for surfaces",
+  },
+  {
+    pattern: /(?:^|-)glow-/,
+    instead: "`signal-*` — and `text-signal-700 dark:text-signal-500` where it is type on paper",
+  },
+];
+
+/**
+ * schema.org types that would assert, in machine-readable form, the one claim
+ * every page on this site disclaims. `src/config/site.ts` argues the choice of
+ * `Organization`; this is what stops a later editor "improving" it to
+ * something that sounds more medical, where no reader would ever see the
+ * change and every crawler would.
+ */
+const FORBIDDEN_SCHEMA_TYPES = new Set([
+  "MedicalBusiness",
+  "MedicalOrganization",
+  "MedicalClinic",
+  "Pharmacy",
+  "Physician",
+  "Drug",
+  "MedicalTherapy",
+  "DietarySupplement",
+]);
+
+/**
+ * How much of a footnote has to match. Long enough that two notes cannot
+ * collide, short enough that an editorial tweak to the tail of a sentence
+ * fails review rather than failing the build.
+ */
+const NOTE_PREFIX_CHARS = 40;
+
 const errors = [];
 const warnings = [];
 
@@ -28,6 +88,71 @@ if (!existsSync(DIST)) {
   console.error("dist/ not found — run `pnpm build` first.");
   process.exit(1);
 }
+
+/**
+ * The compliance rules this gate enforces are read from the dictionary, never
+ * copied into this file — a copy would drift, and a drifted gate is worse than
+ * no gate because it reports success.
+ *
+ * `src/i18n/en/common.ts` is plain JavaScript in a .ts file (no annotations,
+ * no imports), so Node loads it directly with type stripping, which is on by
+ * default from Node 22.18 and in the Node 24 that `.nvmrc` pins. If it ever
+ * stops loading, that is a hard stop rather than a skipped check.
+ */
+let common;
+try {
+  common = (await import(new URL("../src/i18n/en/common.ts", import.meta.url).href)).default;
+} catch (error) {
+  console.error(
+    "could not load src/i18n/en/common.ts, so the compliance checks have no " +
+      "rules to check against:\n" +
+      `  ${error.message}\n` +
+      "  Node 22.18+ and Node 24 strip TypeScript types on import; on an " +
+      "older Node, run this script with --experimental-strip-types.",
+  );
+  process.exit(1);
+}
+
+/** Collapse whitespace, so a text comparison survives compressHTML, source
+    line wrapping and any future reformat of the dictionary. */
+const squash = (value) => value.replace(/\s+/g, " ").trim();
+
+// Astro escapes five characters on the way out — & < > " ' — and everything
+// else, the em dashes and the ® and the § included, ships as literal UTF-8.
+// Decoding by hand rather than reaching into the parser keeps the substitution
+// visible and, more importantly, ordered: &amp; has to go last, or the text
+// "&amp;lt;" would decode twice and come out as "<". (&apos; is here for
+// tolerance; Astro emits the numeric form.)
+const ENTITIES = { "&lt;": "<", "&gt;": ">", "&quot;": '"', "&#39;": "'", "&apos;": "'" };
+const decodeEntities = (value) =>
+  value
+    .replace(/&(?:lt|gt|quot|#39|apos);/g, (entity) => ENTITIES[entity])
+    .replace(/&amp;/g, "&");
+
+/**
+ * A page's visible text, as one collapsed line.
+ *
+ * Deliberately not the DOM: the alternative is removing every <script> and
+ * <style> from the shared parse tree, which the checks that run after this one
+ * still need. Stripping tags can only ever ADD text to the haystack (an
+ * unescaped ">" inside an attribute leaks that attribute in), never remove it,
+ * so it cannot turn a present footnote into a missing one.
+ */
+const visibleText = (html) =>
+  squash(
+    decodeEntities(
+      html
+        .replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi, " ")
+        .replace(/<!--[\s\S]*?-->/g, " ")
+        .replace(/<[^>]+>/g, " "),
+    ),
+  );
+
+const footnotes = common.compliance.notes.map((note) => ({
+  symbol: note.symbol,
+  prefix: squash(note.text).slice(0, NOTE_PREFIX_CHARS),
+}));
+const gatingSentence = squash(common.gating.short);
 
 /** Every .html file in dist/, as paths relative to dist/. */
 function htmlFiles(dir = DIST, prefix = "") {
@@ -151,6 +276,46 @@ for (const page of pages) {
     };
     collect(data);
 
+    /**
+     * The structured data has to say the same thing the footer says, and the
+     * two ways it stops doing that are both one word in someone else's file:
+     * a @type that asserts Ellery practises medicine or dispenses, and an
+     * Offer whose description has lost the clinician-decides condition.
+     *
+     * The second is the reason `src/i18n/en/programs.ts` says its `desc` is
+     * "written to survive being read out of context" — SeoHead reads that copy
+     * straight into `hasOfferCatalog`, so an editor tightening a card's
+     * description also edits what every crawler is told the offer is.
+     */
+    const audit = (node) => {
+      if (Array.isArray(node)) return node.forEach(audit);
+      if (!node || typeof node !== "object") return;
+      // @type is legally a string or an array of them.
+      const types = [].concat(node["@type"] ?? []);
+      for (const type of types) {
+        if (FORBIDDEN_SCHEMA_TYPES.has(type)) {
+          fail(
+            `${where} JSON-LD block ${index} declares @type "${type}" — Ellery ` +
+              "administers, and neither practises medicine nor dispenses " +
+              "(src/config/site.ts explains the Organization choice)",
+          );
+        }
+      }
+      if (types.includes("Offer")) {
+        const described = squash(String(node.itemOffered?.description ?? ""));
+        if (!described.includes(gatingSentence)) {
+          fail(
+            `${where} JSON-LD block ${index}: the offer ` +
+              `"${node.itemOffered?.name ?? "(unnamed)"}" does not carry ` +
+              "common.gating.short — an offer described without the condition " +
+              "is an offer of medication (src/i18n/en/programs.ts)",
+          );
+        }
+      }
+      for (const value of Object.values(node)) audit(value);
+    };
+    audit(data);
+
     for (const [key, value] of Object.entries(data)) {
       if (value === null) fail(`${where} JSON-LD block ${index} has a null value for "${key}"`);
     }
@@ -211,6 +376,81 @@ for (const page of pages) {
       const message = `${where} contains placeholder content matching ${pattern}`;
       if (configured) fail(message);
       else warn(message);
+    }
+  }
+
+  /* --- the compliance footnotes ---------------------------------------- */
+  // The band that resolves every superscript on the site belongs on EVERY
+  // route, and until now that rule lived only in prose — which is how /404
+  // came to ship none of them. A route without the band is a route where a
+  // symbol in the copy above it points at nothing, and an asterisk that
+  // resolves nowhere is the cheapest-looking thing a site in this category
+  // can do. It is also invisible to a typecheck: the band is a component
+  // someone forgets to render, not a call someone gets wrong.
+  const lang = root.querySelector("html")?.getAttribute("lang") ?? "";
+  if (!lang.startsWith("en")) {
+    // One locale ships today, so there is one note set. When a second is
+    // added, `footnotes` becomes a map keyed by lang — and a page whose
+    // language has no registered set must fail here rather than be skipped,
+    // or adding a locale quietly exempts fourteen new routes from the rule.
+    fail(`${where} <html lang="${lang}"> has no registered compliance-note set`);
+  } else {
+    const text = visibleText(page.html);
+    const missing = footnotes.filter((note) => !text.includes(note.prefix));
+    if (missing.length > 0) {
+      fail(
+        `${where} is missing ${missing.length} of ${footnotes.length} compliance ` +
+          `footnotes — ${missing.map((note) => note.symbol).join(" ")} — every ` +
+          "route renders the whole band (src/i18n/en/common.ts → compliance.notes)",
+      );
+    }
+  }
+
+  /* --- content hidden at build time ------------------------------------- */
+  // A React block lifted from a motion-driven library and rendered in .astro
+  // WITHOUT a client:* directive does not animate. It serialises its `initial`
+  // state into the markup and stays there, so the section ships as static HTML
+  // frozen at opacity 0: it renders, it validates, it typechecks, and nobody
+  // sees it. DESIGN-SYSTEM.md §5 names this as the trap; this is the tripwire.
+  //
+  // Two exemptions, both legitimate. Inside an <astro-island> a directive will
+  // hydrate the element and animate it in. Inside <noscript>, invisibility is
+  // the point. And only elements that actually carry text are flagged — an
+  // opacity-0 wrapper around a decorative SVG loses a reader nothing.
+  for (const el of root.querySelectorAll("[style]")) {
+    const style = el.getAttribute("style") ?? "";
+    if (!/(?:^|;)\s*opacity\s*:\s*0(?:\.0+)?\s*(?:;|$)/.test(style)) continue;
+    if (el.text.trim() === "") continue;
+
+    let animatable = false;
+    for (let node = el.parentNode; node; node = node.parentNode) {
+      const tag = node.rawTagName?.toLowerCase();
+      if (tag === "astro-island" || tag === "noscript") {
+        animatable = true;
+        break;
+      }
+    }
+    if (animatable) continue;
+
+    fail(
+      `${where} <${el.rawTagName}> hides page text behind an inline ` +
+        `opacity: 0 with nothing to reveal it — "${squash(el.text).slice(0, 60)}…" ` +
+        "(hydrate it, or strip the motion and use .reveal, whose base state is " +
+        "its final state)",
+    );
+  }
+
+  /* --- classes the rebuild retired --------------------------------------- */
+  // Reported once per distinct token per page: /start/ alone carried nineteen
+  // of one of them, and nineteen identical lines would bury the other errors.
+  const retiredSeen = new Set();
+  for (const el of root.querySelectorAll("[class]")) {
+    for (const token of (el.getAttribute("class") ?? "").split(/\s+/)) {
+      if (token === "" || retiredSeen.has(token)) continue;
+      const retired = RETIRED_CLASSES.find((entry) => entry.pattern.test(token));
+      if (!retired) continue;
+      retiredSeen.add(token);
+      fail(`${where} ships the retired class "${token}" — use ${retired.instead}`);
     }
   }
 }

@@ -1,9 +1,31 @@
 ---
 /**
- * Three article cards on the homepage.
+ * Three articles on the homepage — deliberately NOT the /learn/ index grid.
+ *
+ * WHY ROWS AND NOT CARDS. This section and the /learn/ index were the same
+ * three cards in the same 3-up grid, which meant a reader who followed the
+ * link arrived at the page they had just looked at. blog-11 answers this by
+ * giving its secondary items hairline-divided rows rather than cards, and that
+ * is the honest form here for a second reason: a preview's job is to say what
+ * exists, not to sell each piece. A row carries the category, the length and
+ * the title — everything needed to decide — in a quarter of the height, and
+ * the index keeps the cards.
+ *
+ * NO DEK, and that is a compliance decision as much as an editorial one.
+ * `articles[].dek` carries hedged longevity wording ("may support", "what the
+ * evidence supports, and where it stops"). Every card treatment in the
+ * reference blocks clamps the dek to two or three lines, and a clamp that cuts
+ * a hedge mid-clause changes the claim. Dropping the dek here rather than
+ * truncating it is the only version of this row that cannot mis-state an
+ * article.
+ *
+ * THE LINK WRAPS THE TITLE ONLY. `after:absolute after:inset-0` stretches the
+ * hit area over the whole row, so the accessible name stays the title instead
+ * of becoming "Comparison 9 min read Semaglutide vs tirzepatide…". The arrow
+ * is decoration and is hidden from assistive tech.
  *
  * Reads the first three entries of `d.learn.articles`, which is the same array
- * /learn/ paginates and each article page renders from — so a card cannot
+ * /learn/ paginates and each article page renders from — so a row cannot
  * advertise a title or read-time the article itself does not have.
  *
  * Thumbnails are matched by index rather than named per article, because the
@@ -16,7 +38,8 @@ import { Image } from "astro:assets";
 import learn01 from "@/assets/learn-01.jpg";
 import learn02 from "@/assets/learn-02.jpg";
 import learn03 from "@/assets/learn-03.jpg";
-import { ArrowRight } from "lucide-react";
+import SectionHead from "@/components/SectionHead.astro";
+import { ArrowUpRight } from "lucide-react";
 
 interface Props {
   locale: Locale;
@@ -36,50 +59,55 @@ const cards = d.learn.articles.slice(0, 3).map((article, index) => ({
 
 <section id={anchors.learn} class="bg-card section">
   <div class="shell">
-    <div class="flex flex-wrap items-end justify-between gap-6">
-      <div class="max-w-2xl">
-        <p class="label text-brand-700 dark:text-brand-400">{d.home.learn.eyebrow}</p>
-        <h2 class="display-2 mt-4">{d.home.learn.title}</h2>
-        <p class="lead mt-4">{d.home.learn.lead}</p>
-      </div>
-      <a
-        href={localizedPath(locale, "/learn/")}
-        class="inline-flex items-center gap-2 text-sm font-semibold text-brand-700 dark:text-brand-400"
-      >
-        {d.home.learn.cta}
-        <ArrowRight className="size-4" />
-      </a>
-    </div>
+    <SectionHead
+      eyebrow={d.home.learn.eyebrow}
+      title={d.home.learn.title}
+      lead={d.home.learn.lead}
+      actionHref={localizedPath(locale, "/learn/")}
+      actionLabel={d.home.learn.cta}
+    />
 
-    <ul class="mt-12 grid gap-6 md:grid-cols-3 lg:gap-8">
+    <ul class="reveal mt-12 border-b border-border lg:mt-16">
       {
         cards.map((card) => (
-          <li>
-            <a href={card.href} class="panel group flex h-full flex-col overflow-hidden bg-background">
-              <div class="aspect-[16/10] overflow-hidden">
-                <Image
-                  src={card.image}
-                  alt=""
-                  widths={[400, 640, 800]}
-                  sizes="(min-width: 768px) 22rem, 100vw"
-                  class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                  loading="lazy"
-                />
-              </div>
-              <div class="flex flex-1 flex-col p-6">
-                <p class="label flex items-center gap-3 text-muted-foreground">
-                  <span class="text-brand-700 dark:text-brand-400">{card.category}</span>
-                  <span aria-hidden="true">·</span>
-                  <span class="figure font-normal tracking-normal">
-                    {card.readMinutes} {d.home.learn.readTime}
-                  </span>
-                </p>
-                <h3 class="subhead mt-3 text-[1.0625rem]">{card.title}</h3>
-                <p class="mt-2.5 flex-1 text-sm leading-relaxed text-muted-foreground">
-                  {card.dek}
-                </p>
-              </div>
-            </a>
+          <li
+            class="group relative grid grid-cols-[5rem_1fr_auto] items-center gap-4 border-t border-border py-5 sm:grid-cols-[7rem_1fr_auto] sm:gap-6 sm:py-6"
+          >
+            <div class="aspect-[4/3] overflow-hidden rounded-lg bg-muted">
+              <Image
+                src={card.image}
+                alt=""
+                widths={[160, 224, 320]}
+                sizes="(min-width: 640px) 7rem, 5rem"
+                class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                loading="lazy"
+              />
+            </div>
+
+            <div class="min-w-0">
+              <p class="label flex flex-wrap items-center gap-x-3 gap-y-1 text-muted-foreground">
+                <span class="text-signal-700 dark:text-signal-500">{card.category}</span>
+                <span aria-hidden="true">·</span>
+                {/* The read time is a figure the reader is deciding on, so it
+                    is mono like every other number on the site. */}
+                <span class="figure font-normal tracking-normal">
+                  {card.readMinutes} {d.home.learn.readTime}
+                </span>
+              </p>
+              <h3 class="subhead mt-2">
+                <a
+                  href={card.href}
+                  class="transition-colors after:absolute after:inset-0 group-hover:text-signal-700 dark:group-hover:text-signal-500"
+                >
+                  {card.title}
+                </a>
+              </h3>
+            </div>
+
+            <ArrowUpRight
+              className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+              aria-hidden="true"
+            />
           </li>
         ))
       }

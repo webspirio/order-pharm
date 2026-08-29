@@ -16,14 +16,33 @@
  * a designed block ON the page, not a link with a dead anchor, which is the
  * single cheapest tell in this category.
  *
- * Grounds alternate background / card, with the eligibility band fixed dark
- * in the middle. Every figure comes from `src/config/pricing.ts`.
+ * WHAT THE REBUILD CHANGED, and why:
+ *
+ * - The head block's three figures are now hero-20's editorial metric strip:
+ *   one rule above, one below, hairline dividers between. Three bordered
+ *   cards read as three claims; a divided strip reads as one instrument,
+ *   which is what a page of measurements should open with.
+ * - The photograph is framed rather than bled — a card whose padding is
+ *   visible frame and whose inner radius steps down by exactly the inset.
+ *   The frame is also where the "not a patient, not a result" line goes,
+ *   which is the one thing a stock photograph on a weight-loss page has to say.
+ * - Every table is wrapped in the panel chassis with an `sr-only` caption, and
+ *   the monthly-equivalent column carries a `bg-muted` tint running to the
+ *   panel edge: the tint says "this is the column to compare on", which is the
+ *   only comparison this page actually wants a reader to make.
+ * - The eligibility band is now `slab on-slab` rather than a raw `bg-brand-800`
+ *   with its own paddings, and it is the page's ONE dark band.
+ *
+ * Grounds alternate background / card. Every figure comes from
+ * `src/config/pricing.ts`.
  */
 import { type Locale, t, localizedPath } from "@/i18n";
 import Layout from "@/layouts/Layout.astro";
 import SeoHead from "@/components/SeoHead.astro";
 import TrustTicker from "@/components/sections/TrustTicker.astro";
 import Header from "@/components/sections/Header.astro";
+import Headline from "@/components/Headline.astro";
+import SectionHead from "@/components/SectionHead.astro";
 import Ladder from "@/components/sections/Ladder.astro";
 import Faq from "@/components/sections/Faq.astro";
 import Cta from "@/components/sections/Cta.astro";
@@ -98,6 +117,15 @@ const thresholds = w.eligibility.thresholds.map((item, index) => ({
   ...item,
   value: thresholdValues[index],
 }));
+
+/**
+ * The one link treatment on the page, shared with `SectionHead.astro`'s
+ * trailing action so a cross-link inside a section body and a cross-link in a
+ * section head are the same object. Hover recolours to the signal and the
+ * arrow nudges — the reference template's row affordance, at no JS cost.
+ */
+const crossLink =
+  "group inline-flex items-center gap-2 text-[0.9375rem] font-semibold text-foreground transition-colors hover:text-signal-700 dark:hover:text-signal-500";
 ---
 
 <Layout locale={locale} title={d.meta.weightLoss.title} description={d.meta.weightLoss.description}>
@@ -106,58 +134,92 @@ const thresholds = w.eligibility.thresholds.map((item, index) => ({
 
   <main id="main" tabindex="-1" class="outline-none">
     {/* ---------------------------------------------------------------
-        HEADER BLOCK. Left transparent so the page wash shows through it,
-        which is what keeps an inner page from opening as a white slab. The
-        photograph is a 21/9 band under the type rather than a full-bleed
-        hero: the figures are the thing to read first here.
+        HEAD BLOCK. Left on the page ground rather than given a surface of
+        its own, which is what keeps an inner page from opening as a slab.
+        The h1 carries the page's single Fraunces word; the metric strip
+        and the framed photograph close the block, and the ticker rail
+        below it is the join to the rest of the page.
         --------------------------------------------------------------- */}
-    <section class="page-top pb-14 sm:pb-16">
+    <section class="page-top pb-16 sm:pb-20">
       <div class="shell">
-        <p class="label text-brand-700 dark:text-brand-400">{w.header.eyebrow}</p>
-        <h1 class="display-1 mt-5 max-w-4xl">{w.header.title}</h1>
+        <p class="label text-signal-700 dark:text-signal-500">{w.header.eyebrow}</p>
+
+        <Headline
+          as="h1"
+          reveal
+          text={w.header.title}
+          accent={w.header.titleAccent}
+          class="display-1 mt-5 max-w-4xl"
+        />
+
         <p class="lead mt-6 text-lg">{w.header.lead}</p>
 
-        <div class="mt-8 flex flex-wrap items-center gap-3">
-          <a href={localizedPath(locale, "/start/")} class="btn-solid">
-            {w.header.ctaPrimary}
-            <ArrowRight className="size-4" />
+        <div class="mt-9 flex flex-wrap items-center gap-3">
+          {/* The page's one `.btn-split`. The header pill carries the other,
+              which is the whole two-per-page budget. */}
+          <a href={localizedPath(locale, "/start/")} class="btn-split">
+            <span class="btn-split-label">{w.header.ctaPrimary}</span>
+            <span class="btn-split-tile"><ArrowRight className="size-5" /></span>
           </a>
           <a href={localizedPath(locale, "/pricing/")} class="btn-outline">
             {w.header.ctaSecondary}
           </a>
         </div>
 
-        <h2 class="label mt-12 text-muted-foreground">{w.header.figuresLabel}</h2>
-        <dl class="mt-5 grid gap-x-8 gap-y-7 sm:grid-cols-3">
+        {/* The gating sentence sits in the first screen, not in a footnote.
+            A program page that implies a prescription has failed before the
+            reader reaches a price. */}
+        <p class="mt-7 max-w-2xl text-sm text-muted-foreground">
+          {d.gating.short}<sup class="figure ml-0.5">*</sup>
+        </p>
+
+        {/* THE METRIC STRIP — hero-20's editorial device. Rules above and
+            below, hairline dividers between, and no card. Each cell is a
+            `dt`/`dd` pair in DOM order (the spec allows dt-then-dd inside a
+            `dl > div` and nothing else) with `flex-col-reverse` putting the
+            figure on top, where the eye wants it. */}
+        <h2 class="label mt-14 text-muted-foreground" id="wl-figures">{w.header.figuresLabel}</h2>
+        <dl
+          aria-labelledby="wl-figures"
+          class="mt-5 grid gap-y-8 border-y border-border py-8 sm:grid-cols-3 sm:gap-y-0 sm:divide-x sm:divide-border"
+        >
           {
             headerFigures.map((item) => (
-              <div class="border-t border-border pt-4">
-                <dd class="figure text-2xl text-foreground sm:text-[1.75rem]">{item.value}</dd>
-                <dt class="mt-2">
+              <div class="flex flex-col-reverse justify-end gap-2 sm:px-7 sm:first:pl-0 sm:last:pr-0">
+                <dt>
                   <span class="subhead block text-[0.9375rem]">{item.label}</span>
                   <span class="mt-1 block text-sm text-muted-foreground">{item.note}</span>
                 </dt>
+                <dd class="figure text-2xl text-foreground sm:text-[1.75rem]">{item.value}</dd>
               </div>
             ))
           }
         </dl>
 
-        <p class="mt-7 max-w-2xl text-sm text-muted-foreground">
-          {d.gating.short}<sup class="ml-0.5">*</sup>
-        </p>
-
-        <div
-          class="mt-10 aspect-[16/9] overflow-hidden rounded-lg border border-border sm:aspect-[21/9]"
-        >
-          <Image
-            src={weightLossHero}
-            alt={w.header.imageAlt}
-            widths={[640, 1024, 1440, 1920]}
-            sizes="(min-width: 1152px) 68rem, 100vw"
-            class="h-full w-full object-cover object-[50%_28%]"
-            loading="lazy"
-          />
-        </div>
+        {/* FRAMED MEDIA. The reference template's device: the card's padding
+            is visible frame, and the inner radius steps down by exactly the
+            inset so the two curves stay concentric. The value is derived from
+            `--radius-card`, not a new radius — change the token and the frame
+            still resolves. The caption is on the frame rather than over the
+            photograph, because a disclosure set over an image is a disclosure
+            you have chosen to make hard to read. */}
+        <figure class="panel mt-12 bg-card p-2">
+          <div
+            class="aspect-[16/9] overflow-hidden rounded-[calc(var(--radius-card)-0.5rem)] sm:aspect-[21/9]"
+          >
+            <Image
+              src={weightLossHero}
+              alt={w.header.imageAlt}
+              widths={[640, 1024, 1440, 1920]}
+              sizes="(min-width: 1152px) 66rem, 100vw"
+              class="h-full w-full object-cover object-[50%_28%]"
+              loading="lazy"
+            />
+          </div>
+          <figcaption class="figure px-3 pt-4 pb-2 text-xs text-muted-foreground">
+            {w.header.imageNote}
+          </figcaption>
+        </figure>
       </div>
     </section>
 
@@ -172,13 +234,15 @@ const thresholds = w.eligibility.thresholds.map((item, index) => ({
         --------------------------------------------------------------- */}
     <section class="bg-card section">
       <div class="shell">
-        <div class="max-w-3xl">
-          <p class="label text-brand-700 dark:text-brand-400">{w.ladder.eyebrow}</p>
-          <h2 class="display-2 mt-4">{w.ladder.title}</h2>
-          <p class="lead mt-4">{w.ladder.lead}</p>
-        </div>
+        <SectionHead
+          eyebrow={w.ladder.eyebrow}
+          title={w.ladder.title}
+          lead={w.ladder.lead}
+          actionHref={localizedPath(locale, "/learn/semaglutide-vs-tirzepatide/")}
+          actionLabel={w.ladder.cta}
+        />
 
-        <div class="mt-10 grid gap-6 lg:grid-cols-2 lg:gap-8">
+        <div class="reveal mt-12 grid gap-6 lg:grid-cols-2 lg:gap-8">
           <Ladder
             molecule="semaglutide"
             caption={w.ladder.captions.semaglutide}
@@ -193,16 +257,9 @@ const thresholds = w.eligibility.thresholds.map((item, index) => ({
           />
         </div>
 
-        <p class="mt-8 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+        <p class="mt-9 max-w-3xl border-t border-border pt-6 text-sm leading-relaxed text-muted-foreground">
           {w.ladder.caveat}
         </p>
-        <a
-          href={localizedPath(locale, "/learn/semaglutide-vs-tirzepatide/")}
-          class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-brand-700 dark:text-brand-400"
-        >
-          {w.ladder.cta}
-          <ArrowRight className="size-4" />
-        </a>
       </div>
     </section>
 
@@ -213,99 +270,104 @@ const thresholds = w.eligibility.thresholds.map((item, index) => ({
         --------------------------------------------------------------- */}
     <section class="bg-background section">
       <div class="shell">
-        <div class="max-w-3xl">
-          <p class="label text-brand-700 dark:text-brand-400">{w.treatments.eyebrow}</p>
-          <h2 class="display-2 mt-4">{w.treatments.title}</h2>
-          <p class="lead mt-4">{w.treatments.lead}</p>
+        <SectionHead
+          eyebrow={w.treatments.eyebrow}
+          title={w.treatments.title}
+          lead={w.treatments.lead}
+          actionHref={localizedPath(locale, "/pricing/")}
+          actionLabel={w.treatments.cta}
+        />
+
+        {/* The panel chassis, borrowed from comparison-5: the surface radius
+            wraps the table rather than the table pretending to be a card, so
+            the header rule and the last row are clipped by the same curve.
+            No `overflow-x-auto` here on purpose — a scrollable region needs a
+            tab stop to satisfy 2.1.1, and the honest fix for four columns on a
+            390px screen is the definition list below, not a sideways drag. */}
+        <div class="panel reveal mt-12 hidden overflow-hidden sm:block">
+          <table class="w-full border-collapse text-left">
+            <caption class="sr-only">{w.treatments.caption}</caption>
+            <thead>
+              <tr class="border-b border-border">
+                <th scope="col" class="label px-6 py-4 text-muted-foreground">
+                  {w.treatments.header.preparation}
+                </th>
+                <th scope="col" class="label px-4 py-4 text-right text-muted-foreground">
+                  {w.treatments.header.oneMonth}
+                </th>
+                <th scope="col" class="label px-4 py-4 text-right text-muted-foreground">
+                  {w.treatments.header.threeMonth}
+                </th>
+                {/* The tinted column. The tint is the only comparison this
+                    page wants made — two preparations against each other on
+                    the figure that is actually comparable — and it runs to the
+                    panel edge, so it reads as a column rather than a cell. */}
+                <th scope="col" class="label bg-muted px-6 py-4 text-right text-muted-foreground">
+                  {w.treatments.header.equivalent}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                priceRows.map((row) => (
+                  <tr class="border-b border-hairline align-top last:border-b-0">
+                    <th scope="row" class="px-6 py-6 font-normal">
+                      <span class="subhead">
+                        {row.display}
+                        <sup class="figure ml-0.5 font-normal text-muted-foreground">‡§</sup>
+                      </span>
+                      <span class="mt-1.5 block max-w-md text-sm leading-relaxed text-muted-foreground">
+                        {row.detail}
+                      </span>
+                      <span class="figure mt-1 block text-xs text-muted-foreground">
+                        {row.cadence}
+                      </span>
+                    </th>
+                    <td class="figure px-4 py-6 text-right text-base whitespace-nowrap">
+                      {row.oneMonth}
+                    </td>
+                    <td class="figure px-4 py-6 text-right text-base whitespace-nowrap">
+                      {row.threeMonth}
+                    </td>
+                    <td class="figure bg-muted px-6 py-6 text-right text-base whitespace-nowrap">
+                      {row.equivalent}
+                    </td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
         </div>
 
-        <table class="mt-10 hidden w-full border-collapse text-left sm:table">
-          <thead>
-            <tr class="border-y border-border">
-              <th scope="col" class="label py-3 pr-4 text-muted-foreground">
-                {w.treatments.header.preparation}
-              </th>
-              <th scope="col" class="label py-3 pr-4 text-right text-muted-foreground">
-                {w.treatments.header.oneMonth}
-              </th>
-              <th scope="col" class="label py-3 pr-4 text-right text-muted-foreground">
-                {w.treatments.header.threeMonth}
-              </th>
-              <th scope="col" class="label py-3 text-right text-muted-foreground">
-                {w.treatments.header.equivalent}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {
-              priceRows.map((row) => (
-                <tr class="border-b border-border align-top">
-                  <th scope="row" class="py-5 pr-6 font-normal">
-                    <span class="subhead">
-                      {row.display}
-                      <sup class="ml-0.5 font-normal text-muted-foreground">‡§</sup>
-                    </span>
-                    <span class="mt-1.5 block text-sm leading-relaxed text-muted-foreground">
-                      {row.detail}
-                    </span>
-                    <span class="figure mt-1 block text-xs text-muted-foreground">
-                      {row.cadence}
-                    </span>
-                  </th>
-                  <td class="figure py-5 pr-4 text-right text-base whitespace-nowrap">
-                    {row.oneMonth}
-                  </td>
-                  <td class="figure py-5 pr-4 text-right text-base whitespace-nowrap">
-                    {row.threeMonth}
-                  </td>
-                  <td
-                    class="figure py-5 text-right text-base whitespace-nowrap text-brand-700 dark:text-brand-400"
-                  >
-                    {row.equivalent}
-                  </td>
-                </tr>
-              ))
-            }
-          </tbody>
-        </table>
-
         {/* Below sm: four columns of figures becomes one card per preparation. */}
-        <div class="mt-8 flex flex-col gap-4 sm:hidden">
+        <div class="reveal mt-10 flex flex-col gap-4 sm:hidden">
           {
             priceRows.map((row) => (
               <div class="panel p-5">
                 <h3 class="subhead">
                   {row.display}
-                  <sup class="ml-0.5 font-normal text-muted-foreground">‡§</sup>
+                  <sup class="figure ml-0.5 font-normal text-muted-foreground">‡§</sup>
                 </h3>
                 <p class="mt-1.5 text-sm leading-relaxed text-muted-foreground">{row.detail}</p>
                 <p class="figure mt-1 text-xs text-muted-foreground">{row.cadence}</p>
                 <dl class="mt-4 grid grid-cols-3 gap-3 border-t border-border pt-4">
-                  <div>
-                    <dt
-                      class="label min-h-[1.75rem] text-[0.5625rem] tracking-[0.06em] text-muted-foreground"
-                    >
+                  <div class="flex flex-col-reverse justify-end gap-1.5">
+                    <dt class="label min-h-[1.75rem] text-[0.5625rem] tracking-[0.06em] text-muted-foreground">
                       {w.treatments.header.oneMonth}
                     </dt>
-                    <dd class="figure mt-1.5 text-[0.9375rem]">{row.oneMonth}</dd>
+                    <dd class="figure text-[0.9375rem]">{row.oneMonth}</dd>
                   </div>
-                  <div>
-                    <dt
-                      class="label min-h-[1.75rem] text-[0.5625rem] tracking-[0.06em] text-muted-foreground"
-                    >
+                  <div class="flex flex-col-reverse justify-end gap-1.5">
+                    <dt class="label min-h-[1.75rem] text-[0.5625rem] tracking-[0.06em] text-muted-foreground">
                       {w.treatments.header.threeMonth}
                     </dt>
-                    <dd class="figure mt-1.5 text-[0.9375rem]">{row.threeMonth}</dd>
+                    <dd class="figure text-[0.9375rem]">{row.threeMonth}</dd>
                   </div>
-                  <div>
-                    <dt
-                      class="label min-h-[1.75rem] text-[0.5625rem] tracking-[0.06em] text-muted-foreground"
-                    >
+                  <div class="flex flex-col-reverse justify-end gap-1.5">
+                    <dt class="label min-h-[1.75rem] text-[0.5625rem] tracking-[0.06em] text-muted-foreground">
                       {w.treatments.header.equivalent}
                     </dt>
-                    <dd class="figure mt-1.5 text-[0.9375rem] text-brand-700 dark:text-brand-400">
-                      {row.equivalent}
-                    </dd>
+                    <dd class="figure text-[0.9375rem]">{row.equivalent}</dd>
                   </div>
                 </dl>
               </div>
@@ -313,25 +375,35 @@ const thresholds = w.eligibility.thresholds.map((item, index) => ({
           }
         </div>
 
-        <div class="mt-10 grid gap-8 lg:grid-cols-[1fr_22rem] lg:gap-12">
-          <div>
-            <h3 class="label text-muted-foreground">{w.treatments.feesLabel}</h3>
-            <dl class="mt-4 grid gap-x-8 gap-y-5 sm:grid-cols-2">
+        {/* The two fee lines, and — in the column a competitor reserves for an
+            upsell — the argument for buying less. The aside sticks, so the
+            "buy one month first" sentence stays beside the figures the reader
+            is weighing rather than scrolling away from them. */}
+        <div class="mt-14 grid gap-10 lg:grid-cols-[1fr_20rem] lg:gap-14">
+          <div class="reveal">
+            <h3 class="label text-muted-foreground" id="wl-fees">{w.treatments.feesLabel}</h3>
+            <dl
+              aria-labelledby="wl-fees"
+              class="mt-5 grid gap-x-10 gap-y-6 border-y border-border py-7 sm:grid-cols-2 sm:gap-y-0 sm:divide-x sm:divide-border"
+            >
               {
                 feeRows.map((row) => (
-                  <div class="border-t border-border pt-4">
-                    <dd class="figure text-xl text-foreground">
-                      {row.value}
-                      {row.symbol && <sup class="ml-0.5 text-muted-foreground">{row.symbol}</sup>}
-                    </dd>
-                    <dt class="mt-2">
+                  <div class="flex flex-col-reverse justify-end gap-2 sm:px-7 sm:first:pl-0 sm:last:pr-0">
+                    <dt>
                       <span class="subhead block text-[0.9375rem]">{row.label}</span>
                       <span class="mt-1 block text-sm text-muted-foreground">{row.note}</span>
                     </dt>
+                    <dd class="figure text-xl text-foreground">
+                      {row.value}
+                      {row.symbol && (
+                        <sup class="figure ml-0.5 text-xs text-muted-foreground">{row.symbol}</sup>
+                      )}
+                    </dd>
                   </div>
                 ))
               }
             </dl>
+
             <p class="mt-6 max-w-2xl text-sm leading-relaxed text-muted-foreground">
               {w.treatments.note}
             </p>
@@ -339,27 +411,16 @@ const thresholds = w.eligibility.thresholds.map((item, index) => ({
               {d.gating.long}
             </p>
 
-            <div class="mt-7 flex flex-wrap items-center gap-x-8 gap-y-3">
-              <a
-                href={localizedPath(locale, "/pricing/")}
-                class="inline-flex items-center gap-2 text-sm font-semibold text-brand-700 dark:text-brand-400"
-              >
-                {w.treatments.cta}
-                <ArrowRight className="size-4" />
-              </a>
-              <a
-                href={localizedPath(locale, "/learn/glp-1-cost-without-insurance/")}
-                class="inline-flex items-center gap-2 text-sm font-semibold text-brand-700 dark:text-brand-400"
-              >
-                {w.treatments.ctaSecondary}
-                <ArrowRight className="size-4" />
-              </a>
-            </div>
+            <a
+              href={localizedPath(locale, "/learn/glp-1-cost-without-insurance/")}
+              class:list={["mt-7", crossLink]}
+            >
+              {w.treatments.ctaSecondary}
+              <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+            </a>
           </div>
 
-          {/* The argue-against-buying panel, in the place a competitor would
-              put an upsell. */}
-          <aside class="panel h-fit p-6">
+          <aside class="panel h-fit p-6 lg:sticky lg:top-28">
             <p class="label text-muted-foreground">{w.treatments.hedgeLabel}</p>
             <p class="mt-4 text-sm leading-relaxed text-muted-foreground">{w.treatments.hedge}</p>
           </aside>
@@ -370,47 +431,57 @@ const thresholds = w.eligibility.thresholds.map((item, index) => ({
     {/* ---------------------------------------------------------------
         BRAND-NAME ALTERNATIVES. Named, priced as a range because the
         pharmacy sets it, with the trademark note attached.
+
+        COMPLIANCE, and this is the section that has to get it right: these
+        two are the FDA-approved products and the compounded preparations
+        are not. They therefore live in their own section, under their own
+        heading, on their own surface, and the registered marks carry ‖ on
+        first and prominent use. Nothing here may read as a sibling of a
+        compounded row.
         --------------------------------------------------------------- */}
     <section class="bg-card section">
       <div class="shell">
-        <div class="grid gap-10 lg:grid-cols-[1fr_24rem] lg:gap-14">
-          <div>
-            <p class="label text-brand-700 dark:text-brand-400">{w.brands.eyebrow}</p>
-            <h2 class="display-2 mt-4">{w.brands.title}</h2>
-            <p class="lead mt-4">{w.brands.lead}</p>
+        <SectionHead eyebrow={w.brands.eyebrow} title={w.brands.title} lead={w.brands.lead} />
 
-            <table class="mt-9 w-full border-collapse text-left">
-              <thead>
-                <tr class="border-y border-border">
-                  <th scope="col" class="label py-3 pr-4 text-muted-foreground">
-                    {w.brands.header.product}
-                  </th>
-                  <th scope="col" class="label py-3 text-right text-muted-foreground">
-                    {w.brands.header.cost}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {
-                  brandRows.map((row) => (
-                    <tr class="border-b border-border align-top">
-                      <th scope="row" class="py-5 pr-4 font-normal">
-                        <span class="subhead">
-                          {row.display}
-                          <sup class="ml-0.5 font-normal text-muted-foreground">‖</sup>
-                        </span>
-                        <span class="mt-1.5 block text-sm text-muted-foreground">
-                          {row.molecule}
-                        </span>
-                      </th>
-                      <td class="figure py-5 text-right text-base whitespace-nowrap">{row.range}</td>
-                    </tr>
-                  ))
-                }
-              </tbody>
-            </table>
+        <div class="mt-12 grid gap-8 lg:grid-cols-[1fr_20rem] lg:gap-12">
+          <div class="reveal">
+            <div class="panel overflow-hidden bg-background">
+              <table class="w-full border-collapse text-left">
+                <caption class="sr-only">{w.brands.caption}</caption>
+                <thead>
+                  <tr class="border-b border-border">
+                    <th scope="col" class="label px-6 py-4 text-muted-foreground">
+                      {w.brands.header.product}
+                    </th>
+                    <th scope="col" class="label px-6 py-4 text-right text-muted-foreground">
+                      {w.brands.header.cost}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {
+                    brandRows.map((row) => (
+                      <tr class="border-b border-hairline align-top last:border-b-0">
+                        <th scope="row" class="px-6 py-6 font-normal">
+                          <span class="subhead">
+                            {row.display}
+                            <sup class="figure ml-0.5 font-normal text-muted-foreground">‖</sup>
+                          </span>
+                          <span class="mt-1.5 block text-sm text-muted-foreground">
+                            {row.molecule}
+                          </span>
+                        </th>
+                        <td class="figure px-6 py-6 text-right text-base whitespace-nowrap">
+                          {row.range}
+                        </td>
+                      </tr>
+                    ))
+                  }
+                </tbody>
+              </table>
+            </div>
 
-            <p class="mt-5 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+            <p class="mt-6 max-w-2xl text-sm leading-relaxed text-muted-foreground">
               {d.gating.short}
             </p>
             <p class="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground">
@@ -418,12 +489,16 @@ const thresholds = w.eligibility.thresholds.map((item, index) => ({
             </p>
           </div>
 
-          <div class="flex flex-col gap-6 lg:pt-2">
-            <div class="panel bg-background p-6">
-              <p class="mt-0 text-sm leading-relaxed text-muted-foreground">{w.brands.candour}</p>
+          {/* Two surfaces, one column: the recessed panel is the concession
+              (these cost several times more), the plain paragraph beneath it
+              is the trademark notice. Keeping them visually distinct stops
+              the notice reading as part of the argument. */}
+          <div class="reveal flex flex-col gap-6">
+            <div class="panel-flat p-6">
+              <p class="text-sm leading-relaxed text-muted-foreground">{w.brands.candour}</p>
             </div>
             <p class="text-sm leading-relaxed text-muted-foreground">
-              {w.brands.note}<sup class="ml-0.5">‖</sup>
+              {w.brands.note}<sup class="figure ml-0.5">‖</sup>
             </p>
           </div>
         </div>
@@ -431,42 +506,43 @@ const thresholds = w.eligibility.thresholds.map((item, index) => ({
     </section>
 
     {/* ---------------------------------------------------------------
-        ELIGIBILITY — the fixed-dark band, and the section that argues
-        against buying. Thresholds as figures, then the two lists that
-        actually answer "would they take me".
+        ELIGIBILITY — the page's ONE dark band, and the section that argues
+        against buying. Thresholds as a metric strip, then the two lists
+        that actually answer "would they take me".
         --------------------------------------------------------------- */}
-    <section class="border-b border-brand-50/10 bg-brand-800 py-16 text-brand-50 sm:py-20">
+    <section class="slab on-slab section">
       <div class="shell">
-        <div class="max-w-3xl">
-          <p class="label text-brand-300">{w.eligibility.eyebrow}</p>
-          <h2 class="display-2 mt-4 text-brand-50">{w.eligibility.title}</h2>
-          <p class="mt-4 max-w-2xl text-[1.0625rem] leading-relaxed text-brand-50/65">
-            {w.eligibility.lead}<sup class="ml-0.5 text-brand-50/60">*</sup>
-          </p>
-        </div>
+        <SectionHead
+          on="slab"
+          eyebrow={w.eligibility.eyebrow}
+          title={w.eligibility.title}
+          lead={w.eligibility.lead}
+        />
 
-        <dl class="mt-10 grid gap-x-8 gap-y-7 sm:grid-cols-3">
+        <dl
+          class="reveal mt-12 grid gap-y-8 border-y border-brand-50/12 py-8 sm:grid-cols-3 sm:gap-y-0 sm:divide-x sm:divide-brand-50/12"
+        >
           {
             thresholds.map((item) => (
-              <div class="border-t border-brand-50/15 pt-4">
-                <dd class="figure text-3xl text-brand-50">{item.value}</dd>
-                <dt class="mt-2">
+              <div class="flex flex-col-reverse justify-end gap-2 sm:px-7 sm:first:pl-0 sm:last:pr-0">
+                <dt>
                   <span class="subhead block text-[0.9375rem] text-brand-50">{item.label}</span>
-                  <span class="mt-1 block text-sm text-brand-50/60">{item.note}</span>
+                  <span class="mt-1 block text-sm text-brand-50/70">{item.note}</span>
                 </dt>
+                <dd class="figure text-2xl text-brand-50 sm:text-[1.75rem]">{item.value}</dd>
               </div>
             ))
           }
         </dl>
 
-        <div class="mt-12 grid gap-10 md:grid-cols-2 md:gap-14">
+        <div class="reveal mt-14 grid gap-10 md:grid-cols-2 md:gap-14">
           <div>
-            <h3 class="label text-brand-300">{w.eligibility.countsTitle}</h3>
-            <ul class="mt-4 flex flex-col">
+            <h3 class="label text-signal-500">{w.eligibility.countsTitle}</h3>
+            <ul class="mt-5 flex flex-col divide-y divide-brand-50/12 border-y border-brand-50/12">
               {
                 Object.values(d.programs.conditions).map((item) => (
-                  <li class="flex items-start gap-3 border-t border-brand-50/12 py-3 text-[0.9375rem] text-brand-50/85">
-                    <Check className="mt-1 size-3.5 shrink-0 text-brand-300" />
+                  <li class="flex items-start gap-3 py-3.5 text-[0.9375rem] text-brand-50/70">
+                    <Check className="mt-1 size-3.5 shrink-0 text-signal-500" />
                     <span>{item}</span>
                   </li>
                 ))
@@ -474,12 +550,12 @@ const thresholds = w.eligibility.thresholds.map((item, index) => ({
             </ul>
           </div>
           <div>
-            <h3 class="label text-brand-300">{w.eligibility.rulesOutTitle}</h3>
-            <ul class="mt-4 flex flex-col">
+            <h3 class="label text-signal-500">{w.eligibility.rulesOutTitle}</h3>
+            <ul class="mt-5 flex flex-col divide-y divide-brand-50/12 border-y border-brand-50/12">
               {
                 w.eligibility.rulesOut.map((item) => (
-                  <li class="flex items-start gap-3 border-t border-brand-50/12 py-3 text-[0.9375rem] text-brand-50/85">
-                    <X className="mt-1 size-3.5 shrink-0 text-brand-50/60" />
+                  <li class="flex items-start gap-3 py-3.5 text-[0.9375rem] text-brand-50/70">
+                    <X className="mt-1 size-3.5 shrink-0 text-brand-50/70" />
                     <span>{item}</span>
                   </li>
                 ))
@@ -488,9 +564,9 @@ const thresholds = w.eligibility.thresholds.map((item, index) => ({
           </div>
         </div>
 
-        <div class="panel-invert mt-12 flex flex-col gap-5 p-6 sm:flex-row sm:items-start sm:gap-8">
+        <div class="panel-invert reveal mt-12 flex flex-col gap-5 p-6 sm:flex-row sm:items-start sm:gap-8 sm:p-8">
           <div class="shrink-0">
-            <p class="label text-brand-300">{w.eligibility.refundLabel}</p>
+            <p class="label text-signal-500">{w.eligibility.refundLabel}</p>
             <p class="figure mt-2 text-2xl text-brand-50">{usd(fees.visit)}</p>
           </div>
           <p class="max-w-2xl text-sm leading-relaxed text-brand-50/70">{w.eligibility.closing}</p>
@@ -503,52 +579,50 @@ const thresholds = w.eligibility.thresholds.map((item, index) => ({
         the category's cheap version of this is an anchor that goes
         nowhere. The side-effect content is a table because it genuinely
         pairs a symptom with an action.
+
+        The § footnote rides on the boxed warning rather than on the
+        section heading: `SectionHead` takes a plain string, and a symbol
+        is better placed on the sentence it qualifies than on a heading
+        four paragraphs above it. It also resolves on every price row and
+        on both Ladder charts, so the page carries it three times over.
         --------------------------------------------------------------- */}
     <section class="bg-card section">
       <div class="shell">
-        <div class="max-w-3xl">
-          <p class="label text-brand-700 dark:text-brand-400">{w.safety.eyebrow}</p>
-          <h2 class="display-2 mt-4">
-            {w.safety.title}<sup class="ml-1 text-base text-muted-foreground">§</sup>
-          </h2>
-          <p class="lead mt-4">{w.safety.lead}</p>
-        </div>
+        <SectionHead eyebrow={w.safety.eyebrow} title={w.safety.title} lead={w.safety.lead} />
 
-        <div class="panel mt-10 flex gap-4 bg-background p-6 sm:p-7">
-          <TriangleAlert className="mt-0.5 size-5 shrink-0 text-signal-500" />
+        <div class="panel reveal mt-12 flex gap-4 bg-background p-6 sm:p-8">
+          <TriangleAlert className="mt-0.5 size-5 shrink-0 text-signal-700 dark:text-signal-500" />
           <div>
-            <h3 class="label text-signal-700 dark:text-signal-500">{w.safety.warningLabel}</h3>
+            <h3 class="label text-signal-700 dark:text-signal-500">
+              {w.safety.warningLabel}<sup class="figure ml-0.5">§</sup>
+            </h3>
             <p class="mt-3 max-w-3xl text-[0.9375rem] leading-relaxed text-foreground">
               {w.safety.warning}
             </p>
           </div>
         </div>
 
-        <div class="mt-6 grid gap-6 md:grid-cols-2">
-          <div class="panel bg-background p-6">
+        <div class="reveal mt-6 grid gap-6 md:grid-cols-2">
+          <div class="panel bg-background p-6 sm:p-7">
             <h3 class="subhead">{w.safety.contraindicationsTitle}</h3>
-            <ul class="mt-4 flex flex-col">
+            <ul class="mt-5 flex flex-col divide-y divide-hairline border-y border-hairline">
               {
                 w.safety.contraindications.map((item) => (
-                  <li class="flex items-start gap-3 border-t border-border py-3 text-sm leading-relaxed text-muted-foreground">
-                    <X className="mt-1 size-3.5 shrink-0 text-foreground/50" />
+                  <li class="flex items-start gap-3 py-3.5 text-sm leading-relaxed text-muted-foreground">
+                    <X className="mt-1 size-3.5 shrink-0 text-muted-foreground" />
                     <span>{item}</span>
                   </li>
                 ))
               }
             </ul>
-            <p
-              class="mt-4 border-t border-border pt-4 text-sm leading-relaxed text-muted-foreground"
-            >
-              {w.safety.note}
-            </p>
+            <p class="mt-5 text-sm leading-relaxed text-muted-foreground">{w.safety.note}</p>
           </div>
-          <div class="panel bg-background p-6">
+          <div class="panel bg-background p-6 sm:p-7">
             <h3 class="subhead">{w.safety.urgentTitle}</h3>
-            <ul class="mt-4 flex flex-col">
+            <ul class="mt-5 flex flex-col divide-y divide-hairline border-y border-hairline">
               {
                 w.safety.urgent.map((item) => (
-                  <li class="flex items-start gap-3 border-t border-border py-3 text-sm leading-relaxed text-muted-foreground">
+                  <li class="flex items-start gap-3 py-3.5 text-sm leading-relaxed text-muted-foreground">
                     <TriangleAlert className="mt-1 size-3.5 shrink-0 text-signal-700 dark:text-signal-500" />
                     <span>{item}</span>
                   </li>
@@ -558,44 +632,48 @@ const thresholds = w.eligibility.thresholds.map((item, index) => ({
           </div>
         </div>
 
-        <h3 class="display-3 mt-14">{w.safety.effectsTitle}</h3>
+        <h3 class="display-3 mt-16">{w.safety.effectsTitle}</h3>
 
-        <table class="mt-6 hidden w-full border-collapse text-left sm:table">
-          <thead>
-            <tr class="border-y border-border">
-              <th scope="col" class="label w-[38%] py-3 pr-6 text-muted-foreground">
-                {w.safety.effectsHeader.effect}
-              </th>
-              <th scope="col" class="label py-3 text-muted-foreground">
-                {w.safety.effectsHeader.action}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {
-              w.safety.effects.map((row) => (
-                <tr class="border-b border-border align-top">
-                  <th scope="row" class="py-5 pr-6 font-normal">
-                    <span class="subhead text-[0.9375rem]">{row.effect}</span>
-                  </th>
-                  <td class="py-5 text-sm leading-relaxed text-muted-foreground">{row.action}</td>
-                </tr>
-              ))
-            }
-          </tbody>
-        </table>
+        <div class="panel reveal mt-6 hidden overflow-hidden bg-background sm:block">
+          <table class="w-full border-collapse text-left">
+            <caption class="sr-only">{w.safety.effectsCaption}</caption>
+            <thead>
+              <tr class="border-b border-border">
+                <th scope="col" class="label w-[38%] px-6 py-4 text-muted-foreground">
+                  {w.safety.effectsHeader.effect}
+                </th>
+                <th scope="col" class="label px-6 py-4 text-muted-foreground">
+                  {w.safety.effectsHeader.action}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                w.safety.effects.map((row) => (
+                  <tr class="border-b border-hairline align-top last:border-b-0">
+                    <th scope="row" class="px-6 py-6 font-normal">
+                      <span class="subhead text-[0.9375rem]">{row.effect}</span>
+                    </th>
+                    <td class="px-6 py-6 text-sm leading-relaxed text-muted-foreground">
+                      {row.action}
+                    </td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
 
-        <dl class="mt-6 flex flex-col sm:hidden">
+        <dl class="reveal mt-6 flex flex-col divide-y divide-hairline border-y border-hairline sm:hidden">
           {
             w.safety.effects.map((row) => (
-              <div class="border-t border-border py-4">
+              <div class="py-4">
                 <dt class="subhead text-[0.9375rem]">{row.effect}</dt>
                 <dd class="mt-2 text-sm leading-relaxed text-muted-foreground">{row.action}</dd>
               </div>
             ))
           }
         </dl>
-
       </div>
     </section>
 

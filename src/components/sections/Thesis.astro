@@ -57,8 +57,19 @@ const d = t(locale);
 
 <noscript>
   <style>
-    /* Motion writes the initial `opacity: 0` inline during SSR. Without a
-       runtime to animate it away, the paragraph would never appear. */
+    /* Motion writes `opacity: 0` as an INLINE style during SSR, and without a
+       runtime to animate it away the paragraph would never appear. A
+       stylesheet rule only beats an inline declaration when it is
+       `!important`, which is why this is not merely `opacity: 1`.
+
+       This covers a reader with JavaScript disabled. It does NOT cover the
+       narrower case where JavaScript is enabled but the bundle fails to load
+       — there the noscript block is inert and the paragraph stays hidden.
+       That is a considered trade rather than an oversight: the alternative is
+       to SSR at `opacity: 1` and let hydration apply the hidden state, which
+       makes every reader who scrolls here watch the sentence appear, blur
+       out, and resolve again. The sentence itself is in the SSR HTML either
+       way, so crawlers and screen readers always have it. */
     .thesis-body span {
       opacity: 1 !important;
       filter: none !important;

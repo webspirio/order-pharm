@@ -12,11 +12,11 @@
  * the tab icon and the logotype are literally the same drawing rather than a
  * borrowed icon that nearly matches.
  *
- * Colours are the default palette's ("saline"). The site has three
+ * Colours are the default palette's ("specimen"). The site has three
  * runtime-switchable palettes (PaletteSwitcher.tsx); static files picked once
  * at build time cannot respond to that, so they are generated against the
  * default regardless of a visitor's choice. Re-run after changing the default
- * palette's brand-800 / glow-700 / brand-50 in src/styles/global.css.
+ * palette's brand-800 / brand-600 / signal-500 in src/styles/global.css.
  *
  * Usage: pnpm icons
  */
@@ -27,18 +27,23 @@ import sharp from "sharp";
 
 const OUT_DIR = fileURLToPath(new URL("../public/", import.meta.url));
 
-/* Default palette, "saline". Keep in sync with src/styles/global.css.
-   The sweep runs brand-800 -> brand-600, i.e. entirely within the petrol
-   ramp. An earlier version ran brand-800 -> glow-700 (amber) to reuse the
-   "one signature gradient" idea, and the two hues mixed through olive: the
-   midpoint of a desaturated teal and a warm brown is mud, and it read as a
-   printing error rather than a brand. Amber survives as ACCENT only — the
-   rule under the wordmark here, the ticks on the Relay — which is also what
-   keeps it legible as this site's colour for "clock". */
+/* Default palette, "specimen". Keep in sync with src/styles/global.css.
+
+   The sweep runs brand-800 -> brand-600, entirely within the petrol ramp. An
+   earlier version ran petrol -> amber to reuse the "one signature gradient"
+   idea, and the two hues mixed through olive: the midpoint of a desaturated
+   teal and a warm brown is mud, and it read as a printing error rather than a
+   brand. So the ground stays one hue and amber does what it does everywhere
+   else on the rebuilt site — it is the mark itself.
+
+   The stroke is amber rather than pale blue because that is what the header
+   logotype is now, and a tab icon that does not match the wordmark is a
+   different logo. #e8a33d on #0b2a31 is 7.0:1, which holds at 16px. */
 const GRADIENT_FROM = "#0b2a31"; // brand-800
-const GRADIENT_TO = "#25626f"; // brand-600
-const STROKE = "#ebf4f6"; // brand-50
-const ACCENT = "#d89c3e"; // glow-500
+const GRADIENT_TO = "#245f6c"; // brand-600
+const STROKE = "#e8a33d"; // signal-500 — the mark, matching the header
+const PAPER = "#ecf4f6"; // brand-50 — type on the share image
+const ACCENT = "#e8a33d"; // signal-500
 
 /**
  * The step path, in a 64x64 box with 14px of optical padding. Kept identical
@@ -103,9 +108,14 @@ console.log("wrote favicon.ico");
 /**
  * 1200x630 share image. The mark sits left of centre on the same gradient,
  * with the wordmark rendered as vector text — no font file is loaded, so the
- * letterforms are drawn from a generic serif stack by librsvg. That is
- * deliberate: embedding Fraunces here would mean shipping a font into a build
+ * letterforms are drawn from a generic stack by librsvg. That is deliberate:
+ * embedding Instrument Sans here would mean shipping a font into a build
  * script for one raster, and at 630px the difference is not visible.
+ *
+ * The stack is a GROTESQUE now, not a serif. The rebuild moved the headline
+ * role from Fraunces to Instrument Sans and reserved Fraunces for one italic
+ * accent word, so a serif wordmark here would be the only serif wordmark the
+ * brand has. Tracking is tightened to match `display-1`.
  */
 const OG_W = 1200;
 const OG_H = 630;
@@ -119,15 +129,15 @@ const ogSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${OG_W}" height="$
   </defs>
   <rect width="${OG_W}" height="${OG_H}" fill="url(#bg)"/>
   <g transform="translate(100,150) scale(3.0)">
-    <path d="${STEP_PATH}" fill="none" stroke="${STROKE}" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" transform="translate(-14,-15)"/>
+    <path d="${STEP_PATH}" fill="none" stroke="${STROKE}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" transform="translate(-14,-15)"/>
   </g>
-  <text x="100" y="418" fill="${STROKE}" font-family="Georgia, 'Times New Roman', serif" font-size="88" letter-spacing="-2.5">Ellery Health</text>
-  <rect x="102" y="452" width="60" height="3" fill="${ACCENT}"/>
-  <text x="100" y="510" fill="${STROKE}" fill-opacity="0.7" font-family="monospace" font-size="22" letter-spacing="3.2">LICENSED CLINICIANS. INDEPENDENT PHARMACIES.</text>
+  <text x="100" y="418" fill="${PAPER}" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="500" font-size="92" letter-spacing="-3.4">Ellery Health</text>
+  <rect x="102" y="454" width="96" height="4" fill="${ACCENT}"/>
+  <text x="100" y="512" fill="${PAPER}" fill-opacity="0.72" font-family="monospace" font-size="22" letter-spacing="3.2">LICENSED CLINICIANS. INDEPENDENT PHARMACIES.</text>
 </svg>`;
 
 const og = await sharp(Buffer.from(ogSvg)).jpeg({ quality: 88, mozjpeg: true }).toBuffer();
 await writeFile(path.join(OUT_DIR, "og-image.jpg"), og);
 console.log("wrote og-image.jpg");
 
-console.log("\nIcons generated from the four-step mark, default 'saline' palette.");
+console.log("\nIcons generated from the four-step mark, default 'specimen' palette.");

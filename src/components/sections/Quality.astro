@@ -1,21 +1,50 @@
 ---
 /**
- * The per-batch release panel.
+ * THE RELEASE PANEL — the lab work, in a two-surface bento.
  *
  * Almost nobody in this category publishes lab work, and it is the most direct
  * available answer to the compounded-pharmacy trust gap: the preparation is
  * genuinely not FDA-approved, so the honest move is not to soften that
  * sentence but to show what a licensed pharmacy CAN evidence instead. Citing
  * the USP chapter by number is what separates a quality claim from a quality
- * adjective.
+ * adjective, which is why the standard and the result never leave the same row
+ * — "Pass" on its own is an adjective again.
  *
- * Paired with the named pharmacies, because a release panel from an unnamed
- * facility evidences nothing.
+ * WHAT WAS PORTED. The shell of the reference template's `features-bento`, and
+ * only the shell: `gap-4`, one tall cell beside a stacked pair, and two
+ * genuinely different card surfaces so the group reads as an arrangement
+ * rather than as a row of equals. Everything inside that block was discarded —
+ * the phone mockups, the decorative concentric circles, the avatar stack, the
+ * emoji stat rows, and every `group-hover:scale-105`. A quality panel that
+ * grows when you point at it is the wrong register for the one section on the
+ * site whose whole job is to be checkable.
+ *
+ * The reference fills its lead bento cell with the accent colour. Not here:
+ * amber on this site means "this measures time", the homepage spends its one
+ * amber surface on the closing CTA, and an amber card behind a sterility test
+ * would make the accent decorative in the same gesture. The two surfaces are
+ * the raised panel and the recessed one, which the design system already has.
+ *
+ * THE FRAMED MEDIA is the reference's other idea worth taking: the photograph
+ * sits inset inside its own card rather than bleeding to the card's edge, with
+ * the inner radius stepped down from the outer one (24px frame, 10px of inset,
+ * so the inner corner wants ~14px and takes the nearest allowed value, 12px).
+ * An inset with a matching radius reads as a mistake; a stepped one reads as a
+ * mount.
+ *
+ * ACCESSIBILITY FIX carried in the rebuild: the batch table shipped with no
+ * mobile fallback, unlike Roles.astro, so at 320px three columns collapsed to
+ * unreadable wraps. It is now the site's standard pair — `hidden sm:block`
+ * table plus a `sm:hidden` definition list — and the result cell has moved off
+ * `.label` (11px letterspaced caps, a labelling face) onto `.figure`, because
+ * "Pass" is the value the row exists to deliver and it was being set smaller
+ * than the standard it passes against.
  */
 import { type Locale, t } from "@/i18n";
 import { batchPanel, partners } from "@/config/pricing";
 import { Image } from "astro:assets";
 import vial from "@/assets/vial.jpg";
+import SectionHead from "@/components/SectionHead.astro";
 
 interface Props {
   locale: Locale;
@@ -27,74 +56,117 @@ const d = t(locale);
 
 <section class="bg-card section">
   <div class="shell">
-    <div class="grid items-start gap-10 lg:grid-cols-2 lg:gap-14">
-      <div>
-        <p class="label text-brand-700 dark:text-brand-400">{d.home.quality.eyebrow}</p>
-        <h2 class="display-2 mt-4">{d.home.quality.title}</h2>
-        <p class="lead mt-4">{d.home.quality.lead}</p>
+    <SectionHead
+      eyebrow={d.home.quality.eyebrow}
+      title={d.home.quality.title}
+      lead={d.home.quality.lead}
+    />
 
-        <table class="mt-9 w-full border-collapse text-left">
-          <thead>
-            <tr class="border-y border-border">
-              <th scope="col" class="label py-3 pr-4 text-muted-foreground">
-                {d.home.quality.header.test}
-              </th>
-              <th scope="col" class="label py-3 pr-4 text-muted-foreground">
-                {d.home.quality.header.standard}
-              </th>
-              <th scope="col" class="label py-3 text-right text-muted-foreground">
-                {d.home.quality.header.result}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {
-              batchPanel.map((row) => (
-                <tr class="border-b border-border">
-                  <th scope="row" class="py-3.5 pr-4 text-[0.9375rem] font-medium">{row.test}</th>
-                  <td class="figure py-3.5 pr-4 text-sm text-muted-foreground">{row.standard}</td>
-                  <td class="label py-3.5 text-right text-brand-700 dark:text-brand-400">
-                    {row.result}
-                  </td>
-                </tr>
-              ))
-            }
-          </tbody>
-        </table>
+    {/* `lg:items-start` rather than the default stretch. The two cells hold
+        genuinely different amounts of content, and a stretched table cell puts
+        350px of empty card under the last test row — which reads as an
+        unfinished panel, where an unequal bottom edge just reads as a bento. */}
+    <div class="reveal mt-14 grid grid-cols-1 gap-4 sm:mt-16 lg:grid-cols-[1.4fr_1fr] lg:items-start">
+      {/* THE TALL CELL. `bg-background` and not the default `--card`: on a
+          bg-card band a white panel on a white ground has only its hairline
+          left, and the panel disappears. */}
+      <div class="panel bg-background p-6 sm:p-8">
+        {/* sm and up: the real table. */}
+        <div class="hidden sm:block">
+          <table class="w-full border-collapse text-left">
+            <thead>
+              <tr class="border-y border-border">
+                <th scope="col" class="label py-3 pr-4 text-muted-foreground">
+                  {d.home.quality.header.test}
+                </th>
+                <th scope="col" class="label py-3 pr-4 text-muted-foreground">
+                  {d.home.quality.header.standard}
+                </th>
+                <th scope="col" class="label py-3 text-right text-muted-foreground">
+                  {d.home.quality.header.result}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                batchPanel.map((row) => (
+                  <tr class="border-b border-hairline">
+                    <th scope="row" class="subhead py-3.5 pr-4">
+                      {row.test}
+                    </th>
+                    <td class="figure py-3.5 pr-4 text-sm text-muted-foreground">{row.standard}</td>
+                    <td class="figure py-3.5 text-right text-sm text-foreground">{row.result}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
 
-        <p class="mt-5 text-sm text-muted-foreground">{d.home.quality.note}</p>
+        {/* Below sm: the same three values per test, as a definition list. The
+            standard stays beside the result deliberately — separated, "Pass"
+            stops being evidence and becomes a quality adjective. */}
+        <dl class="flex flex-col sm:hidden">
+          {
+            batchPanel.map((row) => (
+              <div class="border-t border-hairline py-4 first:border-t-0 first:pt-0">
+                <dt class="subhead text-foreground">{row.test}</dt>
+                <dd class="mt-1.5 flex items-baseline justify-between gap-4">
+                  <span class="figure text-sm text-muted-foreground">{row.standard}</span>
+                  <span class="figure shrink-0 text-sm text-foreground">{row.result}</span>
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+
+        <p class="mt-6 text-sm leading-relaxed text-muted-foreground">
+          {d.home.quality.note}
+        </p>
       </div>
 
-      <div class="flex flex-col gap-6">
+      <div class="flex flex-col gap-4">
         {/* Fixed 4:3 box. The source is a 2000x3000 portrait, so an
             unconstrained `w-full` rendered it ~800px tall against a 650px text
             column — and most of those pixels were empty seamless ground. */}
-        <div class="aspect-[4/3] overflow-hidden rounded-lg border border-border">
-          <Image
-            src={vial}
-            alt="A single clear glass vial with a blank label, on a seamless neutral ground, lit from one side."
-            widths={[480, 768, 1024]}
-            sizes="(min-width: 1024px) 32rem, 100vw"
-            class="h-full w-full object-cover"
-            loading="lazy"
-          />
+        <div class="panel bg-background p-2.5">
+          <div class="aspect-[4/3] overflow-hidden rounded-lg">
+            <Image
+              src={vial}
+              alt="A single clear glass vial with a blank label, on a seamless neutral ground, lit from one side."
+              widths={[480, 768, 1024]}
+              sizes="(min-width: 1024px) 24rem, 100vw"
+              class="h-full w-full object-cover"
+              loading="lazy"
+            />
+          </div>
         </div>
 
-        <div class="panel bg-background p-6">
+        {/* The recessed surface, and the second half of the bento's two-card
+            idea. A release panel from an unnamed facility evidences nothing,
+            so the pharmacies are named here and nowhere else on this page. */}
+        <div class="panel-flat p-6">
           <h3 class="label text-muted-foreground">{d.home.quality.pharmaciesTitle}</h3>
-          <ul class="mt-4 flex flex-col divide-y divide-border">
+          {/* Rows of pairs — a name, and what kind of licence it holds — so a
+              definition list rather than a bulleted list of names with a suffix
+              stuck on. The value sits UNDER the term rather than opposite it:
+              "503B outsourcing facility · OH" is 28 characters of mono against
+              a two-word pharmacy name, and in a column this narrow the
+              justified version wrapped the name and ran the value to the
+              card's edge. */}
+          <dl class="mt-4 flex flex-col">
             {
               partners.pharmacies.map((pharmacy) => (
-                <li class="flex items-baseline justify-between gap-4 py-3 first:pt-0 last:pb-0">
-                  <span class="text-[0.9375rem] font-medium">{pharmacy.name}</span>
-                  <span class="figure shrink-0 text-xs text-muted-foreground">
+                <div class="border-t border-hairline py-3">
+                  <dt class="text-[0.9375rem] font-medium">{pharmacy.name}</dt>
+                  <dd class="figure mt-1 text-xs text-muted-foreground">
                     {pharmacy.kind} · {pharmacy.state}
-                  </span>
-                </li>
+                  </dd>
+                </div>
               ))
             }
-          </ul>
-          <p class="mt-4 border-t border-border pt-4 text-sm text-muted-foreground">
+          </dl>
+          <p class="mt-4 border-t border-border pt-4 text-sm leading-relaxed text-muted-foreground">
             {d.home.quality.pharmaciesNote}
           </p>
         </div>

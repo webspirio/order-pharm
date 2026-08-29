@@ -2,7 +2,7 @@
 /**
  * /faq/ — the complete question set, in named groups.
  *
- * THREE DECISIONS WORTH THE COMMENT.
+ * FOUR DECISIONS WORTH THE COMMENT.
  *
  * 1. ONE `FAQPage` BLOCK, EMITTED HERE. `Faq.astro` can emit its own, but
  *    this page renders eight instances of it, and eight FAQPage blocks
@@ -18,11 +18,22 @@
  *    the build instead of shipping a literal brace to a reader. Same
  *    mechanism as the trust ticker, same reason.
  *
- * 3. THE GROUP INDEX IS STICKY AT `lg`, and it is a real list of links rather
- *    than a scroll-spy island: twenty-seven questions is a page you navigate,
- *    and `section[id] { scroll-margin-top: 6rem }` in global.css already makes
- *    the anchors land clear of the sticky header. Below `lg` it is hidden —
- *    a jump list above a list is just the list twice.
+ * 3. THE GROUP INDEX IS A BOARD, NOT A STICKY RAIL — and that is the one
+ *    structural change in this rebuild. The rail lived in a grid column
+ *    beside the eight `Faq` sections, which meant nesting eight components
+ *    that each own a `.shell` inside another `.shell`: the page gutter
+ *    doubled, and the whole arrangement depended on `Faq.astro` never
+ *    changing its own geometry. A board of eight rows above the set is the
+ *    same information, costs nothing, and cannot break when the shared
+ *    component is restyled. `section[id] { scroll-margin-top: 7.5rem }` in
+ *    global.css already lands the anchors clear of the floating header.
+ *
+ * 4. THE CLOSE IS A CHANNEL LIST WITH NO INVENTED FIGURE. The block this is
+ *    taken from (react-bits faq-6) ships "Live chat · weekdays 9:00–18:00 ET"
+ *    and "replies in about two hours"; faq-9 ships "98% support CSAT". Ellery
+ *    has no live chat, and no constant in `pricing.ts` measures a reply time,
+ *    so neither claim is made. The hours are `d.footer.supportHours` — the
+ *    same string the footer prints, not a second copy of it.
  */
 import { type Locale, t, localizedPath } from "@/i18n";
 import { site } from "@/config/site";
@@ -31,13 +42,15 @@ import { coverageLabel, fees, partners, shipping, sla, usd,
 } from "@/config/pricing";
 import Layout from "@/layouts/Layout.astro";
 import SeoHead from "@/components/SeoHead.astro";
+import Headline from "@/components/Headline.astro";
+import SectionHead from "@/components/SectionHead.astro";
 import TrustTicker from "@/components/sections/TrustTicker.astro";
 import Header from "@/components/sections/Header.astro";
 import Faq from "@/components/sections/Faq.astro";
 import Cta from "@/components/sections/Cta.astro";
 import ComplianceBand from "@/components/sections/ComplianceBand.astro";
 import Footer from "@/components/sections/Footer.astro";
-import { ArrowRight, Phone } from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, Mail, Phone } from "lucide-react";
 
 interface Props {
   locale: Locale;
@@ -80,6 +93,10 @@ const groups = d.faq.groups.map((group, index) => ({
 
 const allItems = groups.flatMap((group) => group.items);
 
+/**
+ * Counted, not typed. The head says "27 questions" only for as long as there
+ * are twenty-seven of them in the dictionary.
+ */
 const headerFigures = [
   { value: String(allItems.length), label: d.faq.header.figures.questions },
   { value: `≤ ${sla.reviewHours} hrs`, label: d.faq.header.figures.review },
@@ -104,22 +121,36 @@ const faqJsonLd = {
   <main id="main" tabindex="-1" class="outline-none">
     <section class="bg-background page-top pb-14 sm:pb-16">
       <div class="shell">
-        <p class="label text-brand-700 dark:text-brand-400">{d.faq.header.eyebrow}</p>
-        <h1 class="display-1 mt-5 max-w-4xl">{d.faq.header.title}</h1>
+        <p class="label text-signal-700 dark:text-signal-500">{d.faq.header.eyebrow}</p>
+        <Headline
+          as="h1"
+          reveal
+          text={d.faq.header.title}
+          accent={d.faq.header.titleAccent}
+          class="display-1 mt-5 max-w-4xl"
+        />
         <p class="lead mt-6 text-lg">{d.faq.header.lead}</p>
 
+        {/* `dt` before `dd`, which is the order the spec asks for — the label
+            is the term and the counted figure is its definition. The mono
+            micro-label above a large figure is also how the figure stays the
+            loudest thing in the row without approaching the h1. */}
         <dl class="mt-10 grid max-w-3xl gap-x-8 gap-y-6 sm:grid-cols-3">
           {
             headerFigures.map((item) => (
               <div class="border-t border-border pt-4">
-                <dd class="figure text-2xl text-foreground">{item.value}</dd>
-                <dt class="mt-1.5 text-sm text-muted-foreground">{item.label}</dt>
+                <dt class="label text-muted-foreground">{item.label}</dt>
+                <dd class="figure mt-2.5 text-2xl text-foreground sm:text-[1.75rem]">
+                  {item.value}
+                </dd>
               </div>
             ))
           }
         </dl>
 
-        <p class="mt-8 max-w-3xl text-sm leading-relaxed text-muted-foreground">{d.gating.long}</p>
+        <p class="mt-8 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+          {d.gating.long}<sup class="ml-0.5">*</sup>
+        </p>
         <p class="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground">
           {d.faq.header.note}
         </p>
@@ -131,102 +162,141 @@ const faqJsonLd = {
         header floats. */}
     <TrustTicker locale={locale} />
 
-    {/* The load-bearing four, on the page's one fixed-dark band, between the
-        header and the long pale set. A reader who scrolls no further still
-        leaves with the ones that never change. */}
-    <section class="border-b border-brand-50/10 bg-brand-800 py-14 text-brand-50 sm:py-16">
+    {/* THE LOAD-BEARING FOUR, on this page's one structural dark band. A
+        reader who scrolls no further still leaves with the answers that do
+        not change whichever group they were looking for. */}
+    <section class="slab on-slab section">
       <div class="shell">
-        <div class="grid gap-8 lg:grid-cols-[17rem_1fr] lg:gap-14">
-          <div>
-            <p class="label text-brand-300">{d.faq.fixed.eyebrow}</p>
-            <h2 class="display-3 mt-4 text-brand-50">{d.faq.fixed.title}</h2>
-          </div>
+        <SectionHead
+          on="slab"
+          eyebrow={d.faq.fixed.eyebrow}
+          title={d.faq.fixed.title}
+        />
 
-          <dl class="grid gap-x-10 sm:grid-cols-2">
-            {
-              d.faq.fixed.items.map((item, index) => (
-                <div class="border-t border-brand-50/12 py-4">
-                  <dt class="subhead text-brand-50">
-                    <span class="figure mr-2 text-xs font-normal text-brand-300">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    {item.term}
-                    {item.symbols && <sup class="ml-0.5 text-brand-300">{item.symbols}</sup>}
-                  </dt>
-                  <dd class="mt-2 text-[0.8125rem] leading-relaxed text-brand-50/60">{item.def}</dd>
-                </div>
-              ))
-            }
-          </dl>
-        </div>
+        <dl class="reveal mt-10 grid gap-x-12 sm:grid-cols-2">
+          {
+            d.faq.fixed.items.map((item, index) => (
+              <div class="border-t border-brand-50/12 py-5">
+                <dt class="subhead text-brand-50">
+                  {/* The numeral is decoration for a screen reader: the term
+                      beside it is the whole content of the row. */}
+                  <span aria-hidden="true" class="figure mr-2 text-xs font-normal text-signal-500">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  {item.term}
+                  {item.symbols && <sup class="ml-0.5 text-signal-500">{item.symbols}</sup>}
+                </dt>
+                <dd class="mt-2 text-[0.8125rem] leading-relaxed text-brand-50/70">{item.def}</dd>
+              </div>
+            ))
+          }
+        </dl>
       </div>
     </section>
 
-    {/* The set. Each group is a `Faq` instance in the right-hand column, so
-        the hairline between groups belongs to the column rather than to the
-        page, and the sticky index keeps its own. */}
-    <div class="bg-background">
-      <div class="shell lg:grid lg:grid-cols-[15rem_1fr] lg:items-start">
-        <nav
-          aria-label={d.faq.nav.label}
-          class="hidden px-4 pt-20 sm:px-6 lg:sticky lg:top-24 lg:block"
-        >
-          <h2 class="label text-muted-foreground">{d.faq.nav.heading}</h2>
-          <ol class="mt-4 flex flex-col">
+    {/* THE CONTENTS BOARD. Eight doors with the count on each, on the raised
+        band so it reads as furniture between the dark band and the long pale
+        set below it. */}
+    <section class="bg-card section-tight">
+      <div class="shell">
+        <nav aria-label={d.faq.index.label} class="reveal">
+          <h2 class="label text-muted-foreground">{d.faq.index.heading}</h2>
+          {/* The closing rule belongs to the LIST: in two columns the final
+              row is two items, and `last:border-b` would rule one of them. */}
+          <ol class="mt-6 grid gap-x-12 border-b border-border sm:grid-cols-2">
             {
               groups.map((group) => (
                 <li class="border-t border-border">
-                  <a href={`#${group.id}`} class="group flex items-baseline gap-3 py-2.5">
-                    <span class="figure text-[0.6875rem] text-brand-700 dark:text-brand-400">
+                  <a href={`#${group.id}`} class="group flex items-baseline gap-4 py-4">
+                    <span
+                      aria-hidden="true"
+                      class="figure shrink-0 text-[0.6875rem] text-signal-700 dark:text-signal-500"
+                    >
                       {group.index}
                     </span>
-                    <span class="flex-1 text-sm font-medium group-hover:text-brand-700 dark:group-hover:text-brand-400">
+                    <span class="subhead flex-1 text-[0.9375rem] group-hover:text-signal-700 dark:group-hover:text-signal-500">
                       {group.title}
                     </span>
-                    <span class="figure text-xs text-muted-foreground">{group.items.length}</span>
+                    {/* The count is part of the link's name — "Eligibility and
+                        the review, 5 questions" — so the unit is spelled out
+                        for a screen reader rather than left as a bare digit. */}
+                    <span class="figure shrink-0 text-xs text-muted-foreground">
+                      {group.items.length}
+                      <span class="sr-only">{" "}{d.faq.index.countLabel}</span>
+                    </span>
+                    <ArrowDownRight
+                      aria-hidden="true"
+                      className="size-4 shrink-0 self-center text-muted-foreground transition-transform group-hover:translate-y-0.5"
+                    />
                   </a>
                 </li>
               ))
             }
           </ol>
-
-          <div class="panel mt-8 p-4">
-            <h3 class="subhead text-[0.9375rem]">{d.faq.nav.helpTitle}</h3>
-            <p class="mt-2 text-sm leading-relaxed text-muted-foreground">{d.faq.nav.helpBody}</p>
-            <a
-              href={site.phoneHref}
-              class="figure mt-3 flex items-center gap-2 text-sm text-foreground hover:text-brand-700 dark:hover:text-brand-400"
-            >
-              <Phone className="size-3.5 shrink-0 text-muted-foreground" />
-              {site.phoneDisplay}
-            </a>
-            <a
-              href={localizedPath(locale, "/contact/")}
-              class="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-brand-700 dark:text-brand-400"
-            >
-              {d.faq.nav.helpCta}
-              <ArrowRight className="size-4" />
-            </a>
-          </div>
         </nav>
-
-        <div>
-          {
-            groups.map((group) => (
-              <Faq
-                locale={locale}
-                id={group.id}
-                eyebrow={`${group.index} · ${group.items.length} ${d.faq.nav.countLabel}`}
-                title={group.title}
-                lead={group.lead}
-                items={group.items}
-                columns={1}
-              />
-            ))
-          }
-        </div>
       </div>
-    </div>
+    </section>
+
+    {/* The set. Each group is its own `Faq` section, full width, carrying its
+        own heading and hairline rows. */}
+    {
+      groups.map((group) => (
+        <Faq
+          locale={locale}
+          id={group.id}
+          eyebrow={`${group.index} · ${group.items.length} ${d.faq.index.countLabel}`}
+          title={group.title}
+          lead={group.lead}
+          items={group.items}
+          columns={1}
+        />
+      ))
+    }
+
+    {/* THE CLOSE. Two real channels, the footer's own hours string, and no
+        reply-time promise — see the note at the top of this file. */}
+    <section class="bg-card section">
+      <div class="shell">
+        <SectionHead
+          eyebrow={d.faq.stuck.eyebrow}
+          title={d.faq.stuck.title}
+          lead={d.faq.stuck.lead}
+          actionHref={localizedPath(locale, "/contact/")}
+          actionLabel={d.faq.stuck.cta}
+        />
+
+        <ul class="panel reveal mt-10 max-w-2xl divide-y divide-hairline overflow-hidden bg-background">
+          <li>
+            <a href={site.phoneHref} class="group flex items-center gap-4 p-5 sm:p-6">
+              <Phone className="size-4 shrink-0 text-signal-700 dark:text-signal-500" />
+              <span class="flex-1">
+                <span class="subhead figure block">{site.phoneDisplay}</span>
+                <span class="figure mt-1 block text-sm text-muted-foreground">
+                  {d.footer.supportHours}
+                </span>
+              </span>
+              <ArrowUpRight
+                aria-hidden="true"
+                className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+              />
+            </a>
+          </li>
+          <li>
+            <a href={site.mailHref} class="group flex items-center gap-4 p-5 sm:p-6">
+              <Mail className="size-4 shrink-0 text-signal-700 dark:text-signal-500" />
+              <span class="flex-1">
+                <span class="subhead block">{site.email}</span>
+                <span class="mt-1 block text-sm text-muted-foreground">{d.faq.stuck.emailNote}</span>
+              </span>
+              <ArrowUpRight
+                aria-hidden="true"
+                className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+              />
+            </a>
+          </li>
+        </ul>
+      </div>
+    </section>
 
     <Cta locale={locale} />
     <ComplianceBand locale={locale} />

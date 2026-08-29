@@ -21,7 +21,15 @@
 const weightLoss = {
   header: {
     eyebrow: "Metabolic",
-    title: "The dose ladder, the price table, the thresholds.",
+    /** `{accent}` marks the single word set in Fraunces italic. The site's
+        whole budget for that face is one word per page, so the token is a
+        contract rather than a convenience — `Headline.astro` substitutes it,
+        and a string carrying two tokens is a bug you can grep for. The accent
+        lands on "thresholds" because that is the word the rest of the page is
+        built to earn: the ladder and the price table are published everywhere,
+        the line a clinician declines you at is not. */
+    title: "The dose ladder, the price table, the {accent}.",
+    titleAccent: "thresholds",
     lead: "Compounded semaglutide and compounded tirzepatide, coordinated between you, a clinician licensed in your state, and one of three named mail-order pharmacies. Everything a competitor puts behind an intake is on this page instead, including the part where a clinician says no.",
     ctaPrimary: "Start your intake",
     ctaSecondary: "See the full pricing",
@@ -36,6 +44,13 @@ const weightLoss = {
     ],
     imageAlt:
       "A man in dark running kit jogging along a gravel path between trees in yellow autumn leaf.",
+    /**
+     * The photograph is licensed stock, and neither licence permits implying
+     * that a depicted person endorses anything. Saying so on the frame costs
+     * one line and removes the reading every other site in this category
+     * invites — that the person in the picture is a result.
+     */
+    imageNote: "Stock photograph. Not a patient, and not a result.",
   },
 
   /**
@@ -72,6 +87,10 @@ const weightLoss = {
       threeMonth: "Three months",
       equivalent: "Monthly equivalent",
     },
+    /** `<caption class="sr-only">`. A screen-reader user meets a table with no
+        caption as an unnamed grid of figures; the visible section heading is
+        several elements away by then. No figure goes in the string. */
+    caption: "Medication prices for the two compounded metabolic preparations, at one month and at three.",
     hedgeLabel: "Before you buy three months",
     hedge:
       "If you are not sure you will stay on it, buy one month. The three-month price is only a saving if you finish the three months, and stopping early is common in this category.",
@@ -96,6 +115,7 @@ const weightLoss = {
     title: "The FDA-approved products, at pharmacy cost",
     lead: "The compounded preparations above are not FDA-approved. These two are, and a clinician may decide one of them is the right prescription for you instead of a compounded preparation. Ellery quotes what the pharmacy charges, with nothing added, which is why each one is a range rather than a price.",
     header: { product: "Product", cost: "Pharmacy cost, per month" },
+    caption: "FDA-approved brand-name products and what the pharmacy charges for each per month.",
     indication:
       "Each is approved for specific indications and labelled criteria, and a clinician may also prescribe a medication outside its labelled indication where they judge that appropriate. That decision, and the explanation for it, belongs to the clinician; Ellery neither suggests it nor arranges it.",
     candour:
@@ -156,6 +176,7 @@ const weightLoss = {
     ],
     effectsTitle: "What people commonly report, and what to do about it",
     effectsHeader: { effect: "What you may feel", action: "What to do" },
+    effectsCaption: "Commonly reported side effects and the response to each.",
     effects: [
       {
         effect: "Nausea in the days after a dose",

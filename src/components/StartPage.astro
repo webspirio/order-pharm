@@ -7,11 +7,19 @@
  * the itemisation has been shown, and that the decision belongs to a clinician
  * rather than to Ellery. The form itself then stays a form.
  *
+ * THE HEADER'S RIGHT POLE IS THE DISCLOSURE, and that is the one structural
+ * change the rebuild makes here. The reference template opens its pages with a
+ * statement left and a smaller object right; on most pages that object is a
+ * CTA pill, which this page cannot use — the ask is the form itself, twelve
+ * inches below. So the right pole carries the ◇ demonstration notice instead.
+ * It used to be a grey line under the lead, which is where a reader's eye goes
+ * last, and it is the single most important sentence on the route: nothing
+ * here is submitted or stored. Promoting it costs nothing and is the same
+ * posture the rest of the site takes about the parts of the chain it does not
+ * own.
+ *
  * `IntakeForm` is the site's only substantial island and is mounted
- * `client:load` — it is the reason a visitor is on this page, so deferring it
- * would trade a visible delay for bytes that are needed immediately. Every
- * string it renders is passed in from `d.start.form`; every figure it renders
- * it imports from `src/config/pricing.ts` itself.
+ * `client:idle` — see the comment at the mount point.
  *
  * State availability is DERIVED here rather than declared: the platform serves
  * `coverage.states` of `coverage.totalStates`, so exactly that many codes are
@@ -22,6 +30,8 @@ import { type Locale, t, localizedPath } from "@/i18n";
 import { coverage, coverageLabel, fees, sla, usd } from "@/config/pricing";
 import Layout from "@/layouts/Layout.astro";
 import SeoHead from "@/components/SeoHead.astro";
+import Headline from "@/components/Headline.astro";
+import SectionHead from "@/components/SectionHead.astro";
 import TrustTicker from "@/components/sections/TrustTicker.astro";
 import Header from "@/components/sections/Header.astro";
 import Relay from "@/components/sections/Relay.astro";
@@ -74,6 +84,12 @@ const facts = d.start.header.facts.map((fact, index) => ({
   value: factValues[index],
   symbol: factSymbols[index],
 }));
+
+/** The two coverage figures, side by side, from one constant. */
+const coverageFacts = [
+  { label: d.start.intake.coverageLabel, value: String(coverage.states), note: coverageLabel() },
+  { label: d.start.intake.notYetLabel, value: String(notYetCodes.length), note: notYetNames },
+];
 ---
 
 <Layout locale={locale} title={d.meta.start.title} description={d.meta.start.description}>
@@ -82,20 +98,41 @@ const facts = d.start.header.facts.map((fact, index) => ({
   <main id="main" tabindex="-1" class="outline-none">
     <section class="bg-background page-top pb-14 sm:pb-16">
       <div class="shell">
-        <p class="label text-brand-700 dark:text-brand-400">{d.start.header.eyebrow}</p>
-        <h1 class="display-1 mt-5 max-w-4xl">{d.start.header.title}</h1>
-        <p class="lead mt-6 text-lg">{d.start.header.lead}</p>
+        <p class="label text-signal-700 dark:text-signal-500">{d.start.header.eyebrow}</p>
+        <Headline
+          as="h1"
+          reveal
+          text={d.start.header.title}
+          accent={d.start.header.titleAccent}
+          class="display-1 mt-5 max-w-3xl"
+        />
 
-        <p class="label mt-12 text-muted-foreground">{d.start.header.factsLabel}</p>
+        <div class="mt-9 flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between lg:gap-14">
+          <p class="lead max-w-xl">{d.start.header.lead}</p>
+
+          {/* The ◇ resolves in the compliance band at the foot of every page,
+              like the other seven. It is a footnote symbol, not decoration. */}
+          <aside class="panel-flat w-full shrink-0 p-5 lg:max-w-[20rem]">
+            <p class="label text-signal-700 dark:text-signal-500">
+              <span class="figure mr-1.5">◇</span>
+              {d.start.header.demoLabel}
+            </p>
+            <p class="mt-3 text-sm leading-relaxed">{d.start.header.demo}</p>
+          </aside>
+        </div>
+
+        <p class="label mt-14 text-muted-foreground">{d.start.header.factsLabel}</p>
         <dl class="mt-4 grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
           {
             facts.map((fact) => (
               <div class="border-t border-border pt-4">
                 <dt class="label text-muted-foreground">{fact.label}</dt>
                 <dd>
-                  <p class="figure mt-2.5 text-3xl">
+                  <p class="figure mt-2.5 text-[1.75rem]">
                     {fact.value}
-                    {fact.symbol && <sup class="ml-0.5 text-base text-muted-foreground">{fact.symbol}</sup>}
+                    {fact.symbol && (
+                      <sup class="ml-0.5 text-sm text-muted-foreground">{fact.symbol}</sup>
+                    )}
                   </p>
                   <p class="mt-2 text-sm leading-relaxed text-muted-foreground">{fact.note}</p>
                 </dd>
@@ -104,11 +141,7 @@ const facts = d.start.header.facts.map((fact, index) => ({
           }
         </dl>
 
-        <p class="mt-12 max-w-3xl text-[0.9375rem] leading-relaxed">{d.start.scope.decider}</p>
-        <p class="mt-4 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-          <span class="figure mr-1.5 text-brand-700 dark:text-brand-400">◇</span>
-          {d.start.header.demo}
-        </p>
+        <p class="measure mt-12 text-[0.9375rem] leading-relaxed">{d.start.scope.decider}</p>
       </div>
     </section>
 
@@ -119,70 +152,98 @@ const facts = d.start.header.facts.map((fact, index) => ({
 
     <section class="bg-card section">
       <div class="shell">
-        <div class="max-w-3xl">
-          <p class="label text-brand-700 dark:text-brand-400">{d.start.scope.eyebrow}</p>
-          <h2 class="display-2 mt-4">{d.start.scope.title}</h2>
-          <p class="lead mt-4">{d.start.scope.lead}</p>
-        </div>
+        <SectionHead
+          eyebrow={d.start.scope.eyebrow}
+          title={d.start.scope.title}
+          lead={d.start.scope.lead}
+        />
 
-        <div class="mt-10 grid gap-8 sm:grid-cols-2 sm:gap-12">
-          <div>
-            <p class="label text-brand-700 dark:text-brand-400">{d.start.scope.isLabel}</p>
-            <ul class="mt-4 flex flex-col">
+        {/* TWO SURFACES, not two lists. The pair used to be two bare columns
+            of bullets under two labels, which reads as one list that happens
+            to have a gap in the middle. Giving each side its own card makes
+            the offer and its limits two objects, and the right one is
+            deliberately the longer: the case against starting is appended to
+            it under a hairline, because that argument belongs with "this is
+            not" rather than in a third box below both. */}
+        <div class="mt-12 grid items-start gap-6 lg:grid-cols-2 lg:gap-8">
+          <div class="panel bg-background p-6 sm:p-8">
+            <p class="label text-signal-700 dark:text-signal-500">{d.start.scope.isLabel}</p>
+            <ul class="mt-5 flex flex-col">
               {
-                d.start.scope.is.map((item) => (
-                  <li class="border-t border-border py-4 text-[0.9375rem] leading-relaxed">{item}</li>
-                ))
-              }
-            </ul>
-          </div>
-          <div>
-            <p class="label text-muted-foreground">{d.start.scope.isNotLabel}</p>
-            <ul class="mt-4 flex flex-col">
-              {
-                d.start.scope.isNot.map((item) => (
-                  <li class="border-t border-border py-4 text-[0.9375rem] leading-relaxed text-muted-foreground">
+                d.start.scope.is.map((item, index) => (
+                  <li
+                    class:list={[
+                      "py-4 text-[0.9375rem] leading-relaxed",
+                      index > 0 && "border-t border-border",
+                    ]}
+                  >
                     {item}
                   </li>
                 ))
               }
             </ul>
           </div>
-        </div>
 
-        {/* The sentence that argues against starting. Inside a bg-card band, so
-            the panel takes bg-background or it disappears. */}
-        <div class="panel mt-10 max-w-3xl bg-background p-6">
-          <p class="label text-muted-foreground">{d.start.scope.concessionLabel}</p>
-          <p class="mt-3 text-[0.9375rem] leading-relaxed">{d.start.scope.concession}</p>
+          <div class="panel-flat p-6 sm:p-8">
+            <p class="label text-muted-foreground">{d.start.scope.isNotLabel}</p>
+            <ul class="mt-5 flex flex-col">
+              {
+                d.start.scope.isNot.map((item, index) => (
+                  <li
+                    class:list={[
+                      "py-4 text-[0.9375rem] leading-relaxed text-muted-foreground",
+                      index > 0 && "border-t border-border",
+                    ]}
+                  >
+                    {item}
+                  </li>
+                ))
+              }
+            </ul>
+
+            <div class="mt-4 border-t border-border pt-6">
+              <p class="label text-muted-foreground">{d.start.scope.concessionLabel}</p>
+              <p class="mt-3 text-[0.9375rem] leading-relaxed">{d.start.scope.concession}</p>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
     <section class="bg-background section">
       <div class="shell">
-        <div class="max-w-3xl">
-          <p class="label text-brand-700 dark:text-brand-400">{d.start.intake.eyebrow}</p>
-          <h2 class="display-2 mt-4">{d.start.intake.title}</h2>
-          <p class="lead mt-4">{d.start.intake.lead}</p>
-        </div>
+        <SectionHead
+          eyebrow={d.start.intake.eyebrow}
+          title={d.start.intake.title}
+          lead={d.start.intake.lead}
+        />
 
-        <div class="mt-8 flex flex-wrap gap-x-12 gap-y-6">
-          <div>
-            <p class="label text-muted-foreground">{d.start.intake.coverageLabel}</p>
-            <p class="figure mt-2 text-2xl">{coverage.states}</p>
-            <p class="mt-1 text-sm text-muted-foreground">{coverageLabel()}</p>
-          </div>
-          <div>
-            <p class="label text-muted-foreground">{d.start.intake.notYetLabel}</p>
-            <p class="figure mt-2 text-2xl">{notYetCodes.length}</p>
-            <p class="mt-1 text-sm text-muted-foreground">{notYetNames}</p>
-          </div>
-        </div>
+        <dl class="reveal mt-10 grid max-w-xl gap-x-10 gap-y-6 sm:grid-cols-2">
+          {
+            coverageFacts.map((fact) => (
+              <div class="border-t border-border pt-4">
+                <dt class="label text-muted-foreground">{fact.label}</dt>
+                <dd>
+                  <p class="figure mt-2 text-[1.75rem]">{fact.value}</p>
+                  <p class="mt-1 text-sm leading-relaxed text-muted-foreground">{fact.note}</p>
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
 
+        {/* No `reveal` on this wrapper, and it is not an oversight: `.reveal`
+            animates a transform, a transformed ancestor becomes a containing
+            block, and the form's `lg:sticky` rail would stop sticking.
+
+            `client:idle`, not `client:load`. The form sits below a head block,
+            a facts table and the ticker — it is never the first paint — and
+            `client:load` put ~170 KB of Radix in the critical path of a page
+            whose first screen is prose. Idle keeps the bytes and drops them
+            out of the race. */}
         <div class="mt-12">
           <IntakeForm
-            client:load
+            client:idle
             copy={d.start.form}
             states={stateOptions}
             gating={d.gating.short}
@@ -197,19 +258,18 @@ const facts = d.start.header.facts.map((fact, index) => ({
 
     <section class="bg-card section">
       <div class="shell">
-        <div class="max-w-3xl">
-          <p class="label text-brand-700 dark:text-brand-400">{d.start.next.eyebrow}</p>
-          <h2 class="display-2 mt-4">{d.start.next.title}</h2>
-          <p class="lead mt-4">{d.start.next.lead}</p>
-        </div>
+        <SectionHead
+          eyebrow={d.start.next.eyebrow}
+          title={d.start.next.title}
+          lead={d.start.next.lead}
+        />
 
-        <div class="mt-12">
+        <div class="reveal mt-12">
           <Relay locale={locale} variant="full" onLight />
+          <p class="mt-10 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+            {d.start.next.note}
+          </p>
         </div>
-
-        <p class="mt-10 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-          {d.start.next.note}
-        </p>
       </div>
     </section>
 

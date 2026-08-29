@@ -1,14 +1,49 @@
 ---
 /**
- * Four figures, in the data face, on a hairline grid.
+ * THE LEDGER — four figures, ruled like a page of a report.
  *
- * Every value is imported from `src/config/pricing.ts`; the dictionary
- * supplies only the label and the gloss. That split is the point — a number
- * typed into copy is a number that will one day disagree with the pricing
- * page, which is what happened to all three reference sites.
+ * Ported from React Bits `stats-13`, which is the only stats block in the
+ * library that is a LEDGER rather than a card grid: a hairline container rule,
+ * one full-width row per figure, and the figure and its name on opposite sides
+ * of a twelve-column gutter. That matches what this site already is — Roles,
+ * Receipt and Quality are all real tables — where four bordered boxes would
+ * have been the fifth different way of drawing a small dataset.
+ *
+ * WHAT WAS LEFT BEHIND, and why each one mattered
+ *
+ * - THE COUNT-UP. stats-13 animates every figure from zero. Three of these
+ *   four cannot honestly count: `≤ 2 hrs` is a stated ceiling, and a ceiling
+ *   that visibly climbs reads as "we got faster", a trend claim with no data
+ *   behind it; `4:00` counting up from `0:00` is nonsense; and 47 passes
+ *   through 3, 19 and 31 on the way, each of which is a false statement about
+ *   where the platform operates. The fourth, the administration fee, is the
+ *   fixed number the whole pitch rests on — animating a constant makes it look
+ *   like a figure arriving at a target. The mechanical objection settles it
+ *   anyway: stats-13's CountUp server-renders `(0).toFixed(0)`, so the static
+ *   HTML — the version crawlers, `llms.txt` readers and view-source get —
+ *   would read `0` for every figure on the page whose thesis is that the
+ *   numbers are checkable.
+ * - THE DELTA CHIP ("+38% vs FY24") and its two arrow icons. Ellery has no
+ *   time series for any of these, so a delta would be fabricated performance
+ *   data, and an up-arrow beside a review window is an implied improvement
+ *   claim. Deleted rather than reframed.
+ * - THE `whileInView` MOTION and both npm dependencies. The reveal is the
+ *   site's one CSS class; nothing here hydrates.
+ *
+ * THE AMBER MARKER. Two of the four figures measure time, and amber on this
+ * site means exactly that. So those two rows carry a 3px signal-coloured rule
+ * at their leading edge — a rule, never text (amber type on paper is 1.9:1),
+ * and always redundant with a row that already says "Review window" or
+ * "Dispatch cutoff", so it never becomes the sole carrier of meaning.
+ *
+ * THE FIGURE SIZE. stats-13 sets its numbers at `lg:text-[9rem]`. Capped here
+ * at 2.5rem, which is the largest a figure may be under the type contract:
+ * `.display-1` bottoms out at 2.75rem, so anything above this would be larger
+ * than the page's own h1 on narrow desktops.
  */
 import { type Locale, t } from "@/i18n";
-import { fees, sla, coverage, usd } from "@/config/pricing";
+import { coverage, fees, sla, usd } from "@/config/pricing";
+import SectionHead from "@/components/SectionHead.astro";
 
 interface Props {
   locale: Locale;
@@ -17,31 +52,108 @@ interface Props {
 const { locale } = Astro.props;
 const d = t(locale);
 
-const values = [
-  `${coverage.states}${coverage.includesDC ? " + DC" : ""}`,
-  `≤ ${sla.reviewHours} hrs`,
-  sla.dispatchCutoff,
-  usd(fees.admin),
-];
+/**
+ * Ellery's four figures are heterogeneous — "47 + DC", "≤ 2 hrs", "4:00 pm ET",
+ * "$25" — so each is split into the three parts the ledger sets differently:
+ * a quiet prefix, the figure itself, and a quiet unit. The split is DERIVED
+ * from the constants rather than typed, which is the whole rule of this site:
+ * `"4:00"` and `"$"` never appear in this file as literals.
+ */
+interface Figure {
+  /** Set small and muted, ahead of the figure: the `≤` of a ceiling, the `$`. */
+  prefix?: string;
+  value: string;
+  /** Set small and muted, after the figure: `+ DC`, `hrs`, `pm ET`. */
+  unit?: string;
+  /** Marks a figure that measures time. Drives the amber rule, nothing else. */
+  clock?: boolean;
+  /** A footnote symbol defined in `common.ts` — never a new one. */
+  symbol?: string;
+}
 
-const items = d.home.stats.items.map((item, index) => ({ ...item, value: values[index] }));
+/** `"4:00 pm ET"` -> `["4:00", "pm ET"]`. Split, not retyped. */
+const cutoff = sla.dispatchCutoff.split(" ");
+/** `usd()` owns the currency symbol, so the prefix is taken off its output. */
+const admin = usd(fees.admin);
+
+/**
+ * Keyed by `id`, not by position. The previous version zipped this against
+ * `d.home.stats.items` by array index, so reordering the copy would have
+ * relabelled every figure — a silent content bug with no type error.
+ */
+const figures: Record<string, Figure> = {
+  states: {
+    value: String(coverage.states),
+    // Mirrors the conditional in `coverageLabel()` so the two cannot disagree.
+    unit: coverage.includesDC ? "+ DC" : "",
+  },
+  review: { prefix: "≤", value: String(sla.reviewHours), unit: "hrs", clock: true },
+  cutoff: { value: cutoff[0], unit: cutoff.slice(1).join(" "), clock: true },
+  // † is the administration-fee note in `common.ts`, and the same symbol the
+  // Receipt hangs on the same figure two sections further down.
+  admin: { prefix: admin.slice(0, 1), value: admin.slice(1), symbol: "†" },
+};
+
+const items = d.home.stats.items.map((item) => ({ ...item, ...figures[item.id] }));
 ---
 
-<section class="bg-background">
-  <div class="shell section-tight">
-    <h2 class="label text-muted-foreground">{d.home.stats.label}</h2>
-    <dl class="mt-6 grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-4 sm:gap-x-8">
+{/* bg-card, so this and the Thesis paragraph below it are not two recessed
+    bands with one hairline between them pretending to be a section break. */}
+<section class="bg-card section">
+  <div class="shell">
+    <SectionHead
+      eyebrow={d.home.stats.eyebrow}
+      title={d.home.stats.title}
+      lead={d.home.stats.lead}
+    />
+
+    {/* A definition list, and the TERM comes first in the DOM. A screen reader
+        should hear "Review window — under 2 hrs", not the reverse; the grid
+        puts the figure on the left visually with explicit row/column starts,
+        which costs nothing and keeps the pairing intact. */}
+    <dl class="reveal mt-14 border-t border-border sm:mt-16">
       {
         items.map((item) => (
-          <div class="border-t border-border pt-4">
-            <dd class="figure text-2xl text-foreground sm:text-[1.75rem]">{item.value}</dd>
-            <dt class="mt-2">
-              <span class="subhead block text-[0.9375rem]">{item.label}</span>
-              <span class="mt-1 block text-sm text-muted-foreground">{item.note}</span>
+          <div
+            class:list={[
+              "grid grid-cols-1 gap-y-3 border-b border-border py-8 md:grid-cols-12 md:items-baseline md:gap-8 md:py-10",
+              item.clock &&
+                "relative before:absolute before:-top-px before:left-0 before:h-[3px] before:w-10 before:bg-signal-500 before:content-['']",
+            ]}
+          >
+            <dt class="md:col-span-7 md:col-start-5 md:row-start-1">
+              <span class="subhead block text-foreground">
+                {item.label}
+                {item.symbol && (
+                  <sup class="ml-0.5 font-normal text-muted-foreground">{item.symbol}</sup>
+                )}
+              </span>
+              <span class="mt-2 block max-w-md text-[0.9375rem] leading-relaxed text-muted-foreground">
+                {item.note}
+              </span>
             </dt>
+            <dd class="order-first flex min-w-0 items-baseline gap-1.5 md:col-span-4 md:col-start-1 md:row-start-1">
+              {item.prefix && (
+                <span class="figure text-[1.25rem] text-muted-foreground sm:text-[1.5rem]">
+                  {item.prefix}
+                </span>
+              )}
+              <span class="figure text-[2rem] leading-[0.95] tracking-[-0.03em] text-foreground sm:text-[2.5rem]">
+                {item.value}
+              </span>
+              {item.unit && (
+                <span class="figure shrink-0 text-[0.9375rem] text-muted-foreground sm:text-[1.0625rem]">
+                  {item.unit}
+                </span>
+              )}
+            </dd>
           </div>
         ))
       }
     </dl>
+
+    {/* One of these four figures is a price, so the condition every price on
+        this site is subject to travels with it. Verbatim from `gating`. */}
+    <p class="mt-8 max-w-md text-sm text-muted-foreground">{d.gating.short}</p>
   </div>
 </section>

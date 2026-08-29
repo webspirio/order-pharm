@@ -1,20 +1,40 @@
 ---
 /**
- * The Relay again, in detail — and deliberately on the other axis.
+ * THE CUSTODY RAIL — the Relay again, in detail, and deliberately on the
+ * other axis.
  *
  * The hero's bar gives the clock: four actors, four durations, nothing else.
- * This section gives the explanation. Repeating the same horizontal
- * tick-marked track with paragraphs bolted under it would read as a duplicate
- * section; turning it 90 degrees into a vertical rail keeps the visual
- * language (one hairline, amber ticks, mono durations) while making it
- * obvious this is the long version rather than the same thing twice.
+ * This section gives the explanation. Repeating the same horizontal track
+ * with paragraphs bolted under it would read as a duplicate section; turning
+ * it ninety degrees keeps the visual language (one hairline, one amber
+ * marker, mono durations) while making it obvious this is the long version
+ * rather than the same thing twice.
  *
- * The rail is a `border-l` on the list with a dot per item, rather than the
- * `.relay-step` border-top used horizontally — same idea, correct axis.
+ * STRUCTURE, ported from two places. The sticky left column beside a
+ * scrolling numbered rail is the reference template's `how-it-works.tsx`; the
+ * marker vocabulary — a real `<ol>`, a mono numeral in a chip, and a rule
+ * DRAWN PER SEGMENT rather than one absolutely-positioned bar — is React Bits
+ * `how-it-works-8`. The per-segment rule is the same argument `global.css`
+ * already makes for `.relay-step`'s `border-top`: a segment that belongs to
+ * its own `<li>` re-flows for free when the item's height changes, and needs
+ * no measurement.
+ *
+ * Discarded from the reference: its `pb-64` (256px of empty column per step,
+ * which would make the sticky heading outrun its own content) and its guessed
+ * `h-[calc(100%-6rem)]` track height, which is the geometry `how-it-works-6`
+ * gets right by measuring node centre to node centre — and which per-segment
+ * drawing makes unnecessary.
+ *
+ * MOTION — the one scroll-linked device on the homepage, and it costs no
+ * JavaScript. See the `<style>` block. The nodes never change state: a node
+ * that pulses or ticks green beside "Clinician · Review" reads as an approval
+ * in progress, which is an implied prescription. A filled segment means "you
+ * have read this far", never "this step succeeded".
  */
 import { type Locale, t, localizedPath } from "@/i18n";
 import { anchors } from "@/config/site";
 import { sla } from "@/config/pricing";
+import SectionHead from "@/components/SectionHead.astro";
 import { ArrowRight } from "lucide-react";
 
 interface Props {
@@ -24,6 +44,12 @@ interface Props {
 const { locale } = Astro.props;
 const d = t(locale);
 
+/**
+ * The same four durations `Relay.astro` and `HowItWorksPage.astro` render,
+ * from the same constants. All three build this array by hand because there
+ * is no `relayDurations` export in `src/config/pricing.ts` yet — flagged, not
+ * fixed, since that file is owned elsewhere this pass.
+ */
 const durations = [
   `~${sla.intakeMinutes} min`,
   `≤ ${sla.reviewHours} hrs`,
@@ -34,59 +60,135 @@ const durations = [
 const steps = d.home.relay.steps.map((step, index) => ({
   ...step,
   duration: durations[index],
-  index: index + 1,
+  index: String(index + 1).padStart(2, "0"),
+  isLast: index === d.home.relay.steps.length - 1,
 }));
 ---
 
 <section id={anchors.relay} class="bg-background section">
   <div class="shell">
-    <div class="grid gap-10 lg:grid-cols-[20rem_1fr] lg:gap-16">
-      <div class="lg:sticky lg:top-24 lg:self-start">
-        <p class="label text-brand-700 dark:text-brand-400">{d.home.relay.eyebrow}</p>
-        <h2 class="display-2 mt-4">{d.home.relay.title}</h2>
-        <p class="lead mt-4 max-w-none">{d.home.relay.lead}</p>
+    <div class="grid gap-12 lg:grid-cols-[16rem_1fr] lg:gap-16">
+      {/* 7.5rem is `SmoothScroll.tsx`'s `scrollTo` offset and the
+          `scroll-margin-top` global.css gives every `section[id]`, so a
+          fragment link to #how and this heading come to rest together. */}
+      <div class="lg:sticky lg:top-[7.5rem] lg:h-fit lg:self-start">
+        <SectionHead
+          eyebrow={d.home.relay.eyebrow}
+          title={d.home.relay.title}
+          lead={d.home.relay.lead}
+        />
         <a
           href={localizedPath(locale, "/how-it-works/")}
-          class="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-brand-700 dark:text-brand-400"
+          class="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-foreground underline-offset-4 hover:underline"
         >
           {d.home.relay.cta}
           <ArrowRight className="size-4" />
         </a>
       </div>
 
-      <ol class="relative flex flex-col border-l border-border pl-6 sm:pl-8">
-        {
-          steps.map((step) => (
-            <li class="relative pb-10 last:pb-0">
-              {/* The tick, on the rail. -1px of the 5px dot's own radius past
-                  the 1px border puts its centre on the line. */}
-              <span
-                aria-hidden="true"
-                class="absolute -left-[1.5625rem] top-[0.45rem] size-[7px] rounded-full bg-signal-500 sm:-left-[2.0625rem]"
-              ></span>
-              <span
-                aria-hidden="true"
-                class="absolute -left-6 top-[0.7rem] h-px w-4 bg-signal-500/50 sm:-left-8 sm:w-6"
-              ></span>
-
-              <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-                <p class="label text-muted-foreground">
-                  <span class="text-brand-700 dark:text-brand-400">
-                    {String(step.index).padStart(2, "0")}
+      <div>
+        <ol aria-label={d.home.relay.railLabel} class="relative flex list-none flex-col p-0">
+          {
+            steps.map((step) => (
+              <li class="relative grid grid-cols-[2.25rem_1fr] gap-x-5 pb-14 last:pb-0 sm:gap-x-7 sm:pb-16">
+                {/* The track segment for THIS handoff: node bottom to the top
+                    of the next node. The last step has no successor, so it
+                    has no segment — a rule running past the final node would
+                    imply a fifth party. 17px + 2px straddles the 36px chip's
+                    18px centre. */}
+                {!step.isLast && (
+                  <span
+                    aria-hidden="true"
+                    class="pointer-events-none absolute top-9 bottom-0 left-[1.0625rem] w-0.5 bg-border"
+                  >
+                    <span class="rail-fill block h-full w-full origin-top bg-signal-700 dark:bg-signal-500" />
                   </span>
-                  {" · "}
-                  {step.actor}
-                </p>
-                <p class="figure text-sm text-signal-700 dark:text-signal-500">{step.duration}</p>
-              </div>
-              <h3 class="display-3 mt-2">{step.action}</h3>
-              <p class="mt-2.5 max-w-2xl text-[0.9375rem] leading-relaxed text-muted-foreground">
-                {step.detail}
-              </p>
-            </li>
-          ))
-        }
-      </ol>
+                )}
+
+                {/* `.plate` is amber with near-black ink — 8.7:1 in all three
+                    palettes and both themes. Hidden from assistive tech: the
+                    digit is decoration, and the ordinal is the `<ol>`'s job. */}
+                <span
+                  aria-hidden="true"
+                  class="plate relative z-10 flex size-9 items-center justify-center rounded-full font-mono text-[0.6875rem] font-semibold tabular-nums"
+                >
+                  {step.index}
+                </span>
+
+                <div class="min-w-0">
+                  {/* Actor left, elapsed time right, on one baseline: the four
+                      durations then line up as a column and can be compared,
+                      which is the whole reason this is a scale. */}
+                  <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                    <p class="label text-muted-foreground">{step.actor}</p>
+                    <p class="figure shrink-0 text-[0.8125rem] whitespace-nowrap text-signal-700 dark:text-signal-500">
+                      {step.duration}
+                    </p>
+                  </div>
+                  <h3 class="display-3 mt-2">{step.action}</h3>
+                  <p class="measure mt-3 text-[0.9375rem] leading-relaxed text-muted-foreground">
+                    {step.detail}
+                  </p>
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+
+        {/* The rail ends on "Delivered". A sequence that terminates in a
+            delivery with no condition in view implies the prescription that
+            precedes it, so the gating sentence is the rail's last element
+            rather than a footnote. */}
+        <p class="rule mt-10 border-t pt-5 text-sm text-muted-foreground">{d.gating.short}</p>
+      </div>
     </div>
   </div>
 </section>
+
+<style>
+  /**
+   * THE RAIL FILL — one scroll-driven CSS animation, no island, no library.
+   *
+   * Each segment is its own animation subject, so the fill advances handoff
+   * by handoff as the reader moves down the rail, with no measurement and no
+   * scroll listener. Rendering this as a hydrated `useScroll` island would be
+   * the thing that first pulls a ~32 KB animation runtime onto this route, to
+   * move one hairline.
+   *
+   * THE BASE STATE IS THE FINISHED STATE. `scaleY(0)` is declared only inside
+   * the guards, so all three degradations land on the same picture — a fully
+   * drawn rail: no scroll-timeline support, reduced motion, and JavaScript
+   * off (nothing here is an island) are one outcome, not three. This is the
+   * same construction `.reveal` uses in global.css, and for the same reason:
+   * the failure mode of a `whileInView` block rendered without a `client:*`
+   * directive is content frozen at opacity 0.
+   *
+   * Lenis scrolls the real document — `SmoothScroll.tsx` passes no `wrapper`
+   * or `content` — so the native scroll timeline stays in sync with it, and
+   * `html { overflow-x: hidden }` does not move the scrollport: the root is
+   * still the nearest scroll container, which is the same one `.reveal`
+   * resolves against site-wide.
+   *
+   * IT MUST NEVER READ AS PROGRESS THROUGH AN APPROVAL. The range ends before
+   * the segment leaves the viewport so the fill completes under the reader's
+   * eye rather than racing ahead of it, and no node ever changes state.
+   */
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .rail-fill {
+        transform: scaleY(0);
+        animation: rail-draw auto linear both;
+        animation-timeline: view(block);
+        animation-range: cover 20% cover 70%;
+      }
+      @keyframes rail-draw {
+        from {
+          transform: scaleY(0);
+        }
+        to {
+          transform: scaleY(1);
+        }
+      }
+    }
+  }
+</style>

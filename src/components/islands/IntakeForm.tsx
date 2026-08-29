@@ -72,6 +72,22 @@ import { ArrowLeft, ArrowRight, Info, TriangleAlert } from "lucide-react";
  *    StartPage.astro. Every figure comes from `src/config/pricing.ts`, which
  *    this island imports directly so the running total, the supply table and
  *    the pricing page cannot drift apart.
+ *
+ * GEOMETRY, after the rebuild. Every control here was `rounded-[3px]`, which
+ * on its own made forty controls a sixth radius family. They are all
+ * `rounded-lg` now — the 12px control token — and the surfaces are the site's
+ * own `.panel` / `.panel-flat` / `.slab` classes rather than hand-mixed
+ * backgrounds. The nesting rule is the one that is easy to undo by accident:
+ * the section band is `bg-background`, so the form and the rail are `.panel`
+ * (white, raised); anything INSIDE them is `.panel-flat` (muted, recessed),
+ * because a white card on a white card is not a card.
+ *
+ * FOCUS vs INVALID. The site's focus indicator is now an ink outline drawn by
+ * one global `:focus-visible` rule, not the primitives' amber-adjacent ring
+ * (see the docblocks in `src/components/ui/`). That is what keeps `aria-invalid`
+ * legible: an invalid control keeps the destructive border and its soft red
+ * halo, a focused one gets a 2px ink outline two pixels clear of the box, and
+ * a control that is both shows both.
  */
 
 type FormCopy = Dictionary["start"]["form"];
@@ -201,7 +217,7 @@ function StepHeading({
 }) {
   return (
     <div className="max-w-2xl">
-      <p className="label text-brand-700 dark:text-brand-400">{eyebrow}</p>
+      <p className="label text-signal-700 dark:text-signal-500">{eyebrow}</p>
       <h3 ref={headingRef} tabIndex={-1} className="display-3 mt-3 outline-none">
         {title}
       </h3>
@@ -231,7 +247,7 @@ function CheckRow({
         id={id}
         checked={checked}
         onCheckedChange={(next) => onChange(next === true)}
-        className="mt-0.5 size-[18px] rounded-[3px]"
+        className="mt-0.5 size-[18px]"
       />
       <FieldLabel htmlFor={id} className="text-[0.9375rem] leading-relaxed font-normal">
         {label}
@@ -532,9 +548,9 @@ export default function IntakeForm({
   const rail = (
     <aside
       aria-label={copy.a11y.railLabel}
-      className="panel bg-background p-5 lg:sticky lg:top-24 lg:col-start-2 lg:row-start-1"
+      className="panel p-5 lg:sticky lg:top-24 lg:col-start-2 lg:row-start-1"
     >
-      <p className="label text-brand-700 dark:text-brand-400">{copy.rail.title}</p>
+      <p className="label text-signal-700 dark:text-signal-500">{copy.rail.title}</p>
 
       <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-2">
         <div>
@@ -556,7 +572,7 @@ export default function IntakeForm({
       <Progress
         value={progress}
         aria-label={copy.a11y.progressLabel}
-        className="mt-5 h-[3px] rounded-none [&_[data-slot=progress-indicator]]:motion-reduce:transition-none"
+        className="mt-5 [&_[data-slot=progress-indicator]]:motion-reduce:transition-none"
       />
 
       <Separator className="mt-6" />
@@ -645,21 +661,21 @@ export default function IntakeForm({
               /* `data-[size=default]:h-11`, not `h-11`: the primitive's own
                  height is a data-attribute variant, which outranks a plain
                  utility on specificity no matter what order they merge in. */
-              className="w-full rounded-[3px] text-[0.9375rem] data-[size=default]:h-11"
+              className="w-full rounded-lg text-[0.9375rem] data-[size=default]:h-11"
             >
               <SelectValue placeholder={stateCopy.placeholder} />
             </SelectTrigger>
             <SelectContent
               position="popper"
               align="start"
-              className="rounded-[3px] motion-reduce:animate-none"
+              className="rounded-lg motion-reduce:animate-none"
             >
               <SelectGroup>
                 <SelectLabel className="label px-2 py-2 text-muted-foreground">
                   {stateCopy.groupAvailable}
                 </SelectLabel>
                 {available.map((option) => (
-                  <SelectItem key={option.code} value={option.code} className="rounded-[3px]">
+                  <SelectItem key={option.code} value={option.code} className="rounded-lg">
                     {option.name}
                   </SelectItem>
                 ))}
@@ -669,7 +685,7 @@ export default function IntakeForm({
                   {stateCopy.groupUnavailable}
                 </SelectLabel>
                 {unavailable.map((option) => (
-                  <SelectItem key={option.code} value={option.code} className="rounded-[3px]">
+                  <SelectItem key={option.code} value={option.code} className="rounded-lg">
                     {option.name}
                   </SelectItem>
                 ))}
@@ -682,7 +698,7 @@ export default function IntakeForm({
       </FieldGroup>
 
       {selectedState?.remote && !blocked && (
-        <Alert className="mt-6 max-w-2xl rounded-[3px] border-border bg-card p-4">
+        <Alert className="mt-6 max-w-2xl rounded-lg border-transparent bg-muted p-4">
           <Info />
           <AlertTitle className="figure text-[0.9375rem]">
             {usd(shipping.remoteSurcharge)}
@@ -695,8 +711,8 @@ export default function IntakeForm({
       )}
 
       {blocked && selectedState && (
-        <div className="panel mt-8 max-w-2xl bg-background p-6">
-          <p className="label text-brand-700 dark:text-brand-400">{copy.steps.blocked.eyebrow}</p>
+        <div className="panel-flat mt-8 max-w-2xl p-6">
+          <p className="label text-signal-700 dark:text-signal-500">{copy.steps.blocked.eyebrow}</p>
           <h4 className="subhead mt-3 text-lg">{copy.steps.blocked.title}</h4>
           <p className="mt-3 text-[0.9375rem] leading-relaxed text-muted-foreground">
             {fill(copy.steps.blocked.body, { state: selectedState.name })}
@@ -715,12 +731,12 @@ export default function IntakeForm({
                   autoComplete="email"
                   value={notifyEmail}
                   onChange={(event) => setNotifyEmail(event.target.value)}
-                  className="h-11 w-full max-w-64 rounded-[3px] text-[0.9375rem]"
+                  className="h-11 w-full max-w-64 rounded-lg text-[0.9375rem]"
                 />
                 {/* Disabled, and the note under it says why. There is no list
                     and no endpoint, so a live button would be a lie the rest
                     of this page is written to avoid. */}
-                <button type="button" disabled className="btn-outline opacity-55">
+                <button type="button" disabled className="btn-outline disabled:opacity-50">
                   {copy.steps.blocked.emailButton}
                 </button>
               </div>
@@ -738,7 +754,7 @@ export default function IntakeForm({
             </button>
             <a
               href={links.pricing}
-              className="text-sm font-semibold text-brand-700 dark:text-brand-400"
+              className="text-sm font-semibold text-foreground hover:text-signal-700 dark:hover:text-signal-500"
             >
               {copy.steps.blocked.alternative}
             </a>
@@ -773,11 +789,15 @@ export default function IntakeForm({
             aria-invalid={errors.goal ? true : undefined}
             className="w-full flex-wrap gap-2"
           >
+            {/* Selected reads as the primary ink fill — the same surface
+                `.btn-solid` and a checked Checkbox use — so "chosen" looks
+                identical everywhere in the intake. It was petrol brand-600,
+                which is the structural slab colour and belongs to bands. */}
             {goalOrder.map((id) => (
               <ToggleGroupItem
                 key={id}
                 value={id}
-                className="h-auto min-w-32 flex-1 rounded-[3px] border border-border px-4 py-3 text-[0.9375rem] font-semibold text-foreground data-[state=on]:border-brand-600 data-[state=on]:bg-brand-600 data-[state=on]:text-brand-50 aria-pressed:bg-brand-600"
+                className="h-auto min-w-32 flex-1 rounded-lg border border-border px-4 py-3 text-[0.9375rem] font-semibold text-foreground data-[state=on]:border-primary data-[state=on]:bg-primary data-[state=on]:text-primary-foreground aria-pressed:bg-primary aria-pressed:text-primary-foreground"
               >
                 {goalCopy.options[id].label}
               </ToggleGroupItem>
@@ -832,7 +852,7 @@ export default function IntakeForm({
               onChange={(event) => set("age", event.target.value)}
               aria-invalid={errors.age ? true : undefined}
               aria-describedby={errors.age ? `${uid}-age-error` : undefined}
-              className="figure size-11 rounded-[3px] px-0 text-center text-base"
+              className="figure size-11 rounded-lg px-0 text-center text-base"
             />
             <span className="label text-muted-foreground">{aboutCopy.ageUnit}</span>
           </div>
@@ -853,7 +873,7 @@ export default function IntakeForm({
               <ToggleGroupItem
                 key={id}
                 value={id}
-                className="h-11 rounded-[3px] border border-border px-4 text-[0.9375rem] font-semibold text-foreground data-[state=on]:border-brand-600 data-[state=on]:bg-brand-600 data-[state=on]:text-brand-50 aria-pressed:bg-brand-600"
+                className="h-11 rounded-lg border border-border px-4 text-[0.9375rem] font-semibold text-foreground data-[state=on]:border-primary data-[state=on]:bg-primary data-[state=on]:text-primary-foreground aria-pressed:bg-primary aria-pressed:text-primary-foreground"
               >
                 {aboutCopy.sexOptions[id]}
               </ToggleGroupItem>
@@ -875,7 +895,7 @@ export default function IntakeForm({
                 onChange={(event) => set("heightFt", event.target.value)}
                 aria-invalid={errors.heightFt ? true : undefined}
                 aria-describedby={errors.heightFt ? `${uid}-height-error` : undefined}
-                className="figure size-11 rounded-[3px] px-0 text-center text-base"
+                className="figure size-11 rounded-lg px-0 text-center text-base"
               />
               <span className="label text-muted-foreground">{aboutCopy.heightFtUnit}</span>
             </div>
@@ -888,7 +908,7 @@ export default function IntakeForm({
                 value={answers.heightIn}
                 onChange={(event) => set("heightIn", event.target.value)}
                 aria-invalid={errors.heightFt ? true : undefined}
-                className="figure size-11 rounded-[3px] px-0 text-center text-base"
+                className="figure size-11 rounded-lg px-0 text-center text-base"
               />
               <span className="label text-muted-foreground">{aboutCopy.heightInUnit}</span>
             </div>
@@ -907,7 +927,7 @@ export default function IntakeForm({
               onChange={(event) => set("weightLb", event.target.value)}
               aria-invalid={errors.weightLb ? true : undefined}
               aria-describedby={errors.weightLb ? `${uid}-weight-error` : undefined}
-              className="figure h-11 w-20 rounded-[3px] text-center text-base"
+              className="figure h-11 w-20 rounded-lg text-center text-base"
             />
             <span className="label text-muted-foreground">{aboutCopy.weightUnit}</span>
           </div>
@@ -917,13 +937,13 @@ export default function IntakeForm({
 
       {/* BMI, live. A figure the reader is meant to check, so it is set at
           reading size in the mono face rather than tucked into a caption. */}
-      <div className="panel mt-8 max-w-2xl bg-background p-6">
+      <div className="panel-flat mt-8 max-w-2xl p-6">
         <Micro>{aboutCopy.bmiLabel}</Micro>
         <p aria-live="polite" className="mt-2">
           {bmi === null ? (
             <span className="text-[0.9375rem] text-muted-foreground">{aboutCopy.bmiPending}</span>
           ) : (
-            <span className="figure text-4xl">{bmi.toFixed(1)}</span>
+            <span className="figure text-[1.75rem]">{bmi.toFixed(1)}</span>
           )}
         </p>
         <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{aboutCopy.bmiNote}</p>
@@ -1004,7 +1024,7 @@ export default function IntakeForm({
         bmi !== null &&
         bmi >= eligibility.bmiWithCondition &&
         bmi < eligibility.bmiAlone && (
-          <Alert className="mt-6 max-w-2xl rounded-[3px] border-border bg-card p-4">
+          <Alert className="mt-6 max-w-2xl rounded-lg border-transparent bg-muted p-4">
             <Info />
             <AlertTitle className="figure text-[0.9375rem]">
               {eligibility.bmiWithCondition}
@@ -1069,7 +1089,7 @@ export default function IntakeForm({
       {/* Neutral by construction: it reports that a clinician will read this
           first. It does not and must not report an outcome. */}
       {answers.history.length > 0 && (
-        <Alert className="mt-6 max-w-2xl rounded-[3px] border-border bg-card p-4">
+        <Alert className="mt-6 max-w-2xl rounded-lg border-transparent bg-muted p-4">
           <TriangleAlert />
           <AlertTitle>{historyCopy.flaggedTitle}</AlertTitle>
           <AlertDescription>
@@ -1105,7 +1125,7 @@ export default function IntakeForm({
             value={answers.medications}
             placeholder={medsCopy.medsPlaceholder}
             onChange={(event) => set("medications", event.target.value)}
-            className="rounded-[3px] text-[0.9375rem]"
+            className="rounded-lg text-[0.9375rem]"
           />
           <FieldDescription>{medsCopy.medsNote}</FieldDescription>
         </Field>
@@ -1117,7 +1137,7 @@ export default function IntakeForm({
             value={answers.allergies}
             placeholder={medsCopy.allergiesPlaceholder}
             onChange={(event) => set("allergies", event.target.value)}
-            className="rounded-[3px] text-[0.9375rem]"
+            className="rounded-lg text-[0.9375rem]"
           />
           <FieldDescription>{medsCopy.allergiesNote}</FieldDescription>
         </Field>
@@ -1154,7 +1174,7 @@ export default function IntakeForm({
               <ToggleGroupItem
                 key={id}
                 value={id}
-                className="h-11 min-w-40 rounded-[3px] border border-border px-4 text-[0.9375rem] font-semibold text-foreground data-[state=on]:border-brand-600 data-[state=on]:bg-brand-600 data-[state=on]:text-brand-50 aria-pressed:bg-brand-600"
+                className="h-11 min-w-40 rounded-lg border border-border px-4 text-[0.9375rem] font-semibold text-foreground data-[state=on]:border-primary data-[state=on]:bg-primary data-[state=on]:text-primary-foreground aria-pressed:bg-primary aria-pressed:text-primary-foreground"
               >
                 {supplyCopy.options[id]}
               </ToggleGroupItem>
@@ -1199,7 +1219,7 @@ export default function IntakeForm({
           </Table>
           <p className="mt-5 text-sm leading-relaxed text-muted-foreground">{supplyCopy.note}</p>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{gating}</p>
-          <p className="panel mt-6 bg-background p-5 text-sm leading-relaxed">
+          <p className="panel-flat mt-6 p-5 text-sm leading-relaxed">
             {supplyCopy.concession}
           </p>
         </div>
@@ -1309,20 +1329,25 @@ export default function IntakeForm({
       </p>
       <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground">{gating}</p>
 
-      <div className="panel mt-10 bg-background p-6">
-        <p className="label text-brand-700 dark:text-brand-400">{reviewCopy.refundTitle}</p>
+      <div className="panel-flat mt-10 p-6">
+        <p className="label text-signal-700 dark:text-signal-500">{reviewCopy.refundTitle}</p>
         <p className="mt-3 max-w-2xl text-[0.9375rem] leading-relaxed">{reviewCopy.refundBody}</p>
       </div>
 
       {/* The end of the flow. There is no submit button, because there is
           nothing to submit to, and a button that pretended otherwise would
-          undo everything the rest of this page claims. */}
-      <div className="mt-6 rounded-lg bg-brand-800 p-6 text-brand-50">
-        <p className="label text-brand-300">
+          undo everything the rest of this page claims.
+
+          `slab on-slab` rather than a raw `bg-brand-800`: `.on-slab` also
+          flips the focus token to the signal colour, and the two links and
+          the reset button inside here are keyboard targets on a ground where
+          an ink outline would be invisible. */}
+      <div className="slab on-slab mt-8 rounded-2xl p-6 sm:p-8">
+        <p className="label text-signal-500">
           <span className="figure mr-2">◇</span>
           {reviewCopy.demoTitle}
         </p>
-        <p className="mt-3 max-w-2xl text-[0.9375rem] leading-relaxed text-brand-50/80">
+        <p className="mt-3 max-w-2xl text-[0.9375rem] leading-relaxed text-brand-50/70">
           {reviewCopy.demoBody}
         </p>
         <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
@@ -1331,14 +1356,14 @@ export default function IntakeForm({
           </button>
           <a
             href={links.pricing}
-            className="inline-flex items-center gap-2 text-sm font-semibold text-brand-300 hover:text-brand-50"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-brand-50 hover:text-signal-500"
           >
             {reviewCopy.linkPricing}
             <ArrowRight className="size-4" />
           </a>
           <a
             href={links.howItWorks}
-            className="inline-flex items-center gap-2 text-sm font-semibold text-brand-300 hover:text-brand-50"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-brand-50 hover:text-signal-500"
           >
             {reviewCopy.linkHowItWorks}
             <ArrowRight className="size-4" />
@@ -1372,7 +1397,7 @@ export default function IntakeForm({
           event.preventDefault();
           advance();
         }}
-        className="panel bg-background p-6 sm:p-8 lg:col-start-1 lg:row-start-1"
+        className="panel p-6 sm:p-8 lg:col-start-1 lg:row-start-1"
       >
         <div className="flex items-center justify-between gap-4 border-b border-border pb-5">
           {/* Announced on advance. The visible text and the announcement are
@@ -1381,7 +1406,7 @@ export default function IntakeForm({
             {counter}
           </p>
           {blocked && (
-            <Badge variant="outline" className="label rounded-[3px] border-border px-2">
+            <Badge variant="outline" className="label rounded-lg border-border px-2">
               {copy.steps.blocked.eyebrow}
             </Badge>
           )}

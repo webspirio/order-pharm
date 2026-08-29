@@ -45,7 +45,9 @@ const [
 const faq = {
   header: {
     eyebrow: "Questions",
-    title: "The whole list, including the awkward ones.",
+    /** `{accent}` is the page's one Fraunces word, set by `Headline.astro`. */
+    title: "The whole list, including the {accent} ones.",
+    titleAccent: "awkward",
     lead: "Grouped so you can find yours, and written to be complete rather than reassuring. Where the answer is no, it says no. Where it depends on a clinician, it says which one, and where it belongs to the pharmacy it says that too.",
     /** Labels for the mono figure row under the lead. Values are computed. */
     figures: {
@@ -90,14 +92,37 @@ const faq = {
     ],
   },
 
-  /** The sticky group index at lg and up. */
-  nav: {
+  /**
+   * The contents board, between the fixed four and the set itself.
+   *
+   * It used to be a sticky rail in a grid column beside the groups, which
+   * meant nesting eight `Faq` sections — each of which owns a `.shell` — inside
+   * another `.shell`, doubling the page gutter. A board at the top of the set
+   * costs nothing, survives whatever `Faq.astro` does to its own geometry, and
+   * is the same thing a reader wants: eight labelled doors with the question
+   * count on each.
+   */
+  index: {
+    /** Names the <nav> landmark. */
     label: "Question groups",
-    heading: "The groups",
+    heading: "The eight groups",
     countLabel: "questions",
-    helpTitle: "Not in the list",
-    helpBody: "Call and ask. A person answers, and if the question is clinical they will tell you who to send it to instead of guessing at it.",
-    helpCta: "Contact and hours",
+  },
+
+  /**
+   * The close. Every FAQ page in this category ends on a support panel that
+   * invents its own hours and its own reply time; the hours here are the
+   * footer's single string and there is no reply-time claim at all, because
+   * no figure in `pricing.ts` measures one.
+   */
+  stuck: {
+    eyebrow: "Still stuck",
+    title: "If your question is not here, ask it.",
+    lead: "Support answers questions about cost, timing and an order that already exists. A clinical question goes to the practice and a question about a specific vial goes to the pharmacy that made it — you are told which, rather than guessed at.",
+    cta: "Contact and hours",
+    phoneLabel: "Support line",
+    emailLabel: "Email",
+    emailNote: "For anything that is not urgent. Quote the order number if you have one.",
   },
 
   groups: [

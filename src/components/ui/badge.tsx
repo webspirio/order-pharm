@@ -1,3 +1,22 @@
+/**
+ * LOCALLY EDITED shadcn primitive. Re-running `shadcn add badge` reverts the
+ * two edits below, and both are contract, not taste — see docs/DESIGN-SYSTEM.md.
+ *
+ * 1. RADIUS. Two families and no third: `rounded-lg` (12px, `--radius`) for
+ *    controls, `rounded-2xl` (24px, `--radius-card`) for surfaces. The registry
+ *    ships four more — `rounded-md`, `rounded-xl`, `rounded-4xl` and a
+ *    `min(var(--radius-md), 10px)` ladder — which is what made the intake read
+ *    as a different site from the page around it.
+ * 2. FOCUS. The registry pattern is `outline-none` plus a soft `ring-ring/50`
+ *    halo. It is removed here so the site's single focus rule applies:
+ *    `:focus-visible { outline: 2px solid var(--focus) }` in global.css, which
+ *    is INK and flips to the signal colour on `.on-slab` / `.on-plate`. A ring
+ *    token cannot follow that flip, and a 50%-opacity halo does not clear the
+ *    3:1 that WCAG 2.4.11 asks of a focus indicator. `aria-invalid` keeps its
+ *    destructive border and halo, which is what keeps an invalid control
+ *    visually distinct from a focused one now that focus is not a ring.
+ */
+
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 import { Slot } from "radix-ui"
@@ -5,7 +24,7 @@ import { Slot } from "radix-ui"
 import { cn } from "@/lib/utils"
 
 const badgeVariants = cva(
-  "group/badge inline-flex h-5 w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-4xl border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap transition-all focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&>svg]:pointer-events-none [&>svg]:size-3!",
+  "group/badge inline-flex h-5 w-fit shrink-0 items-center justify-center gap-1 overflow-hidden rounded-lg border border-transparent px-2 py-0.5 text-xs font-medium whitespace-nowrap transition-all has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&>svg]:pointer-events-none [&>svg]:size-3!",
   {
     variants: {
       variant: {

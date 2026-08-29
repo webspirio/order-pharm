@@ -22,10 +22,24 @@
  *    <sup> here, which means an editor cannot accidentally ship one that the
  *    compliance band does not resolve.
  *
- * The prose measure is capped at `max-w-2xl` (~65 characters at this size)
- * while tables get the full `max-w-3xl`, because a four-column comparison at
- * 42rem is unreadable and this is the one page on the site with long-form
- * text on it.
+ * THE READING EXPERIENCE, which is what the rebuild changed here. Prose is
+ * capped at `.measure` (42rem, ~65 characters at this size) while tables get
+ * the full `max-w-3xl`, because a four-column comparison at 42rem is
+ * unreadable and this is the one page on the site with long-form text on it.
+ * The table of contents grew a rail whose amber fill tracks how far through
+ * the article you are — this route's ONE scroll-linked element, and it is a
+ * CSS view-progress timeline rather than an island (see the style block at
+ * the foot of this file). The two disclaimers were promoted rather than
+ * demoted: "read this first" sits above the first paragraph with the signal
+ * rule down its edge, and the clinician-review note closes the prose as a
+ * labelled block instead of a grey sentence nobody reads.
+ *
+ * SIZES. The h1 here is a sentence-length title, so it takes `display-2`
+ * rather than `display-1`, and every heading under it steps down one: the
+ * article's own sections are `display-3`, and so is the "keep reading"
+ * heading. That is why this page does not use `SectionHead.astro`, which
+ * correctly hard-codes `display-2` for a section h2 — on this one page that
+ * would tie the h1.
  */
 import { type Locale, type Dictionary, t, localizedPath, htmlLang } from "@/i18n";
 import { site } from "@/config/site";
@@ -53,7 +67,7 @@ import { Image } from "astro:assets";
 import learn01 from "@/assets/learn-01.jpg";
 import learn02 from "@/assets/learn-02.jpg";
 import learn03 from "@/assets/learn-03.jpg";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
 
 type ArticleSlug = keyof Dictionary["meta"]["articles"];
 
@@ -350,14 +364,14 @@ const breadcrumbJsonLd = {
 
           <div class="mt-8 max-w-3xl">
             <p class="label flex flex-wrap items-center gap-3 text-muted-foreground">
-              <span class="text-brand-700 dark:text-brand-400">{article.category}</span>
+              <span class="text-signal-700 dark:text-signal-500">{article.category}</span>
               <span aria-hidden="true">·</span>
               <span class="figure font-normal tracking-normal">
                 {article.readMinutes} {d.learn.readTime}
               </span>
             </p>
-            <h1 class="display-2 mt-5">{article.title}</h1>
-            <p class="lead mt-5 text-lg">{article.dek}</p>
+            <h1 class="display-2 mt-5 text-balance">{article.title}</h1>
+            <p class="lead mt-5 max-w-2xl text-lg text-pretty">{article.dek}</p>
             <p class="label mt-7 flex flex-wrap items-center gap-3 text-muted-foreground">
               <span>{d.learn.reviewedBy}</span>
               <span aria-hidden="true">·</span>
@@ -368,8 +382,11 @@ const breadcrumbJsonLd = {
             </p>
           </div>
 
-          <aside class="panel mt-9 max-w-3xl border-l-2 border-l-brand-600 p-5 dark:border-l-brand-400">
-            <p class="label text-brand-700 dark:text-brand-400">{chrome.disclaimerLabel}</p>
+          {/* The signal rule is the loudest thing on the page short of the
+              closing plate, and it is spent on the sentence that matters most
+              on a page about a prescription medication. */}
+          <aside class="panel mt-9 max-w-3xl border-l-2 border-l-signal-500 p-6">
+            <p class="label text-signal-700 dark:text-signal-500">{chrome.disclaimerLabel}</p>
             <p class="mt-3 text-[0.9375rem] leading-relaxed text-foreground">
               {d.learn.disclaimer}
             </p>
@@ -377,65 +394,92 @@ const breadcrumbJsonLd = {
         </div>
       </section>
 
-    {/* The ticker closes the head block, the same slot it takes under the
-        hero on the homepage. It cannot sit above the nav any more: the
-        header floats. */}
-    <TrustTicker locale={locale} />
+      {/* The ticker closes the head block, the same slot it takes under the
+          hero on the homepage. It cannot sit above the nav any more: the
+          header floats. */}
+      <TrustTicker locale={locale} />
 
       {/* The article itself, with the table of contents in a rail that sticks
-          on lg and simply sits above the prose below it. */}
-      <section class="bg-background pb-16 pt-10 sm:pb-20 sm:pt-14">
+          beside the prose on lg and simply sits above it below that. */}
+      <section class="bg-background section-tight">
         <div class="shell">
-          <div class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_15rem] lg:gap-16">
+          <div class="article-grid grid gap-10 lg:grid-cols-[minmax(0,1fr)_15rem] lg:gap-16">
             <aside class="lg:col-start-2 lg:row-start-1">
               <nav
+                data-toc
                 aria-labelledby="toc-heading"
-                class="panel p-5 lg:sticky lg:top-24 lg:border-0 lg:bg-transparent lg:p-0"
+                class="panel p-5 lg:sticky lg:top-32 lg:border-0 lg:bg-transparent lg:p-0"
               >
                 <p id="toc-heading" class="label text-muted-foreground">{chrome.toc}</p>
-                <ol class="mt-4 flex flex-col gap-3">
-                  {
-                    contents.map((heading, index) => (
-                      <li class="flex gap-3">
-                        <span class="figure mt-0.5 shrink-0 text-xs text-signal-500">
-                          {String(index + 1).padStart(2, "0")}
-                        </span>
-                        <a
-                          href={`#${heading.id}`}
-                          class="text-sm leading-snug text-muted-foreground hover:text-brand-700 dark:hover:text-brand-400"
-                        >
-                          {heading.text}
-                        </a>
-                      </li>
-                    ))
-                  }
-                </ol>
+
+                <div class="mt-4 flex gap-4">
+                  {/* THE READING RAIL. The track is furniture; the amber fill
+                      is the measurement, and amber on this site is what
+                      measures time. Reading position is elapsed time, so the
+                      accent is doing its declared job rather than decorating,
+                      and it replaces the read-time estimate above with
+                      something the reader can actually check. */}
+                  <div class="relative w-0.5 shrink-0 rounded-full bg-border" aria-hidden="true">
+                    <span class="toc-fill absolute inset-x-0 top-0 h-full origin-top rounded-full bg-signal-500"
+                    ></span>
+                  </div>
+
+                  <ol class="flex min-w-0 flex-1 flex-col gap-3">
+                    {
+                      contents.map((heading, index) => (
+                        <li class="toc-row flex gap-3">
+                          {/* Inactive indices are muted, not amber: signal-500
+                              as small text on paper is 1.9:1 and fails AA.
+                              The active one steps to signal-700, which is
+                              5.6:1 on this ground. */}
+                          <span class="toc-index figure mt-0.5 shrink-0 text-xs text-muted-foreground">
+                            {String(index + 1).padStart(2, "0")}
+                          </span>
+                          <a
+                            href={`#${heading.id}`}
+                            class="toc-link text-sm leading-snug text-muted-foreground transition-colors hover:text-foreground"
+                          >
+                            {heading.text}
+                          </a>
+                        </li>
+                      ))
+                    }
+                  </ol>
+                </div>
               </nav>
             </aside>
 
-            <div class="max-w-3xl lg:col-start-1 lg:row-start-1">
+            {/* `data-article-prose` is the observer's hook below, and the
+                subject of the rail's view-progress timeline. */}
+            <div
+              class="article-prose max-w-3xl lg:col-start-1 lg:row-start-1"
+              data-article-prose
+            >
               {
                 rendered.map((block) => (
                   <>
                     {block.kind === "h2" && (
-                      <h2 id={block.id} class="display-3 mt-14 scroll-mt-28 first:mt-0">
+                      /* No `scroll-mt-*` here: global.css gives every `h2[id]`
+                         a 7.5rem scroll margin, which is the floating
+                         header's clearance, in one place for the whole site. */
+                      <h2 id={block.id} class="display-3 mt-14 first:mt-0">
                         {block.text}
                       </h2>
                     )}
 
                     {block.kind === "p" && (
                       <p
-                        class="mt-5 max-w-2xl text-[1.0625rem] leading-[1.75] text-foreground sm:text-lg"
+                        class="measure mt-5 text-[1.0625rem] leading-[1.75] text-foreground sm:text-lg"
                         set:html={block.html}
                       />
                     )}
 
                     {block.kind === "ul" && (
-                      <ul class="mt-6 flex max-w-2xl flex-col gap-3.5">
+                      <ul class="measure mt-6 flex flex-col gap-3.5">
                         {block.items.map((item) => (
                           <li class="flex gap-3.5 text-[1.0625rem] leading-[1.7] text-foreground">
                             <span
-                              class="mt-2.5 size-1.5 shrink-0 rounded-full bg-brand-600 dark:bg-brand-400"
+                              class="mt-2.5 size-1.5 shrink-0 rounded-full bg-muted-foreground"
                               aria-hidden="true"
                             />
                             <span set:html={item} />
@@ -444,8 +488,11 @@ const breadcrumbJsonLd = {
                       </ul>
                     )}
 
+                    {/* Recessed rather than ruled. The signal rule is already
+                        spent on the disclaimer at the top of the page, and a
+                        device used twice stops being a signal. */}
                     {block.kind === "callout" && (
-                      <aside class="panel mt-8 max-w-2xl border-l-2 border-l-brand-600 p-5 dark:border-l-brand-400">
+                      <aside class="panel-flat measure mt-8 p-5 sm:p-6">
                         <p
                           class="text-[0.9375rem] leading-relaxed text-foreground"
                           set:html={block.html}
@@ -454,7 +501,11 @@ const breadcrumbJsonLd = {
                     )}
 
                     {block.kind === "table" && (
-                      <figure class="mt-10">
+                      /* The table gets a card of its own. It is the widest
+                         object in the column and the only one that breaks the
+                         reading measure, so it should look like a deliberate
+                         inset rather than like prose that ran wide. */
+                      <figure class="panel mt-10 p-5 sm:p-6">
                         <figcaption class="label text-muted-foreground">{block.caption}</figcaption>
 
                         {/* sm and up: the real table. */}
@@ -477,7 +528,7 @@ const breadcrumbJsonLd = {
                             </thead>
                             <tbody>
                               {block.rows.map((row) => (
-                                <tr class="border-b border-border align-top">
+                                <tr class="border-b border-hairline align-top last:border-0">
                                   {row.map((cell, index) =>
                                     index === 0 ? (
                                       <th
@@ -510,7 +561,7 @@ const breadcrumbJsonLd = {
                             four-column comparison at 360px is unreadable. */}
                         <dl class="mt-4 flex flex-col sm:hidden">
                           {block.rows.map((row) => (
-                            <div class="border-t border-border py-4">
+                            <div class="border-t border-hairline py-4">
                               {/* A name labels itself; a figure does not, so a
                                   mono first cell keeps its column heading. */}
                               {row[0].mono && (
@@ -543,15 +594,12 @@ const breadcrumbJsonLd = {
                     )}
 
                     {block.kind === "cta" && (
-                      <div class="mt-12 max-w-2xl border-t border-border pt-6">
+                      <div class="measure mt-12 border-t border-border pt-6">
                         <p
                           class="text-[0.9375rem] leading-relaxed text-muted-foreground"
                           set:html={block.html}
                         />
-                        <a
-                          href={block.href}
-                          class="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-brand-700 dark:text-brand-400"
-                        >
+                        <a href={block.href} class="btn-outline mt-5">
                           {block.label}
                           <ArrowRight className="size-4" />
                         </a>
@@ -561,62 +609,92 @@ const breadcrumbJsonLd = {
                 ))
               }
 
-              <p class="mt-12 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-                {chrome.reviewNote}
-              </p>
+              {/* The review note closes the prose as a labelled block. It used
+                  to be a grey sentence in the same size as a caption, which is
+                  where a reader stops looking; on a page in this category the
+                  provenance of the text is part of the text. */}
+              <aside class="measure mt-14 border-t border-border pt-6">
+                <p class="label text-signal-700 dark:text-signal-500">{d.learn.reviewedBy}</p>
+                <p class="mt-3 text-sm leading-relaxed text-muted-foreground">
+                  {chrome.reviewNote}
+                </p>
+                <p class="label mt-4 text-muted-foreground">
+                  {d.learn.updated}{" "}
+                  <time datetime={article.updatedIso} class="figure font-normal tracking-normal">
+                    {article.updated}
+                  </time>
+                </p>
+              </aside>
             </div>
           </div>
         </div>
       </section>
     </article>
 
-    {/* The other two articles, plus the way back to the index. */}
+    {/* The other two articles, in the same row vocabulary the index uses for
+        everything below its featured piece, so the two surfaces read as one
+        system rather than as two card designs. */}
     <section class="bg-card section">
       <div class="shell">
-        <div class="flex flex-wrap items-end justify-between gap-6">
+        <div class="reveal flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between lg:gap-12">
           <div class="max-w-2xl">
-            <p class="label text-brand-700 dark:text-brand-400">{chrome.nextTitle}</p>
+            <p class="label text-signal-700 dark:text-signal-500">{chrome.nextTitle}</p>
+            {/* `display-3`, not `SectionHead`: see the SIZES note at the top
+                of this file. On this one page a `display-2` section heading
+                would be the same size as the h1 above it. */}
             <h2 class="display-3 mt-4">{d.learn.title}</h2>
             <p class="lead mt-4">{chrome.nextLead}</p>
           </div>
           <a
             href={localizedPath(locale, "/learn/")}
-            class="inline-flex items-center gap-2 text-sm font-semibold text-brand-700 dark:text-brand-400"
+            class="group inline-flex shrink-0 items-center gap-2 text-[0.9375rem] font-semibold text-foreground transition-colors hover:text-signal-700 dark:hover:text-signal-500"
           >
-            <ArrowLeft className="size-4" />
+            <ArrowLeft className="size-4 transition-transform group-hover:-translate-x-1" />
             {chrome.backToIndex}
           </a>
         </div>
 
-        <ul class="mt-10 grid gap-6 md:grid-cols-2 lg:gap-8">
+        <ul class="reveal mt-10 max-w-3xl">
           {
             others.map((entry) => (
-              <li>
-                <a href={entry.href} class="panel group flex h-full flex-col overflow-hidden bg-background">
-                  <div class="aspect-[16/9] overflow-hidden">
-                    <Image
-                      src={entry.image}
-                      alt=""
-                      widths={[400, 640, 900]}
-                      sizes="(min-width: 768px) 28rem, 100vw"
-                      class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                      loading="lazy"
-                    />
-                  </div>
-                  <div class="flex flex-1 flex-col p-6">
-                    <p class="label flex items-center gap-3 text-muted-foreground">
-                      <span class="text-brand-700 dark:text-brand-400">{entry.category}</span>
-                      <span aria-hidden="true">·</span>
-                      <span class="figure font-normal tracking-normal">
-                        {entry.readMinutes} {d.learn.readTime}
-                      </span>
-                    </p>
-                    <h3 class="subhead mt-3">{entry.title}</h3>
-                    <p class="mt-2.5 flex-1 text-sm leading-relaxed text-muted-foreground">
-                      {entry.dek}
-                    </p>
-                  </div>
-                </a>
+              <li class="group relative grid grid-cols-[auto_1fr_auto] items-center gap-4 border-t border-border py-5 last:border-b sm:gap-5 sm:py-6">
+                <div class="aspect-[4/3] w-24 shrink-0 overflow-hidden rounded-lg bg-muted sm:w-28">
+                  <Image
+                    src={entry.image}
+                    alt=""
+                    widths={[112, 224, 336]}
+                    sizes="7rem"
+                    class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                    loading="lazy"
+                  />
+                </div>
+
+                <div class="min-w-0">
+                  <p class="label flex flex-wrap items-center gap-2.5 text-muted-foreground">
+                    <span class="text-signal-700 dark:text-signal-500">{entry.category}</span>
+                    <span aria-hidden="true">·</span>
+                    <span class="figure font-normal tracking-normal">
+                      {entry.readMinutes} {d.learn.readTime}
+                    </span>
+                  </p>
+                  {/* The link wraps the title only, so a screen reader hears
+                      the headline rather than the headline with a category and
+                      a read time read out in front of it; the overlay keeps
+                      the whole row clickable. */}
+                  <h3 class="subhead mt-2 text-pretty">
+                    <a
+                      href={entry.href}
+                      class="transition-colors after:absolute after:inset-0 group-hover:text-signal-700 dark:group-hover:text-signal-500"
+                    >
+                      {entry.title}
+                    </a>
+                  </h3>
+                </div>
+
+                <ArrowUpRight
+                  className="size-4 shrink-0 text-muted-foreground transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                  aria-hidden="true"
+                />
               </li>
             ))
           }
@@ -629,3 +707,134 @@ const breadcrumbJsonLd = {
   </main>
   <Footer locale={locale} />
 </Layout>
+
+<style>
+  /* ===============================================================
+     THE READING RAIL — this route's one scroll-linked element, and
+     it is CSS.
+
+     The rail's amber fill is driven by a VIEW-PROGRESS TIMELINE on
+     the prose column, not by the document scroll position: the
+     `contain` range runs from "the prose top reaches the viewport
+     top" to "the prose bottom reaches the viewport bottom", which is
+     exactly the range in which the reader is reading. A root scroll
+     timeline would count the header, the ticker, the next-reads band
+     and the footer, and the rail would sit at two thirds when the
+     last paragraph ended.
+
+     `timeline-scope` is what lets the fill — which lives in the
+     sticky aside — read a timeline declared on its sibling. Both are
+     descendants of `.article-grid`.
+
+     The plan for this rail was a Motion island using useScroll. That
+     would have been the only hydrated island on these three routes
+     and, since `motion` is in no other bundle on this site, it would
+     have created a 34 KB vendor chunk to fill one hairline. This is
+     the same visual for no bytes.
+
+     The fill is DECORATION (`aria-hidden`), and it is the one thing
+     on the site allowed to be absent in its base state: with no
+     scroll-timeline support, or with reduced motion, the track
+     simply stays empty. Nothing that carries text is hidden, which
+     is the rule that matters.
+     =============================================================== */
+  .article-grid {
+    timeline-scope: --article-read;
+  }
+  .article-prose {
+    view-timeline: --article-read block;
+  }
+  .toc-fill {
+    display: none;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) and (timeline-scope: --probe) {
+      .toc-fill {
+        display: block;
+        /* Order matters: the `animation` shorthand resets
+           `animation-timeline` to `auto`, so the timeline is assigned
+           after it. */
+        animation: toc-fill linear both;
+        animation-timeline: --article-read;
+        animation-range: contain 0% contain 100%;
+      }
+    }
+  }
+  @keyframes toc-fill {
+    from {
+      transform: scaleY(0);
+    }
+    to {
+      transform: scaleY(1);
+    }
+  }
+
+  /* The heading you are currently in, set by the observer below. An instant
+     colour swap, so there is nothing here for reduced motion to turn off. */
+  .toc-row.is-current .toc-link {
+    color: var(--foreground);
+  }
+  .toc-row.is-current .toc-index {
+    color: var(--color-signal-700);
+  }
+  :global(.dark) .toc-row.is-current .toc-index {
+    color: var(--color-signal-500);
+  }
+</style>
+
+<script>
+  /**
+   * Marks the table-of-contents row for the heading being read.
+   *
+   * An IntersectionObserver rather than a scroll listener: the callback only
+   * runs when a heading crosses the header line, so scrolling through a long
+   * section costs nothing. The rect arithmetic inside it is what makes "the
+   * last heading you passed" correct when two headings are on screen at once
+   * — an observer alone only knows which elements intersect, not which one
+   * you are under.
+   *
+   * The list itself is server-rendered and works without this: every row is a
+   * real in-page anchor. This only adds the highlight.
+   */
+  const nav = document.querySelector<HTMLElement>("[data-toc]");
+  const headings = Array.from(
+    document.querySelectorAll<HTMLElement>("[data-article-prose] h2[id]"),
+  );
+
+  if (nav && headings.length > 0) {
+    const rows = new Map<string, HTMLElement>();
+    nav.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach((link) => {
+      const row = link.closest("li");
+      if (row) rows.set(decodeURIComponent(link.hash.slice(1)), row);
+    });
+
+    /* The floating header's clearance, matching the `scroll-margin-top` that
+       global.css gives every `h2[id]`: a heading above this line has been
+       scrolled past. */
+    const headerLine = 120;
+    let current = "";
+
+    const sync = () => {
+      const passed = headings.filter((h) => h.getBoundingClientRect().top <= headerLine);
+      const id = (passed[passed.length - 1] ?? headings[0]).id;
+      if (id === current) return;
+      current = id;
+      rows.forEach((row, key) => {
+        const on = key === id;
+        row.classList.toggle("is-current", on);
+        const link = row.querySelector("a");
+        if (!link) return;
+        /* `location`, not `page`: these anchors point inside the current
+           document rather than to the page you are on. */
+        if (on) link.setAttribute("aria-current", "location");
+        else link.removeAttribute("aria-current");
+      });
+    };
+
+    const observer = new IntersectionObserver(sync, {
+      rootMargin: `-${headerLine}px 0px 0px 0px`,
+    });
+    headings.forEach((heading) => observer.observe(heading));
+    sync();
+  }
+</script>

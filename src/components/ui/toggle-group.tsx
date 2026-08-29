@@ -1,5 +1,17 @@
 "use client"
 
+/**
+ * LOCALLY EDITED shadcn primitive. Re-running `shadcn add toggle-group` reverts the
+ * two edits below, and both are contract, not taste — see docs/DESIGN-SYSTEM.md.
+ *
+ * 1. RADIUS. Two families and no third: `rounded-lg` (12px, `--radius`) for
+ *    controls, `rounded-2xl` (24px, `--radius-card`) for surfaces. The registry
+ *    ships four more — `rounded-md`, `rounded-xl`, `rounded-4xl` and a
+ *    `min(var(--radius-md), 10px)` ladder — which is what made the intake read
+ *    as a different site from the page around it.
+ *
+ * (Focus is handled in toggle.tsx, whose variants this composes.)
+ */
 import * as React from "react"
 import { type VariantProps } from "class-variance-authority"
 import { ToggleGroup as ToggleGroupPrimitive } from "radix-ui"
@@ -41,7 +53,7 @@ function ToggleGroup({
       data-orientation={orientation}
       style={{ "--gap": spacing } as React.CSSProperties}
       className={cn(
-        "group/toggle-group flex w-fit flex-row items-center gap-[--spacing(var(--gap))] rounded-lg data-[size=sm]:rounded-[min(var(--radius-md),10px)] data-vertical:flex-col data-vertical:items-stretch",
+        "group/toggle-group flex w-fit flex-row items-center gap-[--spacing(var(--gap))] rounded-lg data-[size=sm]:rounded-lg data-vertical:flex-col data-vertical:items-stretch",
         className
       )}
       {...props}
