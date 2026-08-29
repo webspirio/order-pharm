@@ -2,136 +2,143 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-/* Display: Fraunces, loaded from the `wonk` variable file (wght + WONK axes,
-   36 KB latin) rather than `index.css` (wght only) — WONK 1 is what swaps in
-   the alternate g/y/f forms that give the headline voice its signature. The
-   `full` file adds a SOFT axis for 3.3x the bytes and is not worth it. */
-@import "@fontsource-variable/fraunces/wonk.css";
+/* Display + body: Instrument Sans. The rebuild inverts the old type
+   assignment — see the THREE ROLES note below — so the sans now carries the
+   headlines and Fraunces is reserved for a single accent word. Instrument
+   Sans Variable ships 400–700, so 500 is a real weight. */
 @import "@fontsource-variable/instrument-sans/index.css";
-/* Data face: two static weights only. 400 for figures and table cells, 600
-   for the uppercase micro-labels. A variable Plex Mono does not exist. */
+/* Accent face: Fraunces, from the `wonk` variable file (wght + WONK, 36 KB
+   latin) rather than `index.css` (wght only). WONK 1 swaps in the alternate
+   g/y/f. It is used in exactly two places now, both italic, so the axis is
+   the whole reason to load this file at all. */
+@import "@fontsource-variable/fraunces/wonk.css";
+/* Data face: two static weights. 400 for figures and table cells, 600 for the
+   uppercase micro-labels. A variable Plex Mono does not exist. */
 @import "@fontsource/ibm-plex-mono/latin-400.css";
 @import "@fontsource/ibm-plex-mono/latin-600.css";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  /* ---------------------------------------------------------------
-     THREE ROLES, AND THE MONO IS THE ONE THAT MATTERS
+  /* ===============================================================
+     THREE ROLES — and the assignment changed in the rebuild.
 
-     This business runs on numbers a patient has to trust: doses in mg,
-     a review window in hours, a dispatch cutoff, an itemised fee. So
-     every figure on this site is set in a monospace with tabular
-     figures, at real reading sizes — not as a decorative eyebrow. That
-     is the type decision the brand is built on; the serif and the sans
-     are chosen to stay out of its way.
+     The old system set every h1/h2/h3 in Fraunces. That reads
+     editorial and luxurious, which is the register the whole
+     category already occupies. The rebuild takes its structure from
+     a premium SaaS template whose power comes from one thing: a very
+     large, very tight grotesque headline. So:
 
-     - heading  Fraunces, weight 400, WONK 1, tight tracking. Warm and
-                slightly irregular, so a platform named after a person
-                reads like one.
-     - sans     Instrument Sans. Crisp humanist grotesque; deliberately
-                not Inter, and not the Poppins/Google-Sans rounding that
-                every competitor in this category uses.
-     - mono     IBM Plex Mono. Institutional rather than code-editor.
-     --------------------------------------------------------------- */
+     - sans     Instrument Sans. Headlines at 500 with tight tracking,
+                and all body copy. Crisp humanist grotesque, and
+                deliberately not Inter or the Poppins rounding every
+                competitor in this category uses.
+     - heading  Fraunces, 400, italic, WONK 1. Reserved for ONE accent
+                word inside the h1, and for pull quotes. Demoting it
+                from "all headings" to "one word" is what makes it
+                register as a decision rather than a font choice.
+     - mono     IBM Plex Mono. EVERY figure on this site: doses, hours,
+                prices, cutoffs, step indices, USP chapters, dates.
+                Unchanged, and still the decision the brand rests on.
+     =============================================================== */
   --font-sans: "Instrument Sans Variable", ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", Roboto, sans-serif;
   --font-heading: "Fraunces Variable", Georgia, "Times New Roman", serif;
   --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  /* ---------------------------------------------------------------
-     BRAND RAMP — three switchable palettes (see PaletteSwitcher.tsx),
-     selected at runtime via a `data-palette` attribute on <html>, the
-     same way `.dark` switches light/dark (see the no-flash script in
-     Layout.astro). This block declares the default palette.
+  /* ===============================================================
+     TWO HUES. A structural deep petrol, and one loud signal.
 
-     DEFAULT — "saline" (hue ~193, petrol/mineral teal + amber signal).
-     Chosen against the field rather than from a mood board: all three
-     reference sites the client supplied are warm, cream-grounded and
-     light-only (Pomegranate burgundy #861a26 on #faf7e9, Ivím forest
-     #444E43 on #F5F4F2, Good Life charcoal #323232 on #fffef8). A cool
-     mineral ground is the one open position that still reads clinical,
-     and it is the only palette here that also ships a real dark mode —
-     which none of the three has.
+     BRAND — deep petrol. It is no longer the page's overall wash;
+     the ground is neutral paper now. Petrol survives as the
+     STRUCTURAL DARK: the full-bleed slab bands, .panel-invert, and
+     the ink of the logotype. brand-800 is fixed-dark in both themes.
 
-     brand-600 is the flat CTA surface; brand-50 text on it clears 6:1.
-     brand-800 is a fixed deep shade for the full-bleed dark bands
-     (Footer, the compliance band, the Relay backdrop) that must read
-     dark in both themes rather than inverting with the page.
+     SIGNAL — amber. Promoted, and this is the rebuild's central
+     colour decision. On the old site amber was a minor second hue
+     meaning "this measures time" (Relay ticks, the review window,
+     the dispatch cutoff). The rebuild makes it THE accent, which is
+     honest — a coordination business sells a clock — and it is the
+     open position: the reference template uses lime, and every site
+     in this category is sage, cream or burgundy.
 
-     glow-* is one deliberately minor second hue — amber. It is the far
-     stop of the site's single gradient and the accent on anything that
-     measures TIME (the Relay's ticks, the dispatch cutoff, the review
-     window). It never carries small text on its own and there is no
-     glow-based semantic token, so the UI stays one colour and the amber
-     stays legible as "this is a clock".
-     --------------------------------------------------------------- */
-  --color-brand-50: #ebf4f6;
-  --color-brand-300: #a3cbd5;
-  --color-brand-400: #6fadbc;
-  --color-brand-500: #3d8b9c;
-  --color-brand-600: #25626f;
-  --color-brand-700: #1a4a55;
+     THE SIGNAL RULE, enforced by contrast rather than taste:
+       signal-500 is a SURFACE and a RULE. Dark ink on it clears
+       8.7:1. As small text on paper it is 1.9:1, so it is NEVER
+       small text on a light ground — use signal-700 (5.6:1 on
+       paper) there. On the petrol slab and in dark mode, signal-500
+       is legible text (7.0:1 and 9.0:1) and may be used as such.
+     =============================================================== */
+  --color-brand-50: #ecf4f6;
+  --color-brand-100: #d7e7eb;
+  --color-brand-300: #9cc6d1;
+  --color-brand-400: #6aa9b8;
+  --color-brand-500: #3a8798;
+  --color-brand-600: #245f6c;
+  --color-brand-700: #17434e;
   --color-brand-800: #0b2a31;
-  --color-brand-foreground: #06181d;
+  --color-brand-900: #061a1f;
 
-  --color-glow-300: #f3dcb4;
-  --color-glow-500: #d89c3e;
-  --color-glow-700: #845213;
+  --color-signal-100: #fdf1dd;
+  --color-signal-300: #f5cf8b;
+  --color-signal-500: #e8a33d;
+  --color-signal-700: #8a5510;
+  --color-signal-900: #4a2c06;
 }
 
-/* Palette: indigo — deep indigo ink + soft coral signal. Cooler and more
-   technical than the default; the option for a client who wants the site to
-   read closer to fintech than to a clinic. */
+/* ---------------------------------------------------------------
+   PALETTE: indigo — deep indigo ink, coral signal. Reads closer to
+   fintech than to a clinic. Same token names, same contrast rules.
+   --------------------------------------------------------------- */
 :root[data-palette="indigo"] {
   --color-brand-50: #eef0fa;
+  --color-brand-100: #dee2f4;
   --color-brand-300: #b4bce8;
   --color-brand-400: #8994d8;
   --color-brand-500: #5a66be;
   --color-brand-600: #3c4491;
   --color-brand-700: #2c3270;
   --color-brand-800: #171b3d;
-  --color-brand-foreground: #101230;
+  --color-brand-900: #0d1029;
 
-  --color-glow-300: #fad5cb;
-  --color-glow-500: #e8836a;
-  --color-glow-700: #8e3a26;
+  --color-signal-100: #fdeae5;
+  --color-signal-300: #f7b8a6;
+  --color-signal-500: #ec7f62;
+  --color-signal-700: #97361d;
+  --color-signal-900: #521a0c;
 }
 
-/* Palette: clay — deep clay/oxblood + sage. This is deliberately the warm,
-   cream-grounded apothecary look the reference sites use, kept as a switchable
-   option so the direction can be compared side by side rather than argued
-   about. */
+/* ---------------------------------------------------------------
+   PALETTE: clay — the warm apothecary look the reference sites in
+   this category use, kept switchable so the direction can be
+   compared rather than argued about. Signal is a deep olive: the
+   warm ground already carries the amber register, so an amber
+   signal on it would disappear.
+   --------------------------------------------------------------- */
 :root[data-palette="clay"] {
-  --color-brand-50: #f7f0ea;
+  --color-brand-50: #f8f1eb;
+  --color-brand-100: #efe1d5;
   --color-brand-300: #debda9;
   --color-brand-400: #c89578;
   --color-brand-500: #a96b4b;
   --color-brand-600: #8a4a32;
   --color-brand-700: #6e3826;
   --color-brand-800: #3d1e14;
-  --color-brand-foreground: #2a1610;
+  --color-brand-900: #26120c;
 
-  /* Sage rather than amber, so the duotone stays warm-plus-cool the way
-     Pomegranate's burgundy-and-sage does. glow-500 is lightened from the
-     obvious mid-sage (#7e9463): amber's job on this site is to carry the
-     time figures on the fixed-dark bands, and at #7e9463 that text cleared
-     4.5:1 on solid brand-800 but not on the Hero's brand-800/55 over a
-     photograph, which is where it actually sits. */
-  --color-glow-300: #d7e1c4;
-  --color-glow-500: #9ab27f;
-  --color-glow-700: #3f4e2c;
+  --color-signal-100: #eef1e2;
+  --color-signal-300: #cbd7a8;
+  --color-signal-500: #9fb469;
+  --color-signal-700: #4f6122;
+  --color-signal-900: #2b360f;
 }
-
-/* Note: the radius scale is NOT declared here. `@theme inline` below derives
-   --radius-sm/md/lg/xl/2xl/3xl from the single `--radius` token in :root, so a
-   --radius-lg here would be silently overridden. */
 
 @theme inline {
   --font-heading: "Fraunces Variable", Georgia, "Times New Roman", serif;
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
+  --color-hairline: var(--hairline);
   --color-destructive: var(--destructive);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
@@ -147,164 +154,215 @@
   --color-card: var(--card);
   --color-foreground: var(--foreground);
   --color-background: var(--background);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
+  /* The site frame, the floating header and every raised card share one
+     surface. Naming it `frame` (after the fixed border it draws) keeps the
+     relationship visible: a card is a piece of the frame lifted off the page. */
+  --color-frame: var(--frame);
+
+  /* TWO RADIUS FAMILIES, and no third.
+       --radius       controls: buttons, inputs, chips, small badges (12px)
+       --radius-card  surfaces: panels, cards, bento tiles, media (24px)
+     The architectural curves — the site frame's corner fillets, the header's
+     bottom sweep, the footer slab's top corners — are not a card radius and
+     use --radius-slab. They are page furniture, not content containers. */
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: calc(var(--radius) * 0.75);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-xl: calc(var(--radius) * 1.34);
+  --radius-2xl: var(--radius-card);
+  --radius-3xl: var(--radius-slab);
 }
 
 :root {
-  /* "Saline" — cool mineral paper, petrol ink. Cards sit one step down from
-     the page so they read as surfaces via colour as well as a hairline.
-     --primary/--primary-foreground are pinned to brand-600/brand-50, the
-     same pair `.btn-solid` renders, so the semantic token matches what a
-     primary surface actually looks like on screen.
+  /* "Specimen" — cool neutral paper, white surfaces, petrol slab, amber
+     signal. The ground is deliberately flatter and less tinted than the old
+     site's: a petrol-washed page cannot carry a loud accent, and the accent
+     is the point now.
 
-     --radius is 0.5rem so cards land at 8px, close to the 10px the premium
-     end of this category uses. Buttons opt out to a near-square 3px via
-     `.btn-solid`/`.btn-outline` below — round cards, square controls. */
-  --background: #f5f7f7;
-  --foreground: #0f1f23;
-  --card: #e9eeef;
-  --card-foreground: #0f1f23;
-  --popover: #f5f7f7;
-  --popover-foreground: #0f1f23;
-  --primary: #25626f;
-  --primary-foreground: #ebf4f6;
-  --secondary: #e9eeef;
-  --secondary-foreground: #0f1f23;
-  --muted: #e9eeef;
+     --card is the same white as --frame. Cards read as raised BY being
+     lighter than the paper, which is how the reference template does it,
+     rather than by a shadow. There are no shadows on this site except the
+     mobile sheet and the two floating overlays. */
+  --background: #f1f3f2;
+  --frame: #ffffff;
+  --foreground: #0c1412;
+  --card: #ffffff;
+  --card-foreground: #0c1412;
+  --popover: #ffffff;
+  --popover-foreground: #0c1412;
+  --primary: #0c1412;
+  --primary-foreground: #f1f3f2;
+  --secondary: #e6eae9;
+  --secondary-foreground: #0c1412;
+  --muted: #e6eae9;
   /* Body prose is set in this token nearly everywhere, so it is a reading
-     colour, not just a "muted" one. Held at >=5:1 on --card (5.0) and
-     --background (5.2), not merely on the page. */
-  --muted-foreground: #59676c;
-  --accent: #dee7e9;
-  --accent-foreground: #0f1f23;
+     colour, not a decorative one. 5.4:1 on --background, 6.0:1 on --card. */
+  --muted-foreground: #5a6663;
+  --accent: #e6eae9;
+  --accent-foreground: #0c1412;
   --destructive: oklch(0.577 0.245 27.325);
-  --border: #d5e0e2;
-  --input: #b9cace;
-  --ring: #25626f;
-  --radius: 0.5rem;
+  /* Two weights of edge. --border is a visible container edge; --hairline is
+     the near-invisible rule used inside tables and between list rows. */
+  --border: #dde3e1;
+  --hairline: #e9edec;
+  --input: #c3ccc9;
+  --ring: #e8a33d;
+  --radius: 0.75rem;
+  --radius-card: 1.5rem;
+  --radius-slab: 2.5rem;
+  /* Thickness of the fixed site frame. Read by the frame itself and by the
+     floating header, which sits exactly on top of it. */
+  --frame-w: 10px;
 }
 
 .dark {
-  /* Same family, inverted: a deep petrol-black rather than neutral #000, so
-     the accent and card surfaces keep their temperature instead of going
-     cold grey. */
-  --background: #0c1418;
-  --foreground: #eaf1f2;
-  --card: #131e23;
-  --card-foreground: #eaf1f2;
-  --popover: #131e23;
-  --popover-foreground: #eaf1f2;
-  --primary: #25626f;
-  --primary-foreground: #ebf4f6;
-  --secondary: #17242a;
-  --secondary-foreground: #eaf1f2;
-  --muted: #17242a;
-  --muted-foreground: #a3b3b8;
-  --accent: #1a282e;
-  --accent-foreground: #eaf1f2;
+  /* Same family, inverted. The frame goes DARKER than the page rather than
+     lighter, so the page still reads as a specimen mounted on a card. */
+  --background: #0b0f0e;
+  --frame: #050807;
+  --foreground: #e8edeb;
+  --card: #141a18;
+  --card-foreground: #e8edeb;
+  --popover: #141a18;
+  --popover-foreground: #e8edeb;
+  --primary: #e8edeb;
+  --primary-foreground: #0b0f0e;
+  --secondary: #1a2220;
+  --secondary-foreground: #e8edeb;
+  --muted: #1a2220;
+  --muted-foreground: #9aa5a2;
+  --accent: #1a2220;
+  --accent-foreground: #e8edeb;
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 16%);
-  --ring: #3d8b9c;
+  --border: #242e2b;
+  --hairline: #1a2220;
+  --input: #33403c;
+  --ring: #e8a33d;
 }
 
 /* Palette: indigo — near-white cool ground, deep indigo ink. */
 :root[data-palette="indigo"] {
-  --background: #f7f8fc;
-  --foreground: #171b3d;
-  --card: #eceef8;
-  --card-foreground: #171b3d;
-  --popover: #f7f8fc;
-  --popover-foreground: #171b3d;
-  --primary: #3c4491;
-  --primary-foreground: #eef0fa;
-  --secondary: #eceef8;
-  --secondary-foreground: #171b3d;
-  --muted: #eceef8;
-  /* >=5:1 on --card, as in the default palette. */
-  --muted-foreground: #575e7e;
-  --accent: #e1e5f5;
-  --accent-foreground: #171b3d;
-  --border: #dadef0;
+  --background: #f3f4fb;
+  --frame: #ffffff;
+  --foreground: #12152f;
+  --card: #ffffff;
+  --card-foreground: #12152f;
+  --popover: #ffffff;
+  --popover-foreground: #12152f;
+  --primary: #12152f;
+  --primary-foreground: #f3f4fb;
+  --secondary: #e7e9f6;
+  --secondary-foreground: #12152f;
+  --muted: #e7e9f6;
+  --muted-foreground: #555c7c;
+  --accent: #e7e9f6;
+  --accent-foreground: #12152f;
+  --border: #dcdff1;
+  --hairline: #e9ebf7;
   --input: #bcc3e6;
-  --ring: #3c4491;
+  --ring: #ec7f62;
 }
 .dark[data-palette="indigo"] {
-  --background: #0d0f22;
+  --background: #0a0c1d;
+  --frame: #050611;
   --foreground: #eef0fa;
-  --card: #15183a;
+  --card: #14173a;
   --card-foreground: #eef0fa;
-  --popover: #15183a;
+  --popover: #14173a;
   --popover-foreground: #eef0fa;
-  --primary: #3c4491;
-  --primary-foreground: #eef0fa;
+  --primary: #eef0fa;
+  --primary-foreground: #0a0c1d;
   --secondary: #1a1e45;
   --secondary-foreground: #eef0fa;
   --muted: #1a1e45;
   --muted-foreground: #a9b0d4;
-  --accent: #1e2350;
+  --accent: #1a1e45;
   --accent-foreground: #eef0fa;
-  --ring: #5a66be;
+  --border: #262c58;
+  --hairline: #1a1e45;
+  --input: #38407a;
+  --ring: #ec7f62;
 }
 
 /* Palette: clay — warm cream ground, deep clay ink. */
 :root[data-palette="clay"] {
-  --background: #fbf8f3;
+  --background: #f8f4ee;
+  --frame: #fffdfa;
   --foreground: #2a1610;
-  --card: #f2ebe1;
+  --card: #fffdfa;
   --card-foreground: #2a1610;
-  --popover: #fbf8f3;
+  --popover: #fffdfa;
   --popover-foreground: #2a1610;
-  --primary: #8a4a32;
-  --primary-foreground: #f7f0ea;
-  --secondary: #f2ebe1;
+  --primary: #2a1610;
+  --primary-foreground: #f8f4ee;
+  --secondary: #eee6da;
   --secondary-foreground: #2a1610;
-  --muted: #f2ebe1;
-  /* >=5:1 on --card, as in the default palette. */
+  --muted: #eee6da;
   --muted-foreground: #6b5a50;
-  --accent: #efe6d8;
+  --accent: #eee6da;
   --accent-foreground: #2a1610;
-  --border: #e6dcce;
+  --border: #e5dbcc;
+  --hairline: #f0e9dd;
   --input: #d3c3ae;
-  --ring: #8a4a32;
+  --ring: #9fb469;
 }
 .dark[data-palette="clay"] {
-  --background: #191110;
-  --foreground: #f7f0ea;
+  --background: #171010;
+  --frame: #0d0808;
+  --foreground: #f8f1eb;
   --card: #241814;
-  --card-foreground: #f7f0ea;
+  --card-foreground: #f8f1eb;
   --popover: #241814;
-  --popover-foreground: #f7f0ea;
-  --primary: #8a4a32;
-  --primary-foreground: #f7f0ea;
+  --popover-foreground: #f8f1eb;
+  --primary: #f8f1eb;
+  --primary-foreground: #171010;
   --secondary: #2c1e18;
-  --secondary-foreground: #f7f0ea;
+  --secondary-foreground: #f8f1eb;
   --muted: #2c1e18;
   --muted-foreground: #beac9f;
-  --accent: #33231c;
-  --accent-foreground: #f7f0ea;
-  --ring: #a96b4b;
+  --accent: #2c1e18;
+  --accent-foreground: #f8f1eb;
+  --border: #38271f;
+  --hairline: #2c1e18;
+  --input: #4d372c;
+  --ring: #9fb469;
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
+    @apply border-border outline-ring/60;
   }
   html {
     @apply font-sans;
     scroll-behavior: smooth;
+    /* The fixed frame overlays the viewport edges. Without this, a horizontal
+       overflow anywhere in a section pushes content under the right rail. */
+    overflow-x: hidden;
+  }
+  /* Lenis adds `.lenis` to <html> when it takes over. Native smooth scrolling
+     and Lenis's own anchor handling fight each other and the page lands short
+     of the target, so the CSS behaviour steps aside — and steps back in
+     automatically for no-JS, reduced motion and coarse pointers, where Lenis
+     never mounts. */
+  html.lenis {
+    scroll-behavior: auto;
+  }
+  body {
+    @apply bg-background text-foreground;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   @media (prefers-reduced-motion: reduce) {
     html {
       scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
     }
   }
   p,
@@ -312,31 +370,32 @@
   dd {
     line-height: 1.6;
   }
-  /* In-page anchor targets sit beneath a `sticky top-0` header. Scoped to
-     `section[id]` so sections added later inherit it automatically. */
-  section[id] {
-    scroll-margin-top: 6rem;
+  /* In-page anchor targets sit beneath the floating header. */
+  section[id],
+  h2[id],
+  h3[id] {
+    scroll-margin-top: 7.5rem;
   }
-  /* The category's premium end sets display type big, LIGHT and tight —
-     never bold. Fraunces is variable so 400 is a real weight here, not the
-     synthetic-bold compromise a single-weight display serif would force.
-     WONK 1 is the whole point of loading the wonk file: it swaps in the
-     alternate g/y/f, which is the one typographic detail nobody else in
-     this category has. */
+  /* Headings are the SANS now, set light-tight rather than bold-wide. 500 is
+     the weight the whole display scale runs at; 600 and 700 are reserved for
+     sub-heads and emphasis inside running copy, where the sans has to hold a
+     level at small sizes. */
   h1,
   h2,
-  h3 {
-    font-family: var(--font-heading);
-    font-weight: 400;
-    font-variation-settings: "WONK" 1;
-    letter-spacing: -0.025em;
+  h3,
+  h4 {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    letter-spacing: -0.03em;
   }
   h1,
   h2 {
-    line-height: 1.04;
+    line-height: 1.02;
   }
-  h3 {
-    line-height: 1.15;
+  h3,
+  h4 {
+    line-height: 1.2;
+    letter-spacing: -0.015em;
   }
   /* Tailwind v4's preflight dropped v3's `button { cursor: pointer }`. */
   button:not(:disabled) {
@@ -347,15 +406,139 @@
   table {
     font-variant-numeric: tabular-nums;
   }
+  ::selection {
+    background: var(--color-signal-500);
+    color: #0c1412;
+  }
+  /* One focus treatment everywhere, and it is the signal colour, so keyboard
+     focus is the same visual event as a primary action. */
+  :focus-visible {
+    outline: 2px solid var(--color-signal-500);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
 }
 
 @layer components {
-  /* ---------------------------------------------------------------
-     THE MONO MICRO-LAYER — `.label`
-     Eyebrows, section indices, table headers, chips, footer column
-     headings, the units beside a figure. One style, used everywhere a
-     word is doing a labelling job rather than a reading job.
-     --------------------------------------------------------------- */
+  /* ===============================================================
+     LAYOUT PRIMITIVES — one container width, two section paddings.
+
+     The harmonization rule this site is held to: exactly ONE outer
+     container and exactly TWO section rhythms across all fourteen
+     routes. A page that invents a third of either is the single
+     clearest tell of an assembled rather than a designed page.
+     =============================================================== */
+  .shell {
+    width: 100%;
+    max-width: 64rem;
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+  @media (min-width: 640px) {
+    .shell {
+      padding-inline: 2rem;
+    }
+  }
+  .section {
+    padding-block: 5rem;
+  }
+  @media (min-width: 640px) {
+    .section {
+      padding-block: 7rem;
+    }
+  }
+  @media (min-width: 1024px) {
+    .section {
+      padding-block: 8.5rem;
+    }
+  }
+  /* The one allowed exception: a band that reads as attached to the thing
+     above it — the ticker under the hero, a breadcrumb, a footnote strip. */
+  .section-tight {
+    padding-block: 3rem;
+  }
+  @media (min-width: 640px) {
+    .section-tight {
+      padding-block: 3.5rem;
+    }
+  }
+  /* Reading measure for prose columns. */
+  .measure {
+    max-width: 42rem;
+  }
+
+  /* ===============================================================
+     TYPE SCALE — three display sizes and nothing between them.
+
+     .display-1 appears exactly once per page, in the h1. Nothing
+     below it may match or exceed it; that inversion is the most
+     common defect when composing a page from parts.
+     =============================================================== */
+  .display-1 {
+    font-size: clamp(2.75rem, 7.4vw, 5.5rem);
+    line-height: 0.98;
+    letter-spacing: -0.038em;
+    font-weight: 500;
+  }
+  .display-2 {
+    font-size: clamp(2rem, 4.2vw, 3.25rem);
+    line-height: 1.04;
+    letter-spacing: -0.032em;
+    font-weight: 500;
+  }
+  .display-3 {
+    font-size: clamp(1.375rem, 2.4vw, 1.75rem);
+    line-height: 1.18;
+    letter-spacing: -0.022em;
+    font-weight: 500;
+  }
+
+  /* The Fraunces moment. Italic, WONK 1, in the signal colour — one word
+     inside the h1, or a pull quote. Two uses, and that is the whole budget.
+     The colour steps to signal-700 on light grounds because signal-500 as
+     text on paper is 1.9:1; the reference template ships exactly that failure
+     and this is where it gets fixed. */
+  .wonk {
+    font-family: var(--font-heading);
+    font-style: italic;
+    font-weight: 400;
+    font-variation-settings: "WONK" 1;
+    letter-spacing: -0.02em;
+    color: var(--color-signal-700);
+  }
+  .dark .wonk,
+  .on-slab .wonk {
+    color: var(--color-signal-500);
+  }
+
+  /* Card titles, FAQ questions, table row labels. Deliberately the sans at
+     600: below ~24px a 400-weight display face carries less ink than the 16px
+     paragraph it introduces, so it reads quieter than the text beneath it. */
+  .subhead {
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    line-height: 1.35;
+    letter-spacing: -0.014em;
+  }
+
+  /* The paragraph under an h1 or h2. */
+  .lead {
+    font-size: 1.0625rem;
+    line-height: 1.62;
+    color: var(--muted-foreground);
+    max-width: 40rem;
+  }
+
+  /* ===============================================================
+     THE MONO MICRO-LAYER
+
+     .label  eyebrows, section indices, table headers, chips, footer
+             column headings, the unit beside a figure.
+     .figure a number the reader is meant to trust: doses, hours,
+             cutoffs, dollars. Tabular so it aligns in a column;
+             tight tracking so it does not read as code.
+     =============================================================== */
   .label {
     font-family: var(--font-mono);
     font-size: 0.6875rem;
@@ -364,199 +547,303 @@
     letter-spacing: 0.16em;
     text-transform: uppercase;
   }
-
-  /* A figure the reader is meant to trust: doses, hours, cutoffs, dollars.
-     Tabular so it aligns in a column; tight tracking so it does not read as
-     code. */
   .figure {
     font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.02em;
   }
 
-  /* The sub-heading level: card titles, FAQ questions, table row labels.
-     Deliberately the SANS, not Fraunces. Below ~24px the display serif has
-     less ink than the 16px sans paragraph beneath it, so a serif sub-head
-     reads quieter than the text it introduces. The rule: Fraunces at 24px
-     and up, where it can carry the voice; the sans below that, using weight
-     — which a 400-only display face cannot supply — to hold the level at
-     any column width. */
-  .subhead {
-    font-family: var(--font-sans);
-    font-size: 1.0625rem;
-    font-weight: 600;
-    line-height: 1.35;
-    letter-spacing: -0.011em;
-  }
+  /* ===============================================================
+     CONTROLS — 12px radius, flat, no gradient, no shadow.
 
-  /* Display sizes. Named rather than inlined so the three ramps stay in
-     proportion and a page cannot invent a fourth. */
-  .display-1 {
-    font-size: clamp(2.5rem, 6.2vw, 4.5rem);
-  }
-  .display-2 {
-    font-size: clamp(2rem, 4.2vw, 3rem);
-  }
-  .display-3 {
-    font-size: clamp(1.5rem, 2.6vw, 2rem);
-  }
-
-  /* Section lead paragraph — the one that sits under an h2. */
-  .lead {
-    font-size: 1.0625rem;
-    line-height: 1.62;
-    color: var(--muted-foreground);
-    max-width: 46rem;
-  }
-
-  /* ---------------------------------------------------------------
-     CONTROLS — near-square, flat, no gradient, no shadow. The one
-     shape decision that separates this from the pill-button house
-     style the rest of the category shares.
-     --------------------------------------------------------------- */
-  .btn-solid {
+     .btn-split is the reference template's signature control, ported:
+     a signal-coloured slab peeking out behind a dark pill, closed by
+     a square arrow tile that rotates on hover. It is the primary CTA
+     and appears at most twice per page (header + one in-page).
+     =============================================================== */
+  .btn-solid,
+  .btn-outline,
+  .btn-solid-invert,
+  .btn-outline-invert {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
-    border: none;
-    border-radius: 3px;
-    background: var(--color-brand-600);
-    color: var(--color-brand-50);
+    border-radius: var(--radius);
     padding: 0.8125rem 1.375rem;
     font-size: 0.9375rem;
     font-weight: 600;
-    letter-spacing: -0.005em;
+    letter-spacing: -0.008em;
+    white-space: nowrap;
     transition:
       background-color 0.2s ease,
-      transform 0.2s ease;
+      border-color 0.2s ease,
+      color 0.2s ease;
+  }
+  .btn-solid {
+    border: none;
+    background: var(--primary);
+    color: var(--primary-foreground);
   }
   .btn-solid:hover {
-    background: var(--color-brand-700);
+    background: color-mix(in oklab, var(--primary) 88%, var(--background));
   }
-
   .btn-outline {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
     border: 1px solid var(--border);
-    border-radius: 3px;
-    background: transparent;
+    background: var(--frame);
     color: var(--foreground);
-    padding: 0.75rem 1.3125rem;
-    font-size: 0.9375rem;
-    font-weight: 600;
-    letter-spacing: -0.005em;
-    transition:
-      background-color 0.2s ease,
-      border-color 0.2s ease;
   }
   .btn-outline:hover {
-    background: var(--accent);
+    background: var(--muted);
     border-color: var(--input);
   }
-
-  /* Same two controls, pinned light, for use on the fixed-dark bands (Hero
-     scrim, Footer, compliance band) where the page's own foreground/border
-     tokens are tuned for a light background. */
+  /* Pinned light, for the fixed-dark slab bands where the page's own
+     foreground and border tokens are tuned for a light ground. */
   .btn-solid-invert {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
     border: none;
-    border-radius: 3px;
     background: var(--color-brand-50);
     color: var(--color-brand-800);
-    padding: 0.8125rem 1.375rem;
-    font-size: 0.9375rem;
-    font-weight: 600;
-    transition: background-color 0.2s ease;
   }
   .btn-solid-invert:hover {
     background: #fff;
   }
   .btn-outline-invert {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    border: 1px solid color-mix(in oklab, var(--color-brand-50) 34%, transparent);
-    border-radius: 3px;
+    border: 1px solid color-mix(in oklab, var(--color-brand-50) 36%, transparent);
     background: transparent;
     color: var(--color-brand-50);
-    padding: 0.75rem 1.3125rem;
-    font-size: 0.9375rem;
-    font-weight: 600;
-    transition:
-      background-color 0.2s ease,
-      color 0.2s ease;
   }
   .btn-outline-invert:hover {
     background: var(--color-brand-50);
     color: var(--color-brand-800);
   }
 
-  /* ---------------------------------------------------------------
-     SURFACES — flat fill plus a hairline. No glass, no blur, no drop
-     shadow: the whole visual language here is hairlines and figures,
-     and a blurred translucent card fights that.
-     --------------------------------------------------------------- */
+  .btn-split {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    isolation: isolate;
+  }
+  /* The slab. Inset from the left so the dark pill covers its start and only
+     the arrow tile's worth of signal shows. */
+  .btn-split::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    right: 0;
+    width: calc(100% - 2rem);
+    border-radius: var(--radius);
+    background: var(--color-signal-500);
+    z-index: -1;
+  }
+  .btn-split > .btn-split-label {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    border-radius: var(--radius);
+    background: var(--primary);
+    color: var(--primary-foreground);
+    padding: 0.8125rem 1.375rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: -0.008em;
+    white-space: nowrap;
+    transition: background-color 0.2s ease;
+  }
+  .btn-split > .btn-split-tile {
+    position: relative;
+    left: -1px;
+    z-index: 1;
+    display: inline-flex;
+    height: 2.875rem;
+    width: 2.875rem;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius);
+    color: #0c1412;
+  }
+  .btn-split:hover > .btn-split-label {
+    background: color-mix(in oklab, var(--primary) 88%, var(--background));
+  }
+  .btn-split svg {
+    transition: transform 0.3s ease;
+  }
+  .btn-split:hover svg {
+    transform: rotate(-45deg);
+  }
+  /* On a slab band the dark pill would vanish, so it inverts to paper. */
+  .on-slab .btn-split > .btn-split-label {
+    background: var(--color-brand-50);
+    color: var(--color-brand-800);
+  }
+  .on-slab .btn-split:hover > .btn-split-label {
+    background: #fff;
+  }
+
+  /* ===============================================================
+     SURFACES
+
+     .panel      a raised card: the frame surface, a hairline, 24px.
+     .panel-flat a recessed card on a frame-coloured band.
+     .panel-invert a card on a slab band.
+     .slab       the full-bleed fixed-dark band. Every long page gets
+                 exactly one, in the middle. Adding `on-slab` flips
+                 the control and Fraunces colours with it.
+     =============================================================== */
   .panel {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-card);
   }
-  /* Only cards that are themselves links get hover feedback; a plain info
-     panel stays inert. */
+  .panel-flat {
+    background: var(--muted);
+    border: 1px solid transparent;
+    border-radius: var(--radius-card);
+  }
+  a.panel,
+  a.panel-flat {
+    transition:
+      border-color 0.2s ease,
+      background-color 0.2s ease;
+  }
   a.panel:hover {
-    border-color: var(--color-brand-400);
+    border-color: var(--color-signal-500);
   }
-
-  /* A panel on a fixed-dark band. */
+  a.panel-flat:hover {
+    background: var(--secondary);
+    border-color: var(--border);
+  }
   .panel-invert {
     background: color-mix(in oklab, var(--color-brand-50) 7%, transparent);
     border: 1px solid color-mix(in oklab, var(--color-brand-50) 14%, transparent);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-card);
+  }
+  .slab {
+    background: var(--color-brand-800);
+    color: var(--color-brand-50);
+  }
+  /* The signal-coloured surface: the bento's lead tile, the footer plate.
+     Always carries near-black ink (8.7:1), never white. */
+  .plate {
+    background: var(--color-signal-500);
+    color: #0c1412;
+    border-radius: var(--radius-card);
+  }
+  .plate-soft {
+    background: var(--color-signal-100);
+    color: #0c1412;
+    border-radius: var(--radius-card);
+  }
+  .dark .plate-soft {
+    background: color-mix(in oklab, var(--color-signal-500) 16%, var(--card));
+    color: var(--foreground);
   }
 
-  /* ---------------------------------------------------------------
-     THE RELAY — the site's signature element. A tick-marked
-     measurement track for the four custody handoffs (you → clinician →
-     pharmacy → courier), because the content genuinely is a sequence
-     measured in elapsed time, and a scale is the honest form for that.
-     Three icon cards would throw the time information away.
+  /* ===============================================================
+     THE SITE FRAME — the reference template's signature device, and
+     the reason the whole page reads as a specimen mounted on a card.
 
-     The rule is drawn per step as a `border-top` rather than as one
-     absolutely-positioned bar across the container. That is what makes
-     it responsive for free: at `grid-cols-2` or `grid-cols-1` the
-     segments simply re-line-up per row, where a single absolute rule
-     would stay pinned to the top of the whole grid and lose every step
-     below the first. The ticks are amber because on this site amber
-     means "clock".
+     Four fixed rails plus four SVG corner fillets, all
+     pointer-events:none. The floating header sits exactly on the top
+     rail and grows its own two fillets sideways into it, so the
+     header appears to be cut from the same sheet.
 
-     Two instances exist. `--relay-line` defaults to a light hairline
-     for the fixed-dark bands (Hero, /how-it-works/'s header); add
-     `.relay-on-light` for a placement on the ordinary page.
-     --------------------------------------------------------------- */
+     Hidden below 850px, where a 10px rail is only a bezel that eats
+     the viewport. The header goes edge-to-edge there instead.
+     =============================================================== */
+  .site-frame {
+    position: fixed;
+    z-index: 120;
+    pointer-events: none;
+    background: var(--frame);
+  }
+  .site-frame-t {
+    inset: 0 0 auto 0;
+    height: var(--frame-w);
+  }
+  .site-frame-b {
+    inset: auto 0 0 0;
+    height: var(--frame-w);
+  }
+  .site-frame-l {
+    inset: 0 auto 0 0;
+    width: var(--frame-w);
+  }
+  .site-frame-r {
+    inset: 0 0 0 auto;
+    width: var(--frame-w);
+  }
+  .site-corner {
+    position: fixed;
+    z-index: 119;
+    pointer-events: none;
+    color: var(--frame);
+  }
+  .site-corner-tl {
+    top: var(--frame-w);
+    left: var(--frame-w);
+    transform: rotate(90deg);
+  }
+  .site-corner-tr {
+    top: var(--frame-w);
+    right: var(--frame-w);
+    transform: rotate(180deg);
+  }
+  .site-corner-bl {
+    bottom: var(--frame-w);
+    left: var(--frame-w);
+  }
+  .site-corner-br {
+    bottom: var(--frame-w);
+    right: var(--frame-w);
+    transform: rotate(270deg);
+  }
+  @media (max-width: 849px) {
+    .site-frame,
+    .site-corner {
+      display: none;
+    }
+  }
+  /* Printing a fixed overlay wastes a rail of toner on every sheet. */
+  @media print {
+    .site-frame,
+    .site-corner {
+      display: none;
+    }
+  }
+
+  /* ===============================================================
+     THE RELAY — the site's own signature, kept and promoted.
+
+     Four custody handoffs (you -> clinician -> pharmacy -> courier)
+     on a tick-marked track, because the content genuinely is a
+     sequence measured in elapsed time and a scale is the honest form
+     for that. Three icon cards would throw the time away.
+
+     The rule is drawn per step as a border-top rather than as one
+     absolutely-positioned bar, which is what makes it re-flow
+     correctly at grid-cols-2 and grid-cols-1: the segments simply
+     re-line-up per row. The ticks are the signal colour, which is
+     also where the signal colour got its original meaning.
+     =============================================================== */
   .relay {
     display: grid;
     gap: 0;
     --relay-line: color-mix(in oklab, var(--color-brand-50) 22%, transparent);
-    --relay-tick: var(--color-glow-500);
+    --relay-tick: var(--color-signal-500);
   }
   .relay-on-light {
     --relay-line: var(--border);
   }
-  /* Both custom properties carry a fallback, so a `.relay-step` also works
-     standalone — /how-it-works/ lays its own steps out in a grid without the
-     `.relay` wrapper, and without the fallbacks `background: var(--relay-tick)`
-     resolved to nothing and the amber ticks rendered invisible. */
+  /* Both custom properties carry a fallback so a .relay-step also works
+     standalone — /how-it-works/ lays its steps out in its own grid without
+     the .relay wrapper. */
   .relay-step {
     position: relative;
     border-top: 1px solid var(--relay-line, var(--border));
     padding-top: 1.625rem;
   }
-  /* The tick: a short vertical stroke dropping from the rule, plus a dot
-     sitting on it. `top: -1px` puts the dot's centre on the 1px border
-     rather than 1px below it. */
   .relay-step::before {
     content: "";
     position: absolute;
@@ -564,7 +851,7 @@
     left: 0;
     width: 1px;
     height: 0.625rem;
-    background: var(--relay-tick, var(--color-glow-500));
+    background: var(--relay-tick, var(--color-signal-500));
   }
   .relay-step::after {
     content: "";
@@ -574,43 +861,81 @@
     width: 5px;
     height: 5px;
     border-radius: 50%;
-    background: var(--relay-tick, var(--color-glow-500));
+    background: var(--relay-tick, var(--color-signal-500));
+  }
+
+  /* A hairline rule used inside tables and between list rows, one step
+     quieter than a container edge. */
+  .rule {
+    border-color: var(--hairline);
+  }
+
+  /* ===============================================================
+     THE OVERLAP — the reference template's best structural moment.
+
+     A card that straddles the top edge of the band below it, so the
+     page's last ask and its legal ground read as one object rather
+     than as two stacked sections.
+
+     The overlap is a fixed 5rem on the card, and the band below
+     reserves 9rem for it, so the join survives any card height. The
+     adjacent-sibling rule means a page that omits the card (the
+     legal pages have no CTA) simply gets a normal band, with no
+     per-page prop to remember.
+     =============================================================== */
+  .band-overlap {
+    position: relative;
+    z-index: 1;
+    margin-bottom: -5rem;
+  }
+  .band-under {
+    padding-top: 4rem;
+  }
+  .band-overlap + .band-under {
+    padding-top: 9rem;
+  }
+
+  /* Controls on the amber plate. The page's own border and primary tokens
+     are tuned for paper, and both disappear on this ground. */
+  .on-plate .btn-outline {
+    border-color: color-mix(in oklab, #0c1412 28%, transparent);
+    background: transparent;
+    color: #0c1412;
+  }
+  .on-plate .btn-outline:hover {
+    background: color-mix(in oklab, #0c1412 8%, transparent);
+    border-color: color-mix(in oklab, #0c1412 45%, transparent);
+  }
+  .on-plate .btn-solid {
+    background: #0c1412;
+    color: var(--color-signal-100);
+  }
+  .on-plate .btn-solid:hover {
+    background: #24302d;
+  }
+  .on-plate :focus-visible {
+    outline-color: #0c1412;
+  }
+
+  /* The tick scale. A row of hairline ticks along an edge, borrowed from the
+     Relay so the loudest surface on the site still says "this is a clock". */
+  .tick-scale {
+    height: 0.5rem;
+    background-image: repeating-linear-gradient(
+      to right,
+      color-mix(in oklab, #0c1412 42%, transparent) 0 1px,
+      transparent 1px 0.75rem
+    );
   }
 }
 
 /* -----------------------------------------------------------------------
-   PAGE WASH — a quiet brand tint for inner pages, so they read as part of
-   this site rather than as an undecorated white body. Applied via a
-   `page-tint` class on each page's <main> rather than globally on <body>,
-   so the homepage's own photography and dark bands are untouched.
+   The mask that fades the hero's product visual into the page, and the
+   scrim over the hero photograph. The only two gradients on the site.
    ----------------------------------------------------------------------- */
-.page-tint {
-  background-color: color-mix(in oklab, var(--color-brand-300) 7%, var(--background));
-  background-image:
-    radial-gradient(
-      ellipse 70% 55% at 100% 0%,
-      color-mix(in oklab, var(--color-brand-300) 30%, transparent),
-      transparent 70%
-    ),
-    radial-gradient(
-      ellipse 55% 45% at 0% 100%,
-      color-mix(in oklab, var(--color-glow-300) 34%, transparent),
-      transparent 70%
-    );
-}
-.dark .page-tint {
-  background-color: color-mix(in oklab, var(--color-brand-700) 14%, var(--background));
-  background-image:
-    radial-gradient(
-      ellipse 70% 55% at 100% 0%,
-      color-mix(in oklab, var(--color-brand-700) 42%, transparent),
-      transparent 70%
-    ),
-    radial-gradient(
-      ellipse 55% 45% at 0% 100%,
-      color-mix(in oklab, var(--color-glow-700) 26%, transparent),
-      transparent 70%
-    );
+.mask-fade-b {
+  -webkit-mask-image: linear-gradient(to bottom, black 55%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 55%, transparent 100%);
 }
 
 /* Smooth recolour on anything interactive. Deliberately narrow — `all` on
@@ -622,11 +947,11 @@ a {
     border-color 0.2s ease;
 }
 
-/* Shadows are used in exactly one place — the mobile menu sheet — and even
-   there as a tint of the ink colour rather than black, so it stays correct
-   across all three palettes. */
+/* Shadows appear in three places only — the floating header, the mobile
+   sheet, and the footer's overlapping CTA card — and always as a tint of the
+   ink colour rather than black, so they stay correct across all palettes. */
 .shadow-lg,
 .shadow-xl,
 .shadow-2xl {
-  box-shadow: 0 16px 40px color-mix(in oklab, var(--foreground) 10%, transparent);
+  box-shadow: 0 18px 44px color-mix(in oklab, var(--foreground) 12%, transparent);
 }

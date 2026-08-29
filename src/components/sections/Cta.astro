@@ -1,16 +1,26 @@
 ---
 /**
- * The closing call to action, shared by every page.
+ * The closing call to action, shared by every page except the legal ones.
  *
- * The copy leads with the two things that stop a click in this category — how
- * long it takes, and what happens if the answer is no — rather than with an
- * offer. `common.cta` holds the strings so a page cannot invent its own
+ * THE ONE LOUD SURFACE. Amber is the site's signal colour and it is spent
+ * here, on a single plate, once per page. That is the whole budget: the
+ * reference template scatters its accent across a bento tile, a progress
+ * line, a pricing halo and a full-bleed footer slab, and the accent stops
+ * meaning anything. Here it means "this is the ask", and near-black ink on it
+ * clears 8.7:1, which is better than the reference's own accent-on-white text.
+ *
+ * The plate straddles the top edge of the compliance band below it (see
+ * `.band-overlap` in global.css) — the reference's best structural move,
+ * where the last ask and the legal ground become one object instead of two
+ * stacked sections.
+ *
+ * The copy leads with the two things that stop a click in this category —
+ * how long it takes, and what happens if the answer is no — rather than with
+ * an offer. `common.cta` holds the strings so no page can invent its own
  * version of the refund promise.
  */
 import { type Locale, t, localizedPath } from "@/i18n";
 import { sla } from "@/config/pricing";
-import { Image } from "astro:assets";
-import consult from "@/assets/consult.jpg";
 import { ArrowRight } from "lucide-react";
 
 interface Props {
@@ -21,39 +31,37 @@ const { locale } = Astro.props;
 const d = t(locale);
 ---
 
-<section class="relative isolate overflow-hidden border-b border-border/70">
-  <Image
-    src={consult}
-    alt=""
-    widths={[768, 1280, 1920]}
-    sizes="100vw"
-    class="absolute inset-0 -z-20 h-full w-full object-cover"
-    loading="lazy"
-  />
-  <div
-    class="absolute inset-0 -z-10 bg-gradient-to-r from-brand-800/94 via-brand-800/80 to-brand-700/55"
-  >
-  </div>
+<section class="band-overlap section-tight">
+  <div class="shell">
+    <div class="plate on-plate overflow-hidden shadow-2xl">
+      {/* Borrowed from the Relay so the loudest surface on the site still
+          says "this is a clock". */}
+      <div class="tick-scale" aria-hidden="true"></div>
 
-  <div class="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-24">
-    <div class="max-w-2xl">
-      <p class="label text-brand-300">{d.cta.eyebrow}</p>
-      <h2 class="display-2 mt-4 text-brand-50">
-        {d.cta.title.replace("{minutes}", String(sla.intakeMinutes))}
-      </h2>
-      <p class="mt-5 text-base leading-relaxed text-brand-50/80">{d.cta.lead}</p>
+      <div class="px-7 py-12 sm:px-12 sm:py-16">
+        <div class="max-w-2xl">
+          <p class="label text-[#0c1412]/60">{d.cta.eyebrow}</p>
+          <h2 class="display-2 mt-4 text-[#0c1412]">
+            {d.cta.title.replace("{minutes}", String(sla.intakeMinutes))}
+          </h2>
+          <p class="mt-5 text-base leading-relaxed text-[#0c1412]/75">{d.cta.lead}</p>
 
-      <div class="mt-8 flex flex-wrap items-center gap-3">
-        <a href={localizedPath(locale, "/start/")} class="btn-solid-invert">
-          {d.cta.primary}
-          <ArrowRight className="size-4" />
-        </a>
-        <a href={localizedPath(locale, "/pricing/")} class="btn-outline-invert">{d.cta.secondary}</a>
+          <div class="mt-9 flex flex-wrap items-center gap-3">
+            <a href={localizedPath(locale, "/start/")} class="btn-solid">
+              {d.cta.primary}
+              <ArrowRight className="size-4" />
+            </a>
+            <a href={localizedPath(locale, "/pricing/")} class="btn-outline">{d.cta.secondary}</a>
+          </div>
+
+          <p class="figure mt-7 text-xs text-[#0c1412]/60">
+            {d.cta.reassure} · ~{sla.intakeMinutes} MIN
+          </p>
+          {/* Every surface that asks for the click also carries the condition
+              the click is subject to. */}
+          <p class="mt-2 text-xs text-[#0c1412]/60">{d.gating.short}</p>
+        </div>
       </div>
-
-      <p class="figure mt-6 text-xs text-brand-50/55">
-        {d.cta.reassure} · ~{sla.intakeMinutes} MIN
-      </p>
     </div>
   </div>
 </section>

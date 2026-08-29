@@ -5,14 +5,20 @@ export type PaletteKey = "original" | "indigo" | "clay";
 
 const PALETTE_KEYS: PaletteKey[] = ["original", "indigo", "clay"];
 
-// Swatch colours are hardcoded here on purpose — each dot shows what that
-// palette's own brand-500 actually looks like, so it can't just read the
-// live --color-brand-500 (which is the *current* palette for every dot).
-const SWATCH: Record<PaletteKey, string> = {
-  original: "#3d8b9c",
-  indigo: "#5a66be",
-  clay: "#a96b4b",
+// Swatch colours are hardcoded on purpose — each dot has to show what THAT
+// palette looks like, so it cannot read the live tokens (which are the
+// *current* palette for every dot). Each is split in half: the structural
+// brand on the left, the signal on the right, because the rebuilt system is a
+// two-hue system and a single dot would hide the half that changes most.
+const SWATCH: Record<PaletteKey, { brand: string; signal: string }> = {
+  original: { brand: "#245f6c", signal: "#e8a33d" },
+  indigo: { brand: "#3c4491", signal: "#ec7f62" },
+  clay: { brand: "#8a4a32", signal: "#9fb469" },
 };
+
+const swatchStyle = (key: PaletteKey) => ({
+  backgroundImage: `linear-gradient(105deg, ${SWATCH[key].brand} 0 50%, ${SWATCH[key].signal} 50% 100%)`,
+});
 
 /**
  * Writes the same `palette` localStorage key (and `data-palette` attribute
@@ -79,12 +85,12 @@ export default function PaletteSwitcher({
         aria-haspopup="menu"
         aria-expanded={open}
         title={label}
-        className="inline-flex size-9 items-center justify-center rounded-md border border-border text-foreground/80 transition-colors hover:bg-accent hover:text-foreground"
+        className="inline-flex size-9 items-center justify-center rounded-lg border border-border text-foreground/80 transition-colors hover:bg-muted hover:text-foreground"
       >
         <span
           aria-hidden="true"
           className="size-4 rounded-full border border-black/10"
-          style={{ backgroundColor: SWATCH[current] }}
+          style={swatchStyle(current)}
         />
       </button>
 
@@ -92,7 +98,7 @@ export default function PaletteSwitcher({
         <ul
           role="menu"
           aria-label={label}
-          className="absolute right-0 z-50 mt-2 min-w-40 overflow-hidden rounded-md border border-border bg-popover p-1 shadow-lg"
+          className="absolute right-0 z-50 mt-2 min-w-40 overflow-hidden rounded-xl border border-border bg-popover p-1 shadow-lg"
         >
           {PALETTE_KEYS.map((key) => (
             <li key={key} role="none">
@@ -101,13 +107,13 @@ export default function PaletteSwitcher({
                 role="menuitemradio"
                 aria-checked={key === current}
                 onClick={() => choose(key)}
-                className="flex w-full items-center justify-between gap-3 rounded-sm px-3 py-2 text-sm text-popover-foreground transition-colors hover:bg-accent"
+                className="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm text-popover-foreground transition-colors hover:bg-muted"
               >
                 <span className="flex items-center gap-2.5">
                   <span
                     aria-hidden="true"
                     className="size-3.5 shrink-0 rounded-full border border-black/10"
-                    style={{ backgroundColor: SWATCH[key] }}
+                    style={swatchStyle(key)}
                   />
                   {options[key]}
                 </span>

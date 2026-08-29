@@ -1,0 +1,50 @@
+---
+/**
+ * THE SITE FRAME.
+ *
+ * Four fixed rails in the frame colour, plus four SVG fillets that round the
+ * inside corners. The effect is that the whole viewport is a mount and the
+ * page is a specimen sitting in it — which is the reference template's
+ * signature device, and the reason a page composed of ordinary sections still
+ * reads as one designed object.
+ *
+ * Everything here is `pointer-events: none` and `aria-hidden`: it is a border,
+ * not content. The floating header sits exactly on the top rail and grows its
+ * own two fillets sideways into it, so the header appears cut from the same
+ * sheet — see Header.astro.
+ *
+ * Hidden below 850px (in global.css, not here) where a 10px rail is only a
+ * bezel eating the viewport, and hidden in print.
+ *
+ * Z-ORDER, declared once so nothing has to guess:
+ *   130  skip link           — must clear everything, including the frame
+ *   120  site frame rails
+ *   119  frame corner fillets
+ *   110  mobile menu sheet   — over the header, under the frame
+ *    60  floating header
+ *    10  in-page sticky bits (sticky table headers, sticky rails)
+ */
+---
+
+<div class="site-frame site-frame-t" aria-hidden="true"></div>
+<div class="site-frame site-frame-b" aria-hidden="true"></div>
+<div class="site-frame site-frame-l" aria-hidden="true"></div>
+<div class="site-frame site-frame-r" aria-hidden="true"></div>
+
+{
+  (["tl", "tr", "bl", "br"] as const).map((corner) => (
+    <svg
+      class={`site-corner site-corner-${corner}`}
+      width="50"
+      height="50"
+      viewBox="0 0 50 50"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M5.50871e-06 0C-0.00788227 37.3001 8.99616 50.0116 50 50H5.50871e-06V0Z"
+        fill="currentColor"
+      />
+    </svg>
+  ))
+}

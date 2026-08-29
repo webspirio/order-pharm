@@ -41,7 +41,7 @@ const common = {
   palette: {
     label: "Colour palette",
     options: {
-      original: "Saline",
+      original: "Specimen",
       indigo: "Indigo",
       clay: "Clay",
     },

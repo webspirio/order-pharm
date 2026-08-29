@@ -27,8 +27,8 @@ const values = [
 const items = d.home.stats.items.map((item, index) => ({ ...item, value: values[index] }));
 ---
 
-<section class="border-b border-border/70 bg-background">
-  <div class="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12">
+<section class="bg-background">
+  <div class="shell section-tight">
     <h2 class="label text-muted-foreground">{d.home.stats.label}</h2>
     <dl class="mt-6 grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-4 sm:gap-x-8">
       {

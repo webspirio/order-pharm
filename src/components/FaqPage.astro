@@ -103,8 +103,8 @@ const faqJsonLd = {
   <TrustTicker locale={locale} />
   <Header locale={locale} />
   <main id="main" tabindex="-1" class="outline-none">
-    <section class="border-b border-border/70 bg-background pb-14 pt-14 sm:pb-16 sm:pt-16">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section class="bg-background pb-14 pt-14 sm:pb-16 sm:pt-16">
+      <div class="shell">
         <p class="label text-brand-700 dark:text-brand-400">{d.faq.header.eyebrow}</p>
         <h1 class="display-1 mt-5 max-w-4xl">{d.faq.header.title}</h1>
         <p class="lead mt-6 text-lg">{d.faq.header.lead}</p>
@@ -131,7 +131,7 @@ const faqJsonLd = {
         header and the long pale set. A reader who scrolls no further still
         leaves with the ones that never change. */}
     <section class="border-b border-brand-50/10 bg-brand-800 py-14 text-brand-50 sm:py-16">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+      <div class="shell">
         <div class="grid gap-8 lg:grid-cols-[17rem_1fr] lg:gap-14">
           <div>
             <p class="label text-brand-300">{d.faq.fixed.eyebrow}</p>
@@ -161,8 +161,8 @@ const faqJsonLd = {
     {/* The set. Each group is a `Faq` instance in the right-hand column, so
         the hairline between groups belongs to the column rather than to the
         page, and the sticky index keeps its own. */}
-    <div class="border-b border-border/70 bg-background">
-      <div class="mx-auto max-w-6xl lg:grid lg:grid-cols-[15rem_1fr] lg:items-start">
+    <div class="bg-background">
+      <div class="shell lg:grid lg:grid-cols-[15rem_1fr] lg:items-start">
         <nav
           aria-label={d.faq.nav.label}
           class="hidden px-4 pt-20 sm:px-6 lg:sticky lg:top-24 lg:block"

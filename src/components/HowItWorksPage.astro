@@ -92,7 +92,7 @@ const resolutions = [
   {
     key: c.steps.resolutionLabels.clock,
     value: c.steps.clockPaused,
-    cls: "text-glow-700 dark:text-glow-500",
+    cls: "text-signal-700 dark:text-signal-500",
     href: "",
     sub: "",
   },
@@ -178,8 +178,8 @@ const details = c.shipping.details.map((detail, index) => ({
         HEADER + THE RELAY, at full strength. The clock is the first
         thing on the page, not a reward for reading an introduction.
         --------------------------------------------------------------- */}
-    <section class="border-b border-border/70 bg-background pb-14 pt-14 sm:pb-16 sm:pt-16">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section class="bg-background pb-14 pt-14 sm:pb-16 sm:pt-16">
+      <div class="shell">
         <p class="label text-brand-700 dark:text-brand-400">{c.header.eyebrow}</p>
         <h1 class="display-1 mt-5 max-w-4xl">{c.header.title}</h1>
         <p class="lead mt-6 text-lg">{c.header.lead}</p>
@@ -196,8 +196,8 @@ const details = c.shipping.details.map((detail, index) => ({
         THE FOUR HANDOFFS, IN DEPTH. Text column and media column swap
         sides per step; the failure panel closes every one of them.
         --------------------------------------------------------------- */}
-    <section class="border-b border-border/70 bg-card py-16 sm:py-20">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section class="bg-card section">
+      <div class="shell">
         <div class="max-w-3xl">
           <p class="label text-brand-700 dark:text-brand-400">{c.steps.eyebrow}</p>
           <h2 class="display-2 mt-4">{c.steps.title}</h2>
@@ -226,7 +226,7 @@ const details = c.shipping.details.map((detail, index) => ({
                         {" · "}
                         {step.actor}
                       </p>
-                      <p class="figure text-sm text-glow-700 dark:text-glow-500">{step.duration}</p>
+                      <p class="figure text-sm text-signal-700 dark:text-signal-500">{step.duration}</p>
                     </div>
                     <h3 class="display-3 mt-2">{step.action}</h3>
 
@@ -354,8 +354,8 @@ const details = c.shipping.details.map((detail, index) => ({
         THE THREE PARTIES, NAMED — plus what 503A and 503B actually
         mean, and how one pharmacy out of three gets an order.
         --------------------------------------------------------------- */}
-    <section class="border-b border-border/70 bg-background py-16 sm:py-20">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section class="bg-background section">
+      <div class="shell">
         <div class="max-w-3xl">
           <p class="label text-brand-700 dark:text-brand-400">{c.parties.eyebrow}</p>
           <h2 class="display-2 mt-4">{c.parties.title}</h2>
@@ -445,7 +445,7 @@ const details = c.shipping.details.map((detail, index) => ({
             {
               c.parties.choices.map((choice, index) => (
                 <li class="relay-step relay-on-light">
-                  <p class="figure text-xs text-glow-700 dark:text-glow-500">
+                  <p class="figure text-xs text-signal-700 dark:text-signal-500">
                     {String(index + 1).padStart(2, "0")}
                   </p>
                   <h4 class="subhead mt-2">{choice.title}</h4>
@@ -465,8 +465,8 @@ const details = c.shipping.details.map((detail, index) => ({
         SHIPPING — a real table, because cost and window per lane is
         row-of-pairs content, with the definition-list fallback below sm.
         --------------------------------------------------------------- */}
-    <section class="border-b border-border/70 bg-card py-16 sm:py-20">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section class="bg-card section">
+      <div class="shell">
         <div class="max-w-3xl">
           <p class="label text-brand-700 dark:text-brand-400">{c.shipping.eyebrow}</p>
           <h2 class="display-2 mt-4">{c.shipping.title}</h2>
@@ -536,7 +536,7 @@ const details = c.shipping.details.map((detail, index) => ({
                 <dt class="flex flex-wrap items-baseline gap-x-4">
                   <span class="subhead">{detail.label}</span>
                   {detail.value && (
-                    <span class="figure text-base text-glow-700 dark:text-glow-500">
+                    <span class="figure text-base text-signal-700 dark:text-signal-500">
                       {detail.value}
                     </span>
                   )}
@@ -559,8 +559,8 @@ const details = c.shipping.details.map((detail, index) => ({
         REFILLS — the sticky-column layout, so the ceiling on a
         prescription stays on screen beside the table of triggers.
         --------------------------------------------------------------- */}
-    <section class="border-b border-border/70 bg-background py-16 sm:py-20">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section class="bg-background section">
+      <div class="shell">
         <div class="grid gap-10 lg:grid-cols-[23rem_1fr] lg:gap-16">
           <div class="lg:sticky lg:top-24 lg:self-start">
             <p class="label text-brand-700 dark:text-brand-400">{c.refills.eyebrow}</p>
@@ -568,7 +568,7 @@ const details = c.shipping.details.map((detail, index) => ({
             <p class="lead mt-4 max-w-none">{c.refills.lead}</p>
 
             <div class="mt-8 border-t border-border pt-5">
-              <p class="figure text-3xl text-glow-700 dark:text-glow-500">{rxMaxDays} days</p>
+              <p class="figure text-3xl text-signal-700 dark:text-signal-500">{rxMaxDays} days</p>
               <p class="label mt-2.5 text-muted-foreground">{c.refills.maxLabel}</p>
               <p class="mt-3 text-sm leading-relaxed text-muted-foreground">{c.refills.maxNote}</p>
             </div>
@@ -635,12 +635,12 @@ const details = c.shipping.details.map((detail, index) => ({
         covered entity, and this says so before saying anything else.
         --------------------------------------------------------------- */}
     <section class="border-b border-brand-50/10 bg-brand-800 py-16 text-brand-50 sm:py-20">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+      <div class="shell">
         <div class="max-w-3xl">
           <p class="label text-brand-300">{c.data.eyebrow}</p>
           <h2 class="display-2 mt-4 text-brand-50">
             {c.data.title}
-            <sup class="ml-1 text-[0.4em] text-glow-500">◆</sup>
+            <sup class="ml-1 text-[0.4em] text-signal-500">◆</sup>
           </h2>
           <p class="mt-4 text-[1.0625rem] leading-relaxed text-brand-50/65">{c.data.lead}</p>
         </div>
@@ -718,8 +718,8 @@ const details = c.shipping.details.map((detail, index) => ({
     {/* ---------------------------------------------------------------
         WHAT ELLERY IS NOT — the restatement, and the two exits.
         --------------------------------------------------------------- */}
-    <section class="border-b border-border/70 bg-card py-16 sm:py-20">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section class="bg-card section">
+      <div class="shell">
         <div class="max-w-3xl">
           <p class="label text-brand-700 dark:text-brand-400">{c.isNot.eyebrow}</p>
           <h2 class="display-2 mt-4">{c.isNot.title}</h2>

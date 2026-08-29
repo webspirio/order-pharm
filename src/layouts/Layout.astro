@@ -1,6 +1,8 @@
 ---
 import "@/styles/global.css";
 import { type Locale, htmlLang, defaultLocale, t } from "@/i18n";
+import SiteFrame from "@/components/SiteFrame.astro";
+import SmoothScroll from "@/components/islands/SmoothScroll.tsx";
 
 interface Props {
   locale?: Locale;
@@ -41,7 +43,7 @@ const d = t(locale);
           // Same no-flash approach as the dark-mode toggle above, for the
           // colour-palette switcher (PaletteSwitcher.tsx) — a `data-palette`
           // attribute rather than a class since there are three options, not
-          // two. No stored value means the default "original" palette, which
+          // two. No stored value means the default "specimen" palette, which
           // is just the CSS with no attribute selector match, so nothing to
           // set here in that case.
           const storedPalette = localStorage.getItem("palette");
@@ -55,9 +57,14 @@ const d = t(locale);
   <body class="min-h-dvh bg-background text-foreground antialiased">
     <a
       href="#main"
-      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:font-bold focus:text-primary-foreground focus:shadow-lg"
+      class="sr-only focus:not-sr-only focus:fixed focus:left-6 focus:top-6 focus:z-[130] focus:rounded-lg focus:bg-signal-500 focus:px-4 focus:py-2.5 focus:font-semibold focus:text-[#0c1412] focus:shadow-lg"
       >{d.a11y.skip}</a
     >
+    <SiteFrame />
+    {/* `client:idle`, never in the critical path. The island renders null and
+        tears itself down for reduced motion or a coarse pointer — see the
+        file for why both matter. */}
+    <SmoothScroll client:idle />
     <slot />
   </body>
 </html>

@@ -1,0 +1,117 @@
+---
+/**
+ * A headline with one word set in Fraunces italic, and — optionally — a
+ * word-by-word mount reveal that costs no JavaScript.
+ *
+ * TWO THINGS THIS SOLVES
+ *
+ * 1. The accent word. Fraunces' whole budget on this site is one word per
+ *    page, so the dictionary carries a `{accent}` token inside the string and
+ *    the accent word beside it. That keeps the copy translatable (a
+ *    translator moves the token) and makes the constraint checkable: a
+ *    headline with two tokens is a bug you can grep for.
+ *
+ * 2. The reveal. The reference template animates its hero headline with
+ *    Motion, which means shipping a 35 KB animation runtime to hydrate one
+ *    h1. Splitting on words and giving each span an `animation-delay` gets
+ *    the same staggered blur-up from a CSS keyframe, works with JavaScript
+ *    disabled, and is inert under `prefers-reduced-motion`. Reserve `reveal`
+ *    for the h1 above the fold — everything below it reveals on scroll.
+ *
+ * Newlines in the text become hard line breaks, so the dictionary controls
+ * where the headline turns.
+ */
+interface Props {
+  /** Dictionary string. May contain `{accent}` once, and `\n` for line breaks. */
+  text: string;
+  /** The word that replaces `{accent}`, set in Fraunces italic. */
+  accent?: string;
+  /** Heading level. Defaults to h2; the hero passes "h1". */
+  as?: "h1" | "h2" | "h3" | "p";
+  /** Adds the staggered mount reveal. Above-the-fold headings only. */
+  reveal?: boolean;
+  class?: string;
+}
+
+const { text, accent, as: Tag = "h2", reveal = false, class: className = "" } = Astro.props;
+
+/**
+ * Split into lines, then words, keeping the `{accent}` token as its own word
+ * so it can be swapped for a styled span. A running index across all lines
+ * drives the stagger, so the delay keeps increasing across a line break.
+ */
+interface Word {
+  word: string;
+  index: number;
+  isAccent: boolean;
+}
+
+let wordIndex = 0;
+const lines: Word[][] = text.split("\n").map((line: string) =>
+  line.split(" ").map((word: string) => ({
+    word,
+    index: wordIndex++,
+    isAccent: word.includes("{accent}"),
+  })),
+);
+---
+
+<Tag class:list={[className, reveal && "hl-reveal"]}>
+  {
+    lines.map((words: Word[], lineNumber: number) => (
+      <>
+        {lineNumber > 0 && <br />}
+        {words.map(({ word, index, isAccent }: Word) => (
+          <>
+            <span class="hl-word" style={reveal ? `--i:${index}` : undefined}>
+              {isAccent && accent ? (
+                <Fragment set:html={word.replace("{accent}", `<i class="wonk">${accent}</i>`)} />
+              ) : (
+                word
+              )}
+            </span>
+            {/* The space lives OUTSIDE the span. Inside an inline-block,
+                trailing whitespace collapses to nothing and the headline
+                renders as one long word — and Astro's `compressHTML: 'jsx'`
+                strips whitespace between adjacent inline elements anyway, so
+                it has to be an explicit expression either way. */}
+            {" "}
+          </>
+        ))}
+      </>
+    ))
+  }
+</Tag>
+
+<style>
+  .hl-word {
+    display: inline-block;
+  }
+
+  .hl-reveal .hl-word {
+    animation: hl-rise 0.75s cubic-bezier(0.23, 1, 0.32, 1) both;
+    /* 55ms per word keeps a nine-word headline inside half a second, which is
+       the point at which a stagger stops reading as choreography and starts
+       reading as a slow page. */
+    animation-delay: calc(var(--i) * 55ms + 120ms);
+  }
+
+  @keyframes hl-rise {
+    from {
+      opacity: 0;
+      transform: translateY(0.4em);
+      filter: blur(7px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hl-reveal .hl-word {
+      animation: none;
+    }
+  }
+</style>

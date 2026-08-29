@@ -156,8 +156,8 @@ const hasAddress = Boolean(site.addressStreet && site.addressCountryCode);
   <TrustTicker locale={locale} />
   <Header locale={locale} />
   <main id="main" tabindex="-1" class="outline-none">
-    <section class="border-b border-border/70 bg-background pb-14 pt-14 sm:pb-16 sm:pt-16">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section class="bg-background pb-14 pt-14 sm:pb-16 sm:pt-16">
+      <div class="shell">
         <p class="label text-brand-700 dark:text-brand-400">{c.header.eyebrow}</p>
         <h1 class="display-1 mt-5 max-w-4xl">{c.header.title}</h1>
         <p class="lead mt-6 text-lg">{c.header.lead}</p>
@@ -197,8 +197,8 @@ const hasAddress = Boolean(site.addressStreet && site.addressCountryCode);
       </div>
     </section>
 
-    <section class="border-b border-border/70 bg-card py-16 sm:py-20">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section class="bg-card section">
+      <div class="shell">
         <div class="max-w-3xl">
           <p class="label text-brand-700 dark:text-brand-400">{c.channels.eyebrow}</p>
           <h2 class="display-2 mt-4">{c.channels.title}</h2>
@@ -251,7 +251,7 @@ const hasAddress = Boolean(site.addressStreet && site.addressCountryCode);
     {/* The plate: one wide band of photography with a cutline, rather than a
         scrim over a headline — the page already has a dark band and this is
         not a hero. */}
-    <section class="border-b border-border/70 bg-background">
+    <section class="bg-background">
       <div class="aspect-[4/3] w-full sm:aspect-[21/9]">
         <Image
           src={contactImage}
@@ -262,7 +262,7 @@ const hasAddress = Boolean(site.addressStreet && site.addressCountryCode);
           loading="lazy"
         />
       </div>
-      <div class="mx-auto max-w-6xl px-4 py-6 sm:px-6">
+      <div class="shell py-6">
         <div class="flex flex-col gap-3 sm:flex-row sm:items-baseline sm:justify-between">
           <p class="max-w-2xl text-sm leading-relaxed text-muted-foreground">
             <span class="label mr-2 text-brand-700 dark:text-brand-400">{c.plate.label}</span>
@@ -275,7 +275,7 @@ const hasAddress = Boolean(site.addressStreet && site.addressCountryCode);
 
     {/* Routing. This table is the page. */}
     <section class="border-b border-brand-50/10 bg-brand-800 py-16 text-brand-50 sm:py-20">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+      <div class="shell">
         <div class="max-w-3xl">
           <p class="label text-brand-300">{c.routing.eyebrow}</p>
           <h2 class="display-2 mt-4 text-brand-50">{c.routing.title}</h2>
@@ -373,8 +373,8 @@ const hasAddress = Boolean(site.addressStreet && site.addressCountryCode);
       </div>
     </section>
 
-    <section class="border-b border-border/70 bg-background py-16 sm:py-20">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section class="bg-background section">
+      <div class="shell">
         <div class="max-w-3xl">
           <p class="label text-brand-700 dark:text-brand-400">{c.response.eyebrow}</p>
           <h2 class="display-2 mt-4">{c.response.title}</h2>
@@ -407,7 +407,7 @@ const hasAddress = Boolean(site.addressStreet && site.addressCountryCode);
                       {row.detail}
                     </span>
                   </th>
-                  <td class="figure py-5 pr-4 text-[0.8125rem] text-glow-700 sm:pr-8 dark:text-glow-500">
+                  <td class="figure py-5 pr-4 text-[0.8125rem] text-signal-700 sm:pr-8 dark:text-signal-500">
                     {row.when}
                   </td>
                   <td class="hidden py-5 text-sm leading-relaxed text-muted-foreground sm:table-cell">
@@ -425,8 +425,8 @@ const hasAddress = Boolean(site.addressStreet && site.addressCountryCode);
       </div>
     </section>
 
-    <section class="border-b border-border/70 bg-card py-16 sm:py-20">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section class="bg-card section">
+      <div class="shell">
         <div class="grid gap-10 lg:grid-cols-[1fr_22rem] lg:gap-14">
           <div>
             <p class="label text-brand-700 dark:text-brand-400">{c.office.eyebrow}</p>

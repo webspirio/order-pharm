@@ -52,8 +52,8 @@ const cards = d.learn.articles.map((article, index) => ({
   <TrustTicker locale={locale} />
   <Header locale={locale} />
   <main id="main" tabindex="-1" class="outline-none">
-    <section class="border-b border-border/70 bg-background pb-14 pt-14 sm:pb-16 sm:pt-16">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section class="bg-background pb-14 pt-14 sm:pb-16 sm:pt-16">
+      <div class="shell">
         <p class="label text-brand-700 dark:text-brand-400">{d.learn.eyebrow}</p>
         <h1 class="display-1 mt-5 max-w-4xl">{d.learn.title}</h1>
         <p class="lead mt-6 text-lg">{d.learn.lead}</p>
@@ -65,8 +65,8 @@ const cards = d.learn.articles.map((article, index) => ({
       </div>
     </section>
 
-    <section class="border-b border-border/70 bg-card py-16 sm:py-20">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section class="bg-card section">
+      <div class="shell">
         <ul class="grid gap-6 md:grid-cols-3 lg:gap-8">
           {
             cards.map((card) => (
@@ -115,8 +115,8 @@ const cards = d.learn.articles.map((article, index) => ({
       </div>
     </section>
 
-    <section class="border-b border-border/70 bg-background py-16 sm:py-20">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section class="bg-background section">
+      <div class="shell">
         <div class="max-w-3xl">
           <p class="label text-brand-700 dark:text-brand-400">{d.learn.standards.eyebrow}</p>
           <h2 class="display-2 mt-4">{d.learn.standards.title}</h2>
@@ -126,7 +126,7 @@ const cards = d.learn.articles.map((article, index) => ({
           {
             d.learn.standards.items.map((item, index) => (
               <li class="flex gap-4 border-t border-border pt-5">
-                <span class="figure shrink-0 text-xs text-glow-500">
+                <span class="figure shrink-0 text-xs text-signal-500">
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <p class="text-[0.9375rem] leading-relaxed text-muted-foreground">{item}</p>

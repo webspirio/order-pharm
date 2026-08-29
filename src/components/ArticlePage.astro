@@ -330,8 +330,8 @@ const breadcrumbJsonLd = {
     <article>
       {/* Header block: the article's own metadata, then the disclaimer —
           prominent, above the first paragraph, not in small print. */}
-      <section class="border-b border-border/70 bg-background pb-12 pt-10 sm:pb-14 sm:pt-12">
-        <div class="mx-auto max-w-6xl px-4 sm:px-6">
+      <section class="bg-background pb-12 pt-10 sm:pb-14 sm:pt-12">
+        <div class="shell">
           <nav aria-label="Breadcrumb">
             <ol class="label flex flex-wrap items-center gap-2.5 text-muted-foreground">
               {
@@ -381,7 +381,7 @@ const breadcrumbJsonLd = {
       {/* The article itself, with the table of contents in a rail that sticks
           on lg and simply sits above the prose below it. */}
       <section class="bg-background pb-16 pt-10 sm:pb-20 sm:pt-14">
-        <div class="mx-auto max-w-6xl px-4 sm:px-6">
+        <div class="shell">
           <div class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_15rem] lg:gap-16">
             <aside class="lg:col-start-2 lg:row-start-1">
               <nav
@@ -393,7 +393,7 @@ const breadcrumbJsonLd = {
                   {
                     contents.map((heading, index) => (
                       <li class="flex gap-3">
-                        <span class="figure mt-0.5 shrink-0 text-xs text-glow-500">
+                        <span class="figure mt-0.5 shrink-0 text-xs text-signal-500">
                           {String(index + 1).padStart(2, "0")}
                         </span>
                         <a
@@ -567,8 +567,8 @@ const breadcrumbJsonLd = {
     </article>
 
     {/* The other two articles, plus the way back to the index. */}
-    <section class="border-y border-border/70 bg-card py-16 sm:py-20">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section class="bg-card section">
+      <div class="shell">
         <div class="flex flex-wrap items-end justify-between gap-6">
           <div class="max-w-2xl">
             <p class="label text-brand-700 dark:text-brand-400">{chrome.nextTitle}</p>

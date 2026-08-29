@@ -546,7 +546,7 @@ export default function IntakeForm({
         </div>
         <div>
           <Micro>{copy.rail.timeLabel}</Micro>
-          <p className="figure mt-1.5 text-2xl text-glow-700 dark:text-glow-500">
+          <p className="figure mt-1.5 text-2xl text-signal-700 dark:text-signal-500">
             {minutesLeft}
             <span className="label ml-1 align-middle">{copy.rail.timeUnit}</span>
           </p>
@@ -602,7 +602,7 @@ export default function IntakeForm({
                 className={cn(
                   "figure text-[0.6875rem]",
                   index === boundedIndex
-                    ? "text-glow-700 dark:text-glow-500"
+                    ? "text-signal-700 dark:text-signal-500"
                     : "text-muted-foreground",
                 )}
               >

@@ -40,3 +40,9 @@ pnpm-debug.log*
 
 # Meeting transcripts and client notes — not part of the site.
 meeting-*.md
+
+# Licensed third-party reference template (not redistributable)
+references/
+
+# Licensed React Bits Pro source cache (not redistributable)
+.rb-source/

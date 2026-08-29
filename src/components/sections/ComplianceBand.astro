@@ -3,16 +3,20 @@
  * Where every footnote symbol on the site resolves.
  *
  * The premium tell in this category is a symbol system that actually
- * resolves: Hims runs † for the medication caveat and * for trial data and
- * gives both a real citation; the cheap version is a bare asterisk that
- * resolves nowhere, which two of the three reference sites ship. So this band
- * exists on every page, carries every symbol used anywhere on the site, and
- * is designed rather than dumped — one of the reference sites drops the full
- * pharma safety text as a wall of unstyled paragraphs at the bottom of its
- * pricing page, which is legally sufficient and the last impression it leaves.
+ * resolves; the cheap version is a bare asterisk that resolves nowhere, which
+ * two of the three reference sites ship. So this band exists on every page,
+ * carries every symbol used anywhere on the site, and is designed rather than
+ * dumped — one of the reference sites drops the full pharma safety text as a
+ * wall of unstyled paragraphs at the bottom of its pricing page, which is
+ * legally sufficient and the last impression it leaves.
  *
- * On a fixed brand-800 band so it reads as a deliberate part of the page in
- * both themes rather than inverting with it.
+ * On the fixed petrol slab so it reads the same in both themes rather than
+ * inverting with the page, with the slab's top corners swept and inset to the
+ * frame — it is the bottom of the mount, and the CTA plate lands on it.
+ *
+ * CONTRAST FLOOR: on this ground `text-brand-50` may not go below /60.
+ * /40 is 3.4:1, /45 is 3.7:1, /50 is 4.4:1, /60 is 5.8:1. Hairlines and
+ * borders are decorative and exempt.
  */
 import { type Locale, t } from "@/i18n";
 import { site } from "@/config/site";
@@ -26,15 +30,15 @@ const { locale } = Astro.props;
 const d = t(locale);
 ---
 
-<section class="bg-brand-800 text-brand-50">
-  <div class="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-16">
-    <div class="grid gap-8 lg:grid-cols-[18rem_1fr] lg:gap-14">
+<section class="band-under compliance-band slab on-slab">
+  <div class="shell pb-16 sm:pb-20">
+    <div class="grid gap-10 lg:grid-cols-[17rem_1fr] lg:gap-16">
       <div>
         <h2 class="display-3 text-brand-50">{d.compliance.title}</h2>
-        <p class="mt-4 text-sm leading-relaxed text-brand-50/65">{d.compliance.lead}</p>
+        <p class="mt-4 text-sm leading-relaxed text-brand-50/70">{d.compliance.lead}</p>
 
         <div class="panel-invert mt-6 flex gap-3 p-4">
-          <TriangleAlert className="mt-0.5 size-4 shrink-0 text-glow-500" />
+          <TriangleAlert className="mt-0.5 size-4 shrink-0 text-signal-500" />
           <p class="text-sm leading-relaxed text-brand-50/80">{d.compliance.emergency}</p>
         </div>
       </div>
@@ -42,11 +46,11 @@ const d = t(locale);
       {/* A definition list, not paragraphs: each symbol is the term and its
           note is the definition, which is exactly the semantics of a footnote
           key and gives a screen reader something better than "asterisk". */}
-      <dl class="grid gap-x-10 gap-y-0 sm:grid-cols-2">
+      <dl class="grid gap-x-12 gap-y-0 sm:grid-cols-2">
         {
           d.compliance.notes.map((note) => (
             <div class="border-t border-brand-50/12 py-4">
-              <dt class="figure text-sm text-glow-500">{note.symbol}</dt>
+              <dt class="figure text-sm text-signal-500">{note.symbol}</dt>
               <dd class="mt-1.5 text-[0.8125rem] leading-relaxed text-brand-50/60">{note.text}</dd>
             </div>
           ))
@@ -59,3 +63,21 @@ const d = t(locale);
     </p>
   </div>
 </section>
+
+<style>
+  /* Inset to the frame and swept at the top, so the slab reads as the bottom
+     plate of the mount rather than as a full-bleed band that happens to be
+     dark. Squared off below 850px, where the frame is hidden. */
+  .compliance-band {
+    margin-inline: var(--frame-w);
+    border-top-left-radius: var(--radius-slab);
+    border-top-right-radius: var(--radius-slab);
+  }
+  @media (max-width: 849px) {
+    .compliance-band {
+      margin-inline: 0;
+      border-top-left-radius: 1.75rem;
+      border-top-right-radius: 1.75rem;
+    }
+  }
+</style>

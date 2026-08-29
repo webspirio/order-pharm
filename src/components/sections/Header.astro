@@ -1,4 +1,25 @@
 ---
+/**
+ * THE FLOATING HEADER.
+ *
+ * Ported from the reference template: a fixed pill that sits exactly on the
+ * site frame's top rail, in the frame colour, with its bottom corners swept
+ * and two fillets growing sideways so it reads as cut from the same sheet as
+ * the frame rather than laid on top of it.
+ *
+ * Width is `min(64rem, 100vw - 8rem)`. The 8rem of side room is what the two
+ * 50px fillets need; without it they clip against the rails on mid-size
+ * laptops, which is the one way this device visibly breaks.
+ *
+ * Below 850px the frame is hidden (a 10px rail is only a bezel on a phone), so
+ * the header goes edge to edge and keeps only its bottom sweep.
+ *
+ * It is a plain Astro element, not an island: the nav is five links and the
+ * only stateful controls are the three small islands on the right. The mount
+ * animation is a CSS fade — deliberately NOT a transform that persists, since
+ * a transformed ancestor becomes a containing block for `position: fixed`
+ * descendants and would clip the mobile sheet.
+ */
 import {
   type Locale,
   t,
@@ -15,6 +36,7 @@ import ThemeToggle from "@/components/islands/ThemeToggle.tsx";
 import LanguageSwitcher from "@/components/islands/LanguageSwitcher.tsx";
 import PaletteSwitcher from "@/components/islands/PaletteSwitcher.tsx";
 import MobileMenu from "@/components/islands/MobileMenu.tsx";
+import { ArrowDownRight } from "lucide-react";
 
 interface Props {
   locale: Locale;
@@ -52,18 +74,15 @@ const langOptions = locales.map((l) => ({
 const currentLabel = (localeSegment[locale] || htmlLang[locale]).toUpperCase();
 
 // On /start/ itself, a CTA that re-links to /start/ is dead weight — swap it
-// for the support number, which is the actual next thing a stuck visitor wants.
+// for the support number, which is the actual next thing a stuck visitor
+// wants. It also stops the page carrying two competing primary buttons.
 const onStart = currentPath === "/start/";
-const ctaHref = onStart ? site.phoneHref : startPath;
-const ctaLabel = onStart ? site.phoneDisplay : d.nav.cta;
 ---
 
-<header
-  class="sticky top-0 z-50 border-b border-border/70 bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70"
->
-  <div class="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6">
-    <a href={home} class="group flex shrink-0 items-center gap-2.5 leading-none">
-      <Mark class="size-8 shrink-0 text-brand-600 dark:text-brand-400" />
+<header class="site-header">
+  <div class="flex h-18 items-center gap-3 px-5 sm:px-6">
+    <a href={home} class="flex shrink-0 items-center gap-2.5 leading-none">
+      <Mark class="size-7 shrink-0 text-signal-700 dark:text-signal-500" />
       {/* Two-row lockup. The second row is a flex row of single characters
           inside justify-between: its own natural width is just the packed
           letters, so once the flex-col parent resolves to the wider row above
@@ -72,19 +91,16 @@ const ctaLabel = onStart ? site.phoneDisplay : d.nav.cta;
           end at the same x by construction, rather than via a tracking value
           eyeballed against one particular word. */}
       <span class="flex flex-col gap-[3px]">
-        <span class="font-heading text-[1.4rem] leading-none tracking-tight text-foreground">
+        <span class="text-[1.3rem] leading-none font-semibold tracking-[-0.04em] text-foreground">
           {site.shortName}
         </span>
-        <span class="label flex justify-between text-[0.5rem] text-brand-600 dark:text-brand-400">
+        <span class="label flex justify-between text-[0.5rem] text-muted-foreground">
           {"HEALTH".split("").map((char) => <span>{char}</span>)}
         </span>
       </span>
     </a>
 
-    <nav
-      aria-label={d.a11y.primaryNav}
-      class="ml-auto hidden items-center lg:flex"
-    >
+    <nav aria-label={d.a11y.primaryNav} class="mx-auto hidden items-center lg:flex">
       {
         navLinks.map((link) => {
           const active = currentPath === unlocalizedPath(link.href);
@@ -93,8 +109,8 @@ const ctaLabel = onStart ? site.phoneDisplay : d.nav.cta;
               href={link.href}
               aria-current={active ? "page" : undefined}
               class:list={[
-                "nav-link relative px-3 py-2 text-sm font-medium transition-colors",
-                active ? "text-foreground" : "text-foreground/65 hover:text-foreground",
+                "nav-link relative rounded-lg px-3 py-2 text-[0.9375rem] font-medium transition-colors",
+                active ? "text-foreground" : "text-muted-foreground hover:text-foreground",
               ]}
             >
               {link.label}
@@ -104,11 +120,21 @@ const ctaLabel = onStart ? site.phoneDisplay : d.nav.cta;
       }
     </nav>
 
-    <div class="ml-auto flex items-center gap-2 lg:ml-4">
-      {/* A "2H REVIEW" micro-label used to sit here. It said the same thing
-          as the ticker two rows above it and read as clutter beside the CTA —
-          the header's job is the map and one action. */}
-      <a href={ctaHref} class="btn-solid hidden !py-2.5 !text-sm sm:inline-flex">{ctaLabel}</a>
+    <div class="ml-auto flex items-center gap-2 lg:ml-0">
+      {
+        onStart ? (
+          <a href={site.phoneHref} class="btn-outline hidden !py-2.5 !text-sm sm:inline-flex">
+            {site.phoneDisplay}
+          </a>
+        ) : (
+          <a href={startPath} class="btn-split hidden sm:inline-flex">
+            <span class="btn-split-label !py-2.5 !text-sm">{d.nav.cta}</span>
+            <span class="btn-split-tile !h-10 !w-10">
+              <ArrowDownRight className="size-4" />
+            </span>
+          </a>
+        )
+      }
       {
         locales.length > 1 && (
           <LanguageSwitcher
@@ -120,10 +146,10 @@ const ctaLabel = onStart ? site.phoneDisplay : d.nav.cta;
           />
         )
       }
-      {/* `client:idle`, not `client:load`. Both header controls are
-          nice-to-haves that a first-time visitor never touches, and
-          `client:load` on either one pulls the React runtime into the critical
-          path on all fourteen pages. Deferred, LCP is 235ms with CLS 0. */}
+      {/* `client:idle`, not `client:load`. All three are nice-to-haves a
+          first-time visitor never touches, and `client:load` on any of them
+          pulls the React runtime into the critical path on all fourteen
+          pages. */}
       <PaletteSwitcher client:idle label={d.palette.label} options={d.palette.options} />
       <ThemeToggle client:idle label={d.nav.toggleTheme} />
       <MobileMenu
@@ -140,20 +166,97 @@ const ctaLabel = onStart ? site.phoneDisplay : d.nav.cta;
       />
     </div>
   </div>
+
+  {/* The two fillets. They are the header's own corners inverted, so the
+      frame's top rail appears to flow into the header's sides. Hidden with
+      the frame below 850px. */}
+  <svg
+    class="header-fillet -left-[49px] rotate-180"
+    width="50"
+    height="50"
+    viewBox="0 0 50 50"
+    fill="none"
+    aria-hidden="true"
+  >
+    <path
+      d="M5.50871e-06 0C-0.00788227 37.3001 8.99616 50.0116 50 50H5.50871e-06V0Z"
+      fill="currentColor"></path>
+  </svg>
+  <svg
+    class="header-fillet -right-[49px] rotate-90"
+    width="50"
+    height="50"
+    viewBox="0 0 50 50"
+    fill="none"
+    aria-hidden="true"
+  >
+    <path
+      d="M5.50871e-06 0C-0.00788227 37.3001 8.99616 50.0116 50 50H5.50871e-06V0Z"
+      fill="currentColor"></path>
+  </svg>
 </header>
 
 <style>
-  /* A hairline that grows from the left on hover, and stays put on the
-     current page. The nav is the one place a little motion earns its keep;
-     everything else on this site recolours and nothing moves. */
+  .site-header {
+    position: fixed;
+    top: var(--frame-w);
+    right: 0;
+    left: 0;
+    z-index: 60;
+    /* The 8rem of side room is exactly what the two 50px fillets need.
+       Centred with `margin-inline: auto` rather than a translate: a transform
+       on this element would make it a containing block for `position: fixed`
+       descendants, which is the exact bug MobileMenu.tsx portals around. */
+    width: min(64rem, calc(100vw - 8rem));
+    margin-inline: auto;
+    background: var(--frame);
+    border-bottom-left-radius: var(--radius-slab);
+    border-bottom-right-radius: var(--radius-slab);
+    box-shadow: 0 18px 44px color-mix(in oklab, var(--foreground) 12%, transparent);
+    animation: header-in 0.5s cubic-bezier(0.23, 1, 0.32, 1) both;
+  }
+
+  /* Opacity only. A translate would leave a transform on the ancestor, which
+     makes it a containing block for `position: fixed` descendants — the exact
+     bug MobileMenu.tsx portals around. */
+  @keyframes header-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .header-fillet {
+    position: absolute;
+    top: 0;
+    color: var(--frame);
+    pointer-events: none;
+  }
+
+  @media (max-width: 849px) {
+    .site-header {
+      top: 0;
+      width: 100%;
+      border-bottom-left-radius: 1.75rem;
+      border-bottom-right-radius: 1.75rem;
+    }
+    .header-fillet {
+      display: none;
+    }
+  }
+
+  /* A hairline that grows from the left on hover and stays put on the current
+     page. The nav is the one place a little motion earns its keep. */
   .nav-link::after {
     content: "";
     position: absolute;
     right: 0.75rem;
-    bottom: 0.35rem;
+    bottom: 0.4rem;
     left: 0.75rem;
     height: 1px;
-    background: var(--color-glow-500);
+    background: var(--color-signal-500);
     transform: scaleX(0);
     transform-origin: left;
     transition: transform 0.25s ease;
@@ -162,7 +265,11 @@ const ctaLabel = onStart ? site.phoneDisplay : d.nav.cta;
   .nav-link[aria-current="page"]::after {
     transform: scaleX(1);
   }
+
   @media (prefers-reduced-motion: reduce) {
+    .site-header {
+      animation: none;
+    }
     .nav-link::after {
       transition: none;
     }

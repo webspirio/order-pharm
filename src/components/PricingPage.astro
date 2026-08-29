@@ -197,8 +197,8 @@ const eligibilityRows = c.eligibility.rows.map((row, index) => ({
   <Header locale={locale} />
   <main id="main" tabindex="-1" class="outline-none">
     {/* 1. HEADER ------------------------------------------------------- */}
-    <section class="border-b border-border/70 bg-background pb-14 pt-14 sm:pb-16 sm:pt-16">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section class="bg-background pb-14 pt-14 sm:pb-16 sm:pt-16">
+      <div class="shell">
         <p class="label text-brand-700 dark:text-brand-400">{c.header.eyebrow}</p>
         <h1 class="display-1 mt-5 max-w-4xl">{c.header.title}</h1>
         <p class="lead mt-6 text-lg">{c.header.lead}</p>
@@ -234,8 +234,8 @@ const eligibilityRows = c.eligibility.rows.map((row, index) => ({
     </section>
 
     {/* 2. THE RECEIPT, IN FULL ---------------------------------------- */}
-    <section id={anchors.pricing} class="border-b border-border/70 bg-card py-16 sm:py-20">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section id={anchors.pricing} class="bg-card section">
+      <div class="shell">
         <div class="max-w-3xl">
           <p class="label text-brand-700 dark:text-brand-400">{c.receipt.eyebrow}</p>
           <h2 class="display-2 mt-4">{c.receipt.title}</h2>
@@ -308,8 +308,8 @@ const eligibilityRows = c.eligibility.rows.map((row, index) => ({
     </section>
 
     {/* 3. PER-PREPARATION PRICES -------------------------------------- */}
-    <section class="border-b border-border/70 bg-background py-16 sm:py-20">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section class="bg-background section">
+      <div class="shell">
         <div class="max-w-3xl">
           <p class="label text-brand-700 dark:text-brand-400">{c.treatments.eyebrow}</p>
           <h2 class="display-2 mt-4">{c.treatments.title}</h2>
@@ -476,8 +476,8 @@ const eligibilityRows = c.eligibility.rows.map((row, index) => ({
     </section>
 
     {/* 4. MEMBERSHIP -------------------------------------------------- */}
-    <section class="border-b border-border/70 bg-card py-16 sm:py-20">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section class="bg-card section">
+      <div class="shell">
         <div class="max-w-3xl">
           <p class="label text-brand-700 dark:text-brand-400">{m.eyebrow}</p>
           <h2 class="display-2 mt-4">{m.title}</h2>
@@ -600,8 +600,8 @@ const eligibilityRows = c.eligibility.rows.map((row, index) => ({
     </section>
 
     {/* 5. DELIVERY ---------------------------------------------------- */}
-    <section class="border-b border-border/70 bg-background py-16 sm:py-20">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section class="bg-background section">
+      <div class="shell">
         <div class="max-w-3xl">
           <p class="label text-brand-700 dark:text-brand-400">{c.shipping.eyebrow}</p>
           <h2 class="display-2 mt-4">{c.shipping.title}</h2>
@@ -631,7 +631,7 @@ const eligibilityRows = c.eligibility.rows.map((row, index) => ({
                     <span class="mt-1.5 block max-w-xl text-sm leading-relaxed text-muted-foreground">
                       {row.note}
                     </span>
-                    <span class="figure mt-2 block text-sm text-glow-700 sm:hidden dark:text-glow-500">
+                    <span class="figure mt-2 block text-sm text-signal-700 sm:hidden dark:text-signal-500">
                       {row.window}
                     </span>
                   </th>
@@ -641,7 +641,7 @@ const eligibilityRows = c.eligibility.rows.map((row, index) => ({
                     {row.cost}
                   </td>
                   <td
-                    class="figure hidden py-5 text-[0.9375rem] whitespace-nowrap text-glow-700 sm:table-cell dark:text-glow-500"
+                    class="figure hidden py-5 text-[0.9375rem] whitespace-nowrap text-signal-700 sm:table-cell dark:text-signal-500"
                   >
                     {row.window}
                   </td>
@@ -652,7 +652,7 @@ const eligibilityRows = c.eligibility.rows.map((row, index) => ({
         </table>
 
         <div class="panel mt-8 flex max-w-3xl gap-3 p-5">
-          <Clock className="mt-0.5 size-4 shrink-0 text-glow-700 dark:text-glow-500" />
+          <Clock className="mt-0.5 size-4 shrink-0 text-signal-700 dark:text-signal-500" />
           <p class="text-sm leading-relaxed text-muted-foreground">{cutoffNote}</p>
         </div>
       </div>
@@ -660,7 +660,7 @@ const eligibilityRows = c.eligibility.rows.map((row, index) => ({
 
     {/* 6. THE TWO BOUNDARY LISTS — the page's fixed-dark band --------- */}
     <section class="border-b border-brand-50/10 bg-brand-800 py-16 text-brand-50 sm:py-20">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+      <div class="shell">
         <div class="max-w-3xl">
           <p class="label text-brand-300">{c.boundaries.eyebrow}</p>
           <h2 class="display-2 mt-4 text-brand-50">{c.boundaries.title}</h2>
@@ -702,8 +702,8 @@ const eligibilityRows = c.eligibility.rows.map((row, index) => ({
     </section>
 
     {/* 7. ELIGIBILITY THRESHOLDS ------------------------------------- */}
-    <section class="border-b border-border/70 bg-card py-16 sm:py-20">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section class="bg-card section">
+      <div class="shell">
         <div class="grid gap-10 lg:grid-cols-[1fr_20rem] lg:gap-14">
           <div>
             <p class="label text-brand-700 dark:text-brand-400">{c.eligibility.eyebrow}</p>

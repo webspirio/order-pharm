@@ -128,7 +128,7 @@ const verifySymbol = (symbol: string) => {
 };
 
 const footnote = (symbol: string) =>
-  `<sup class="ml-0.5 text-glow-700 dark:text-glow-500">${verifySymbol(symbol)}</sup>`;
+  `<sup class="ml-0.5 text-signal-700 dark:text-signal-500">${verifySymbol(symbol)}</sup>`;
 
 const pharmacyNames = partners.pharmacies.map((pharmacy) => pharmacy.name);
 const officeLine = `${site.addressStreet}, ${site.addressLocality}, ${site.addressRegion} ${site.addressPostal}`;
@@ -277,8 +277,8 @@ const related = [
     {/* Masthead. The effective date is mono because it is a figure with legal
         force, and it is repeated at the foot of the document, which is where
         the text itself refers to it. */}
-    <section class="border-b border-border/70 bg-card pb-14 pt-14 sm:pb-16 sm:pt-16">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section class="bg-card pb-14 pt-14 sm:pb-16 sm:pt-16">
+      <div class="shell">
         <p class="label text-brand-700 dark:text-brand-400">{docData.eyebrow}</p>
         <h1 class="display-1 mt-5 max-w-4xl">{docData.title}</h1>
         <p class="lead mt-6 text-lg" set:html={render(docData.lead)} />
@@ -307,9 +307,9 @@ const related = [
             the notice has failed. */}
         <div class="panel mt-8 max-w-3xl border-l-2 border-l-brand-500 bg-background p-5 sm:p-6">
           <div class="flex gap-3.5">
-            <TriangleAlert className="mt-0.5 size-4 shrink-0 text-glow-700 dark:text-glow-500" />
+            <TriangleAlert className="mt-0.5 size-4 shrink-0 text-signal-700 dark:text-signal-500" />
             <div>
-              <p class="label text-glow-700 dark:text-glow-500">{d.legal.notice.label}</p>
+              <p class="label text-signal-700 dark:text-signal-500">{d.legal.notice.label}</p>
               <p class="subhead mt-2.5">{d.legal.notice.title}</p>
               <p
                 class="mt-2 text-[0.875rem] leading-relaxed text-muted-foreground"
@@ -322,7 +322,7 @@ const related = [
     </section>
 
     <section class="bg-background py-14 sm:py-16">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+      <div class="shell">
         <div class="grid gap-10 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-14">
           {/* The contents rail. A 4,000-word document without one is a
               document you are expected not to read. */}
@@ -382,7 +382,7 @@ const related = [
                     <div class="flex items-baseline gap-4">
                       <span
                         aria-hidden="true"
-                        class="figure shrink-0 text-sm text-glow-700 dark:text-glow-500"
+                        class="figure shrink-0 text-sm text-signal-700 dark:text-signal-500"
                       >
                         {index(position)}
                       </span>
@@ -390,7 +390,7 @@ const related = [
                         <span class="sr-only">{`${d.legal.sectionLabel} ${position + 1}. `}</span>
                         {section.heading}
                         {section.symbols?.map((symbol) => (
-                          <sup class="ml-1 align-super text-[0.4em] text-glow-700 dark:text-glow-500">
+                          <sup class="ml-1 align-super text-[0.4em] text-signal-700 dark:text-signal-500">
                             {verifySymbol(symbol)}
                           </sup>
                         ))}

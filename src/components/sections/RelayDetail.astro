@@ -38,8 +38,8 @@ const steps = d.home.relay.steps.map((step, index) => ({
 }));
 ---
 
-<section id={anchors.relay} class="border-b border-border/70 bg-background py-16 sm:py-20">
-  <div class="mx-auto max-w-6xl px-4 sm:px-6">
+<section id={anchors.relay} class="bg-background section">
+  <div class="shell">
     <div class="grid gap-10 lg:grid-cols-[20rem_1fr] lg:gap-16">
       <div class="lg:sticky lg:top-24 lg:self-start">
         <p class="label text-brand-700 dark:text-brand-400">{d.home.relay.eyebrow}</p>
@@ -62,11 +62,11 @@ const steps = d.home.relay.steps.map((step, index) => ({
                   the 1px border puts its centre on the line. */}
               <span
                 aria-hidden="true"
-                class="absolute -left-[1.5625rem] top-[0.45rem] size-[7px] rounded-full bg-glow-500 sm:-left-[2.0625rem]"
+                class="absolute -left-[1.5625rem] top-[0.45rem] size-[7px] rounded-full bg-signal-500 sm:-left-[2.0625rem]"
               ></span>
               <span
                 aria-hidden="true"
-                class="absolute -left-6 top-[0.7rem] h-px w-4 bg-glow-500/50 sm:-left-8 sm:w-6"
+                class="absolute -left-6 top-[0.7rem] h-px w-4 bg-signal-500/50 sm:-left-8 sm:w-6"
               ></span>
 
               <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
@@ -77,7 +77,7 @@ const steps = d.home.relay.steps.map((step, index) => ({
                   {" · "}
                   {step.actor}
                 </p>
-                <p class="figure text-sm text-glow-700 dark:text-glow-500">{step.duration}</p>
+                <p class="figure text-sm text-signal-700 dark:text-signal-500">{step.duration}</p>
               </div>
               <h3 class="display-3 mt-2">{step.action}</h3>
               <p class="mt-2.5 max-w-2xl text-[0.9375rem] leading-relaxed text-muted-foreground">

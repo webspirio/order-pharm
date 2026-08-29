@@ -105,15 +105,15 @@ const thresholds = w.eligibility.thresholds.map((item, index) => ({
   <TrustTicker locale={locale} />
   <Header locale={locale} />
 
-  <main id="main" tabindex="-1" class="page-tint outline-none">
+  <main id="main" tabindex="-1" class="outline-none">
     {/* ---------------------------------------------------------------
         HEADER BLOCK. Left transparent so the page wash shows through it,
         which is what keeps an inner page from opening as a white slab. The
         photograph is a 21/9 band under the type rather than a full-bleed
         hero: the figures are the thing to read first here.
         --------------------------------------------------------------- */}
-    <section class="border-b border-border/70 pb-14 pt-14 sm:pb-16 sm:pt-16">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section class="pb-14 pt-14 sm:pb-16 sm:pt-16">
+      <div class="shell">
         <p class="label text-brand-700 dark:text-brand-400">{w.header.eyebrow}</p>
         <h1 class="display-1 mt-5 max-w-4xl">{w.header.title}</h1>
         <p class="lead mt-6 text-lg">{w.header.lead}</p>
@@ -166,8 +166,8 @@ const thresholds = w.eligibility.thresholds.map((item, index) => ({
         THE LADDER. Two instances of one prop-driven component, stacked,
         deliberately not on a shared axis — see Ladder.astro.
         --------------------------------------------------------------- */}
-    <section class="border-b border-border/70 bg-card py-16 sm:py-20">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section class="bg-card section">
+      <div class="shell">
         <div class="max-w-3xl">
           <p class="label text-brand-700 dark:text-brand-400">{w.ladder.eyebrow}</p>
           <h2 class="display-2 mt-4">{w.ladder.title}</h2>
@@ -207,8 +207,8 @@ const thresholds = w.eligibility.thresholds.map((item, index) => ({
         "from" badge — publishing the second month's price is the whole
         premium tell here. Definition list below `sm`.
         --------------------------------------------------------------- */}
-    <section class="border-b border-border/70 bg-background py-16 sm:py-20">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section class="bg-background section">
+      <div class="shell">
         <div class="max-w-3xl">
           <p class="label text-brand-700 dark:text-brand-400">{w.treatments.eyebrow}</p>
           <h2 class="display-2 mt-4">{w.treatments.title}</h2>
@@ -367,8 +367,8 @@ const thresholds = w.eligibility.thresholds.map((item, index) => ({
         BRAND-NAME ALTERNATIVES. Named, priced as a range because the
         pharmacy sets it, with the trademark note attached.
         --------------------------------------------------------------- */}
-    <section class="border-b border-border/70 bg-card py-16 sm:py-20">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section class="bg-card section">
+      <div class="shell">
         <div class="grid gap-10 lg:grid-cols-[1fr_24rem] lg:gap-14">
           <div>
             <p class="label text-brand-700 dark:text-brand-400">{w.brands.eyebrow}</p>
@@ -432,7 +432,7 @@ const thresholds = w.eligibility.thresholds.map((item, index) => ({
         actually answer "would they take me".
         --------------------------------------------------------------- */}
     <section class="border-b border-brand-50/10 bg-brand-800 py-16 text-brand-50 sm:py-20">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+      <div class="shell">
         <div class="max-w-3xl">
           <p class="label text-brand-300">{w.eligibility.eyebrow}</p>
           <h2 class="display-2 mt-4 text-brand-50">{w.eligibility.title}</h2>
@@ -500,8 +500,8 @@ const thresholds = w.eligibility.thresholds.map((item, index) => ({
         nowhere. The side-effect content is a table because it genuinely
         pairs a symptom with an action.
         --------------------------------------------------------------- */}
-    <section class="border-b border-border/70 bg-card py-16 sm:py-20">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section class="bg-card section">
+      <div class="shell">
         <div class="max-w-3xl">
           <p class="label text-brand-700 dark:text-brand-400">{w.safety.eyebrow}</p>
           <h2 class="display-2 mt-4">
@@ -511,9 +511,9 @@ const thresholds = w.eligibility.thresholds.map((item, index) => ({
         </div>
 
         <div class="panel mt-10 flex gap-4 bg-background p-6 sm:p-7">
-          <TriangleAlert className="mt-0.5 size-5 shrink-0 text-glow-500" />
+          <TriangleAlert className="mt-0.5 size-5 shrink-0 text-signal-500" />
           <div>
-            <h3 class="label text-glow-700 dark:text-glow-500">{w.safety.warningLabel}</h3>
+            <h3 class="label text-signal-700 dark:text-signal-500">{w.safety.warningLabel}</h3>
             <p class="mt-3 max-w-3xl text-[0.9375rem] leading-relaxed text-foreground">
               {w.safety.warning}
             </p>
@@ -545,7 +545,7 @@ const thresholds = w.eligibility.thresholds.map((item, index) => ({
               {
                 w.safety.urgent.map((item) => (
                   <li class="flex items-start gap-3 border-t border-border py-3 text-sm leading-relaxed text-muted-foreground">
-                    <TriangleAlert className="mt-1 size-3.5 shrink-0 text-glow-700 dark:text-glow-500" />
+                    <TriangleAlert className="mt-1 size-3.5 shrink-0 text-signal-700 dark:text-signal-500" />
                     <span>{item}</span>
                   </li>
                 ))

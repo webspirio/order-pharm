@@ -1,0 +1,378 @@
+# React Bits Pro — components (starter registry, 135)
+
+- **3d-letter-swap-tw** — Staggered customizable 3D letter swap animation (Tailwind version)  ·  _?_  ·  deps: motion  ·  13k
+- **3d-text-reveal-tw** — Scroll-triggered 3D text animation with GSAP (Tailwind version)  ·  _?_  ·  deps: gsap,@gsap/react  ·  4k
+- **agentic-ball-tw** — Animated 3D orb with swirl and glow effects (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  7k
+- **ai-blob-tw** — Animated 3D blob with customizable colors and glow effects (Tailwind version)  ·  _?_  ·  deps: three  ·  12k
+- **animated-list-tw** — Animated list with animated items (Tailwind version)  ·  _?_  ·  deps: motion  ·  11k
+- **ascii-cursor-tw** — Cursor that leaves ASCII character trail (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,@react-three/drei,three  ·  11k
+- **ascii-tiles-tw** — A field of glassy tiles made of glowing ASCII characters (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  12k
+- **ascii-waves-tw** — Wave effect made of ASCII characters (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  11k
+- **aura-blob-tw** — A soft glowing blob surrounded by a slowly shifting aura (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  16k
+- **aurora-beam-tw** — A sweeping aurora beam built from layered sheets of light (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  17k
+- **aurora-blur-tw** — Ethereal aurora borealis blur effect (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  9k
+- **bending-marquee-tw** — A marquee that bends along a curve as it scrolls (Tailwind version)  ·  _?_  ·  deps: none  ·  11k
+- **black-hole-tw** — Gravitational particle effect with color cycling (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  9k
+- **blinking-dots-tw** — A crisp field of dots blinking in and out on a fixed grid (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  14k
+- **blinking-squares-tw** — A grid of little squares that quietly twinkle (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  8k
+- **blur-highlight-tw** — Animated paragraph with blur-in effect and automatic text highlighting (Tailwind version)  ·  _?_  ·  deps: motion  ·  8k
+- **blurred-rays-tw** — Flickering vertical light beams with bloom (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  11k
+- **card-spread-tw** — A fanned deck of cards that spreads open on hover (Tailwind version)  ·  _?_  ·  deps: motion  ·  11k
+- **center-flow-tw** — Radial flowing animation from center (Tailwind version)  ·  _?_  ·  deps: next-themes  ·  15k
+- **chroma-blinds-tw** — Colorful diagonal stripes that bend toward your cursor (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  11k
+- **chroma-card-tw** — Card with chromatic color shifting effect (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three,gsap  ·  10k
+- **chroma-waves-tw** — Animated wave shader effect with noise distortion (Tailwind version)  ·  _?_  ·  deps: three  ·  11k
+- **circle-gallery-tw** — Draggable circular carousel with inertia and 3D transforms (Tailwind version)  ·  _?_  ·  deps: gsap  ·  14k
+- **circle-stack-tw** — A tilted stack of circles that cycles through your images (Tailwind version)  ·  _?_  ·  deps: none  ·  4k
+- **circles-tw** — Rotating orbital rings with images and customizable animations (Tailwind version)  ·  _?_  ·  deps: none  ·  12k
+- **click-stack-tw** — Click-to-cycle animated card stack (Tailwind version)  ·  _?_  ·  deps: gsap  ·  7k
+- **color-loops-tw** — Animated colorful loops with orbital motion (Tailwind version)  ·  _?_  ·  deps: three  ·  6k
+- **comparison-slider-tw** — Before/after image comparison with draggable or hover controls (Tailwind version)  ·  _?_  ·  deps: gsap,@gsap/react,lucide-react  ·  17k
+- **credit-card-tw** — Interactive 3D credit card with parallax tilt and hover effects (Tailwind version)  ·  _?_  ·  deps: motion,lucide-react  ·  20k
+- **cursor-wave-tw** — A grid of shapes that reacts to your cursor and clicks (Tailwind version)  ·  _?_  ·  deps: none  ·  16k
+- **custom-cursor-tw** — Interactive cursor component with smooth animations and target morphing (Tailwind version)  ·  _?_  ·  deps: motion  ·  14k
+- **depth-card-tw** — Perspective depth effect that responds to mouse movement (Tailwind version)  ·  _?_  ·  deps: none  ·  11k
+- **device-tw** — Performant CSS device mockup with custom content (Tailwind version)  ·  _?_  ·  deps: motion,lenis  ·  10k
+- **dither-cursor-tw** — Cursor with dithering pixelated trail effect (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,@react-three/drei,three  ·  11k
+- **dither-wave-tw** — Animated wave effect with retro dithering pattern (Tailwind version)  ·  _?_  ·  deps: three  ·  10k
+- **dot-shift-tw** — Shifting grid of animated dots (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  3k
+- **draggable-grid-tw** — Pannable grid with smooth drag and momentum (Tailwind version)  ·  _?_  ·  deps: gsap,@gsap/react  ·  11k
+- **falling-rays-tw** — Rays falling from top like rain of light (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  11k
+- **flame-paths-tw** — Animated flame-like wave effect (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  10k
+- **fog-sphere-tw** — A soft, swirling sphere of fog (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  13k
+- **frame-border-tw** — Animated noise-textured border effect (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  7k
+- **frame-scrub-tw** — Scroll drives a frame sequence through a canvas playhead (Tailwind version)  ·  _?_  ·  deps: none  ·  29k
+- **glass-cursor-tw** — Glass-like cursor trail with refraction and blur (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  15k
+- **glass-flow-tw** — Flowing glass-like blur animation (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  11k
+- **glass-tiles-tw** — A shimmering background of colorful glass tiles (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  6k
+- **glitch-text-tw** — Interactive canvas-based text with sticky glitch effect that responds to cursor movement (Tailwind version)  ·  _?_  ·  deps: none  ·  13k
+- **glitter-warp-tw** — Starfield warp tunnel with glittering particle effects (Tailwind version)  ·  _?_  ·  deps: three  ·  7k
+- **globe-tw** — Interactive 3D globe with animated arcs and location markers (Tailwind version)  ·  _?_  ·  deps: none  ·  22k
+- **glowing-wave-tw** — A single luminous wave sweeping slowly across the screen (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  16k
+- **glue-dots-tw** — Metaball dots that stick together and stretch apart as they meet (Tailwind version)  ·  _?_  ·  deps: none  ·  14k
+- **gradient-bars-tw** — Animated striped gradient bars (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  9k
+- **gradient-blob-tw** — Morphing 3D blob with gradient colors and cursor interaction (Tailwind version)  ·  _?_  ·  deps: three  ·  17k
+- **gradient-carousel-tw** — 3D card carousel with dynamic gradient background extraction (Tailwind version)  ·  _?_  ·  deps: gsap  ·  28k
+- **grain-wave-tw** — Grainy wave texture animation effect (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three,next-themes  ·  8k
+- **grid-rise-tw** — A raymarched tile field that lifts and ripples under the cursor (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  20k
+- **halftone-vortex-tw** — Cursor-reactive halftone dot vortex (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  9k
+- **halftone-wave-tw** — Animated halftone dot grid with noise (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  10k
+- **hover-preview-tw** — Interactive text image previews when hovering over target words. (Tailwind version)  ·  _?_  ·  deps: motion  ·  9k
+- **infinite-gallery-tw** — 3D infinite scrolling image gallery with drag and parallax (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  23k
+- **landscape-tw** — A procedurally generated landscape scrolling toward the horizon (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  19k
+- **lenticular-carousel-tw** — A gallery whose cards turn over like a lenticular print (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three,lucide-react  ·  31k
+- **light-droplets-tw** — Falling light streaks with rotation and glow effects (Tailwind version)  ·  _?_  ·  deps: three  ·  10k
+- **lightspeed-tw** — Hyperspace light streak effect with click interaction (Tailwind version)  ·  _?_  ·  deps: three  ·  12k
+- **liquid-ascii-tw** — Fluid simulation rendered as ASCII characters (Tailwind version)  ·  _?_  ·  deps: none  ·  24k
+- **liquid-bars-tw** — Animated liquid bar effect with smooth wave motion (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  14k
+- **liquid-lines-tw** — Flowing liquid line animation effect (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three,next-themes  ·  8k
+- **liquid-swap-tw** — Swap images transition with a stunning liquid glass ball effect (Tailwind version)  ·  _?_  ·  deps: three,gsap  ·  12k
+- **magic-transform-tw** — Documents fly in and come out as colorful results (Tailwind version)  ·  _?_  ·  deps: motion  ·  26k
+- **metallic-swirl-tw** — Metallic swirl shader background (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  9k
+- **minimal-ripple-tw** — Quiet concentric ripples spreading outward from a still point (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  13k
+- **modal-cards-tw** — Expandable cards that open into full-screen modals (Tailwind version)  ·  _?_  ·  deps: motion  ·  17k
+- **mosaic-tw** — Mosaic effect with animated wave or video background (Tailwind version)  ·  _?_  ·  deps: three  ·  11k
+- **mosaic-waves-tw** — Waves rolling through a mosaic of shifting tiles (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  14k
+- **neon-reveal-tw** — Realistic neon bar effect that sweeps across the container (Tailwind version)  ·  _?_  ·  deps: three  ·  15k
+- **neural-float-tw** — Soft neural filaments drifting weightlessly across the canvas (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  20k
+- **neural-tunnel-tw** — An endless tunnel of pulsing neural strands (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  13k
+- **page-flip-tw** — A book-style page flip you can drag through (Tailwind version)  ·  _?_  ·  deps: motion  ·  9k
+- **parallax-cards-tw** — 3D layered card display with mouse-driven parallax depth effect (Tailwind version)  ·  _?_  ·  deps: gsap  ·  12k
+- **parallax-carousel-tw** — A draggable image carousel with a smooth parallax feel (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  16k
+- **parallax-pills-tw** — Bouncy labeled pills that drift along with your cursor (Tailwind version)  ·  _?_  ·  deps: motion  ·  12k
+- **particle-image-tw** — An image dissolved into GPU particles that swirl apart and reassemble (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  21k
+- **particle-text-tw** — Interactive 3D particle text with WebGL (Tailwind version)  ·  _?_  ·  deps: none  ·  8k
+- **perspective-grid-tw** — Infinite scrolling 3D perspective grid with WebGL shader rendering (Tailwind version)  ·  _?_  ·  deps: three  ·  9k
+- **pixel-magnet-tw** — A cursor trail that magnetises the pixels it passes through (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  12k
+- **pixel-rain-tw** — Pixelated streaks falling in a quiet digital rain (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  12k
+- **pixel-reveal-tw** — An image that reveals itself through a sweep of pixels (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  13k
+- **pixelate-hover-tw** — Interactive pixelation effect with cursor-controlled reveal (Tailwind version)  ·  _?_  ·  deps: three  ·  24k
+- **portal-tw** — Circular portal shader with customizable particle effects (Tailwind version)  ·  _?_  ·  deps: three  ·  9k
+- **preloader-tw** — Animated loading screens with multiple style variants (Tailwind version)  ·  _?_  ·  deps: motion  ·  17k
+- **radial-liquid-tw** — Radial shader waves with distortion and various effects (Tailwind version)  ·  _?_  ·  deps: three  ·  20k
+- **reel-gallery-tw** — Tilted reels of images that glide as you scroll (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  22k
+- **retro-lines-tw** — Retro perspective grid with scrolling waves (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  10k
+- **rising-lines-tw** — Ascending lines and particles with laser beam effect (Tailwind version)  ·  _?_  ·  deps: three  ·  12k
+- **rising-particles-tw** — Particles glowing softly as they rise and drift upward (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  16k
+- **rolling-blinds-tw** — Bands of light that roll open and closed like window blinds (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  11k
+- **rotating-cards-tw** — 3D circular carousel with draggable rotating cards (Tailwind version)  ·  _?_  ·  deps: motion  ·  9k
+- **rotating-stars-tw** — Spinning star particles with orbital animation (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  4k
+- **rubber-fluid-tw** — Rubbery fluid distortion shader (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  11k
+- **scroll-mask-tw** — Scroll opens a mask that reveals an image six ways (Tailwind version)  ·  _?_  ·  deps: none  ·  16k
+- **scroll-stack-tw** — Pinned cards that stack, turn and dissolve as the page scrolls (Tailwind version)  ·  _?_  ·  deps: none  ·  17k
+- **shader-card-tw** — Card with animated WebGL shader background effect (Tailwind version)  ·  _?_  ·  deps: three  ·  13k
+- **shader-reveal-tw** — Interactive liquid image reveal (Tailwind version)  ·  _?_  ·  deps: three  ·  50k
+- **shader-waves-tw** — Animated wave patterns with customizable colors and noise (Tailwind version)  ·  _?_  ·  deps: three  ·  9k
+- **shadow-bars-tw** — Animated shadow bar effect with depth (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three,next-themes  ·  10k
+- **silk-waves-tw** — Smooth flowing silk-like wave animation (Tailwind version)  ·  _?_  ·  deps: three  ·  8k
+- **simple-graph-tw** — Animated line graph w/ custom interactions and advanced customization (Tailwind version)  ·  _?_  ·  deps: motion,lucide-react  ·  16k
+- **simple-swirl-tw** — Rotating concentric swirl with glow (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  9k
+- **skewed-carousel-tw** — A skewed marquee of cards that tilts and scales as it scrolls (Tailwind version)  ·  _?_  ·  deps: motion,lucide-react  ·  11k
+- **smooth-cursor-tw** — Canvas-based smooth cursor trail with spring physics (Tailwind version)  ·  _?_  ·  deps: none  ·  7k
+- **specter-orb-tw** — A ghostly raymarched orb wrapped in drifting smoke (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  19k
+- **spectral-clouds-tw** — Volumetric clouds tinted with drifting spectral light (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  18k
+- **speeding-text-tw** — Text that stretches and smears as it races past the viewport (Tailwind version)  ·  _?_  ·  deps: motion  ·  12k
+- **square-matrix-tw** — Animated dot grid with wave presets (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  10k
+- **squares-terminal-tw** — A terminal-style grid of squares that flicker on and off (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  11k
+- **squircle-shift-tw** — Morphing squircle shape animation (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three,next-themes  ·  9k
+- **staggered-text-tw** — Flexible, feature-rich text animation component for staggered reveals (Tailwind version)  ·  _?_  ·  deps: motion  ·  10k
+- **star-burst-tw** — Star burst explosion effect with particles (Tailwind version)  ·  _?_  ·  deps: three  ·  9k
+- **star-swipe-tw** — Conformal star warp shader with sweeping motion (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  10k
+- **swirl-blend-tw** — Colorful iterative swirl shader with palette controls (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  10k
+- **synaptic-shift-tw** — Neural network-like connection animations (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  4k
+- **tech-wall-tw** — A wall of technical panels lighting up in sequence (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  18k
+- **text-cube-tw** — Cursor-following 3D text cube with depth fade (Tailwind version)  ·  _?_  ·  deps: none  ·  10k
+- **text-path-tw** — Animated text that follows an SVG path with GSAP (Tailwind version)  ·  _?_  ·  deps: gsap,@gsap/react  ·  3k
+- **text-scatter-tw** — Interactive letter scatter effect (Tailwind version)  ·  _?_  ·  deps: gsap  ·  2k
+- **thinking-dots-tw** — A dot matrix breathing around a drifting cloud of density (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  18k
+- **tilted-tiles-tw** — A tilted grid of image columns that drift as you scroll (Tailwind version)  ·  _?_  ·  deps: motion  ·  10k
+- **tumble-carousel-tw** — Cards that tumble end over end as the carousel advances (Tailwind version)  ·  _?_  ·  deps: motion,lucide-react  ·  14k
+- **twilight-lines-tw** — Soft glowing lines that pulse with a warm sweep (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  11k
+- **user-cursor-tw** — A custom cursor with a little name tag that follows along (Tailwind version)  ·  _?_  ·  deps: motion  ·  14k
+- **vortex-tw** — Infinitely spinning 3D tunnel with particles and depth effect (Tailwind version)  ·  _?_  ·  deps: none  ·  9k
+- **warp-twister-tw** — Twisting warp distortion effect (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three,next-themes  ·  10k
+- **warped-card-tw** — Image card with mouse-following bulge distortion shader (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  9k
+- **watercolor-tw** — Animated watercolor noise shader with two-color blend (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  9k
+- **wireframe-ball-tw** — A rotating wireframe polyhedron raymarched in a shader (Tailwind version)  ·  _?_  ·  deps: @react-three/fiber,three  ·  26k
+
+
+# React Bits Pro — marketing blocks (pro registry, 238)
+
+- **404-1** — Minimalist 404 page with title and card grid  ·  _default NotFound1_  ·  deps: motion,lucide-react  ·  6k
+- **404-2** — Full screen 404 text with centered layout and navigation button  ·  _default NotFound2_  ·  deps: motion,lucide-react  ·  12k
+- **404-3** — Centered 404 page with blurred large numerals and a compact CTA  ·  _default NotFound3_  ·  deps: motion  ·  3k
+- **404-4** — Editorial top-aligned 404 with large headline and a three-column card grid  ·  _default NotFound4_  ·  deps: motion,lucide-react  ·  4k
+- **404-5** — Bold 404 heading with scattered colorful illustrated cards below  ·  _default NotFound5_  ·  deps: motion,lucide-react,matter-js  ·  12k
+- **404-6** — Theme-aware GLSL static-field 404 with a synchronized chromatic-glitch numeral and centered composition  ·  _default NotFound6_  ·  deps: motion,three,lucide-react  ·  12k
+- **404-7** — Radar-sweep 404 with sweep-synced contact pings, outline-mix numeral, and inline search  ·  _default NotFound7_  ·  deps: motion,lucide-react  ·  10k
+- **404-8** — Terminal 404 that prints an ASCII numeral diagnosis with live recovery routes and a blinking caret  ·  _default NotFound8_  ·  deps: motion,lucide-react  ·  7k
+- **about-1** — Two-column carousel with auto-cycling images and text  ·  _default About1_  ·  deps: motion,lucide-react  ·  9k
+- **about-10** — People-first portrait collage around a faded brand statement with play CTA and trust strip.  ·  _default About10_  ·  deps: motion,lucide-react  ·  6k
+- **about-11** — Sticky company narrative beside a drawn timeline rail with varied milestone chapters.  ·  _default About11_  ·  deps: motion,lucide-react  ·  8k
+- **about-12** — Inverted founder pull-quote panel paired with a numbered operating-values ledger.  ·  _default About12_  ·  deps: motion,lucide-react  ·  5k
+- **about-2** — Timeline with horizontal progress bar  ·  _default About2_  ·  deps: motion,lucide-react  ·  16k
+- **about-3** — Glass cards with metrics overlay  ·  _default About3_  ·  deps: motion  ·  5k
+- **about-4** — Three-column layout with cycling progress circle  ·  _default About4_  ·  deps: motion  ·  8k
+- **about-5** — Infinite horizontal scroll with bento cards  ·  _default About5_  ·  deps: lenis  ·  5k
+- **about-6** — Meet the Team section with large wordmark headline and founder profile cards  ·  _default About6_  ·  deps: motion,lucide-react  ·  4k
+- **about-7** — Medical advisors section with institution logos and five-column doctor grid  ·  _default About7_  ·  deps: motion  ·  3k
+- **about-8** — Team section with horizontal motion carousel and arrow navigation controls  ·  _default About8_  ·  deps: motion,lucide-react  ·  6k
+- **about-9** — Centered mission statement with serif emphasis, cinematic film card, and an editorial stat rail.  ·  _default About9_  ·  deps: motion,lucide-react  ·  5k
+- **auth-1** — Split layout with sign-in form and animated testimonial marquee  ·  _named Auth1_  ·  deps: motion,lucide-react,next-themes,clsx,tailwind-merge  ·  20k
+- **auth-2** — Split layout with gradient background, OAuth buttons, and sign-in form  ·  _named Auth2_  ·  deps: motion,lucide-react  ·  9k
+- **auth-3** — Centered card with OAuth options and floating brand section over background image  ·  _named Auth3_  ·  deps: motion  ·  7k
+- **auth-4** — Framed split-panel sign-in with OAuth, password toggle, and an orbital trust-ring showcase with customer quote.  ·  _named Auth4_  ·  deps: motion,lucide-react  ·  16k
+- **auth-5** — Centered magic-link card that swaps to a check-your-inbox state with resend cooldown and OAuth fallback.  ·  _named Auth5_  ·  deps: motion,lucide-react  ·  12k
+- **auth-6** — Minimal six-digit verification screen with grouped auto-advancing OTP inputs and resend countdown.  ·  _named Auth6_  ·  deps: motion,lucide-react  ·  8k
+- **blog-1** — Responsive blog page with article card grid  ·  _named Blog1_  ·  deps: motion  ·  5k
+- **blog-10** — Editorial archive with a sticky radio topic rail and full-width article rows.  ·  _named Blog10_  ·  deps: motion,lucide-react  ·  9k
+- **blog-11** — Framed featured essay beside a hairline-divided list of compact secondary reads.  ·  _named Blog11_  ·  deps: motion,lucide-react  ·  9k
+- **blog-2** — Recently published section with animated pagination  ·  _named Blog2_  ·  deps: motion,lucide-react  ·  8k
+- **blog-3** — Blog section with sidebar filtering and next/prev buttons  ·  _named Blog3_  ·  deps: motion  ·  6k
+- **blog-4** — Article page with stats and user details  ·  _named Blog4_  ·  deps: motion,lucide-react  ·  6k
+- **blog-5** — Detailed article page with scroll progress and AI input  ·  _named Blog5_  ·  deps: motion,lucide-react  ·  14k
+- **blog-6** — Filterable newsroom grid with section tabs, image tiles, and hover reveal arrow  ·  _default Blog6_  ·  deps: motion,lucide-react  ·  8k
+- **blog-7** — Blog grid with sidebar tag filter and color-coded category pills  ·  _default Blog7_  ·  deps: motion  ·  7k
+- **blog-8** — Filterable changelog grid with a sliding category pill, live search, and floating image chips.  ·  _named Blog8_  ·  deps: motion,lucide-react  ·  11k
+- **blog-9** — Poster-style journal teaser with floating label cards and circular arrow actions.  ·  _named Blog9_  ·  deps: motion,lucide-react  ·  6k
+- **comparison-1** — Two-column layout with brand logos, checkmark feature comparison, and CTA button  ·  _default Comparison1_  ·  deps: motion,lucide-react  ·  5k
+- **comparison-2** — Pricing comparison table with plan toggle, colored border highlight, and feature rows  ·  _default Comparison2_  ·  deps: motion,lucide-react  ·  17k
+- **comparison-3** — Visual bar chart comparison with animated rising bars, logo circles, and G2 scores  ·  _default Comparison3_  ·  deps: motion,lucide-react  ·  7k
+- **comparison-4** — Two-column us-vs-them comparison with bold feature rows and check/X indicators  ·  _default Comparison4_  ·  deps: motion,lucide-react  ·  4k
+- **comparison-5** — A cost-at-scale comparison table where savings deepen through an emerald heat ramp at each growth stage, with stacked cards on mobile.  ·  _default Comparison5_  ·  deps: motion,lucide-react  ·  11k
+- **comparison-6** — An editorial two-column panel trading the usual stack for the product line by line, with ban/check chips and a footer link.  ·  _default Comparison6_  ·  deps: motion,lucide-react  ·  7k
+- **comparison-7** — A genuinely draggable before-and-after wipe with keyboard slider support that swaps a scattered launch flow for one command surface.  ·  _default Comparison7_  ·  deps: motion,lucide-react  ·  11k
+- **comparison-8** — A grouped capability matrix with tri-state status chips, a tinted featured column, and a sticky label rail on horizontal scroll.  ·  _default Comparison8_  ·  deps: motion,lucide-react  ·  11k
+- **contact-1** — Three-card grid layout with pill badges and call-to-action links  ·  _default Contact1_  ·  deps: motion,lucide-react  ·  3k
+- **contact-10** — Dark enterprise sales form with consultation benefits and dense fields.  ·  _default Contact10_  ·  deps: motion,lucide-react  ·  9k
+- **contact-11** — Team-routing contact layout with personal desks and an enquiry form.  ·  _default Contact11_  ·  deps: motion,lucide-react  ·  11k
+- **contact-12** — Support pathway hub with six animated contact option cards.  ·  _default Contact12_  ·  deps: motion,lucide-react  ·  5k
+- **contact-2** — Two-column layout with company info and full contact form with input fields  ·  _default Contact2_  ·  deps: motion  ·  7k
+- **contact-3** — Simple centered layout with three square icon cards for contact methods  ·  _default Contact3_  ·  deps: motion,lucide-react  ·  3k
+- **contact-4** — Large image with glass card overlay and structured contact information  ·  _default Contact4_  ·  deps: motion,lucide-react  ·  4k
+- **contact-5** — Two-column layout with detailed contact info and auto-playing image carousel  ·  _default Contact5_  ·  deps: motion,lucide-react  ·  8k
+- **contact-6** — Centered contact card with circular logo badge, heading, and dark CTA  ·  _default Contact6_  ·  deps: motion,lucide-react  ·  1k
+- **contact-7** — Narrow centered contact form with serif italic headline and stacked inputs  ·  _default Contact7_  ·  deps: motion,lucide-react  ·  6k
+- **contact-8** — Split layout with serif headline, checklist, reviewer avatars, and dark pill-input form  ·  _default Contact8_  ·  deps: motion,lucide-react  ·  9k
+- **contact-9** — Location-first contact section with studio details and a photo carousel panel.  ·  _default Contact9_  ·  deps: motion,lucide-react  ·  10k
+- **cta-1** — Centered sign-up form with cursor-parallax floating background cards  ·  _default CTA1_  ·  deps: motion  ·  7k
+- **cta-10** — Floating join-the-movement card with side image, email input, and close button  ·  _default Cta10_  ·  deps: motion,lucide-react  ·  3k
+- **cta-11** — Oversized neutral product-preview banner with layered reveal motion  ·  _default CTA11_  ·  deps: motion,lucide-react  ·  9k
+- **cta-12** — Centered launch CTA with blueprint grid, corner marks, and terminal glyph fields  ·  _default CTA12_  ·  deps: motion,lucide-react  ·  7k
+- **cta-13** — Editorial serif CTA panel with halftone print texture and a single decisive action  ·  _default CTA13_  ·  deps: motion,lucide-react  ·  6k
+- **cta-14** — Dark split CTA with animated marquee tags and stacked preview card  ·  _default CTA14_  ·  deps: motion,lucide-react  ·  9k
+- **cta-2** — Full-screen centered CTA with GSAP-powered cursor trail image effect  ·  _default CTA2_  ·  deps: motion,gsap  ·  6k
+- **cta-3** — DevOps deployment CTA with animated rotating SVG circles and 3D card layout  ·  _default CTA3_  ·  deps: motion,lucide-react  ·  7k
+- **cta-4** — Centered CTA with infinitely scrolling cards  ·  _default Cta4_  ·  deps: motion,lucide-react  ·  4k
+- **cta-5** — Rounded video mask with CTA content below  ·  _default Cta5_  ·  deps: motion,lucide-react  ·  3k
+- **cta-6** — Integrations headline inside a mosaic grid of logo tiles with a monochrome CTA  ·  _default Cta6_  ·  deps: motion,lucide-react  ·  4k
+- **cta-7** — Centered download CTA with serif headline, press awards row, and phone mockup  ·  _default Cta7_  ·  deps: motion,lucide-react  ·  3k
+- **cta-8** — Cursor-reveal outlined wordmark with start CTA pill and corner tick marks  ·  _default Cta8_  ·  deps: motion  ·  6k
+- **cta-9** — Centered migration CTA with tilted video and document accents on either side  ·  _default Cta9_  ·  deps: motion,lucide-react  ·  4k
+- **download-1** — Versioned download section with OS options  ·  _named Download1_  ·  deps: motion,lucide-react  ·  12k
+- **download-2** — Download CTA with rating cards and app store options  ·  _named Download2_  ·  deps: motion,lucide-react  ·  5k
+- **download-3** — Download CTA with description and animated shader logo  ·  _named Download3_  ·  deps: motion,@react-three/fiber,three,lucide-react  ·  5k
+- **download-4** — Editorial sample-pack download with serif headline, overlay image, and pink CTA  ·  _default Download4_  ·  deps: motion,lucide-react  ·  4k
+- **download-5** — Centered desktop-app download hero with dual CTAs and iOS/Android footer  ·  _default Download5_  ·  deps: motion  ·  4k
+- **download-6** — Desktop release manifest with signed platform builds, checksums, and changelog highlights.  ·  _named Download6_  ·  deps: motion,lucide-react  ·  14k
+- **download-7** — Centered mobile app hero with store badges, a scan-to-install chip, and layered phone silhouettes.  ·  _named Download7_  ·  deps: motion,lucide-react  ·  12k
+- **download-8** — Terminal installer with platform tabs, a copyable one-line command, and verified install output.  ·  _named Download8_  ·  deps: motion,lucide-react  ·  12k
+- **ecommerce-1** — Sneaker product page with thumbnail rail, fit toggle, and accordion details  ·  _default Ecommerce1_  ·  deps: motion,lucide-react  ·  10k
+- **ecommerce-10** — Editorial lookbook with indexed look switcher, staggered shoppable piece rows, and complete-the-look totals.  ·  _default Ecommerce10_  ·  deps: motion,lucide-react  ·  11k
+- **ecommerce-11** — Cart review with animated line items, free-shipping progress, gift-note expander, and sticky order summary.  ·  _default Ecommerce11_  ·  deps: motion,lucide-react  ·  14k
+- **ecommerce-2** — Product catalog with sidebar brand filter, color swatches, and feature chips  ·  _default Ecommerce2_  ·  deps: motion,lucide-react  ·  9k
+- **ecommerce-3** — Split-image bag product page with color swatches driving images and tabbed details  ·  _default Ecommerce3_  ·  deps: motion,lucide-react  ·  8k
+- **ecommerce-4** — Out-of-stock apparel page with size picker, highlight pills, and notify-me CTA  ·  _default Ecommerce4_  ·  deps: motion,lucide-react  ·  7k
+- **ecommerce-5** — Four-up product comparison with feature lists and buy buttons  ·  _default Ecommerce5_  ·  deps: motion  ·  3k
+- **ecommerce-6** — Shop-all product grid with animated category pill tabs and sold-out overlay  ·  _default Ecommerce6_  ·  deps: motion  ·  5k
+- **ecommerce-7** — Category tile grid with animated underline tabs switching between print collections  ·  _default Ecommerce7_  ·  deps: motion,lucide-react  ·  11k
+- **ecommerce-8** — Object product page with crossfading gallery, layout-animated finish swatches, tabular spec sheet, and quantity-aware add to bag.  ·  _default Ecommerce8_  ·  deps: motion,lucide-react  ·  10k
+- **ecommerce-9** — Filterable collection grid with animated filter pill, quiet status chips, and motion-driven quick-add size overlay.  ·  _default Ecommerce9_  ·  deps: motion,lucide-react  ·  10k
+- **faq-1** — Classic two-column FAQ with sticky title and animated accordion  ·  _default FAQ1_  ·  deps: motion,lucide-react  ·  4k
+- **faq-2** — Message-style FAQ with chat bubbles  ·  _default FAQ2_  ·  deps: motion,lucide-react  ·  7k
+- **faq-3** — Multi-category tabbed FAQ with animated accordions  ·  _default FAQ3_  ·  deps: motion,lucide-react  ·  10k
+- **faq-4** — Centered stacked FAQ list with plus/minus toggles and minimalist styling  ·  _default Faq4_  ·  deps: motion,lucide-react  ·  7k
+- **faq-5** — Two-column FAQ with inline CTA links and bordered accordions  ·  _default Faq5_  ·  deps: motion,lucide-react  ·  5k
+- **faq-6** — Two-column FAQ with sticky intro, numbered accordion, and contact channels.  ·  _default FAQ6_  ·  deps: motion,lucide-react  ·  8k
+- **faq-7** — Help-center FAQ with vertical category rail and animated tab indicator.  ·  _default FAQ7_  ·  deps: motion,lucide-react  ·  13k
+- **faq-8** — Searchable FAQ with topic filters, instant results, and empty state.  ·  _default FAQ8_  ·  deps: motion,lucide-react  ·  12k
+- **faq-9** — FAQ grid with a dark sticky contact panel and response stats.  ·  _default FAQ9_  ·  deps: motion,lucide-react  ·  9k
+- **features-1** — 8-item grid with bordered icons and descriptions  ·  _named Features1_  ·  deps: motion,lucide-react  ·  4k
+- **features-10** — Split integration map with orbital rings, labeled floating service nodes, and a pulsing central hub.  ·  _named Features10_  ·  deps: motion,lucide-react  ·  10k
+- **features-11** — Editorial split headline with three indexed, anchored workflow cards.  ·  _named Features11_  ·  deps: motion,lucide-react  ·  5k
+- **features-12** — Tonal neutral feature trio with anchored benefit statements and an inverted focal card.  ·  _named Features12_  ·  deps: motion,lucide-react  ·  4k
+- **features-13** — Interactive accordion feature list with an animated abstract preview panel.  ·  _named Features13_  ·  deps: motion,lucide-react  ·  18k
+- **features-2** — Two-column layout with auto-cycling carousel and animated glass overlay cards  ·  _named Features2_  ·  deps: motion,lucide-react  ·  10k
+- **features-3** — Grid with opposite-scrolling vertical marquees and gradient fades  ·  _named Features3_  ·  deps: motion,lucide-react  ·  8k
+- **features-4** — Auto-cycling tabbed interface with smooth transitions and feature lists  ·  _named Features4_  ·  deps: motion,lucide-react  ·  9k
+- **features-5** — 6-card grid with icons, CTAs, and dashed fade background  ·  _named Features5_  ·  deps: motion,lucide-react  ·  8k
+- **features-6** — Four feature cards with colored gradient blobs and hover arrow accents  ·  _default Features6_  ·  deps: motion,lucide-react  ·  4k
+- **features-7** — Alternating feature rows with phone mockup, rewards card, and social feed  ·  _default Features7_  ·  deps: motion  ·  2k
+- **features-8** — Three-column centered icons with serif titles and minimalist copy  ·  _default Features8_  ·  deps: motion,lucide-react  ·  2k
+- **features-9** — Persona-based tabs with animated SVG illustrations and 2-column content  ·  _default Features9_  ·  deps: motion,lucide-react  ·  7k
+- **footer-1** — Four-column layout with branding, outlined link cards, and large background text  ·  _default Footer1_  ·  deps: motion,lucide-react  ·  9k
+- **footer-10** — Editorial statement footer with faint grid texture, lifecycle nav row, compliance line, and a glass-panel promo card.  ·  _default Footer10_  ·  deps: motion,lucide-react  ·  7k
+- **footer-11** — Airy five-column sitemap footer with product icon links, brand bar, social row, and fine-print disclaimer.  ·  _default Footer11_  ·  deps: motion,lucide-react  ·  6k
+- **footer-12** — Newsletter console footer with a dark dispatch panel, live status vitals, nav columns, and a slim legal bar.  ·  _default Footer12_  ·  deps: motion,lucide-react  ·  10k
+- **footer-2** — Centered footer with curved SVG overlays, social icons, and image background  ·  _default Footer2_  ·  deps: motion,lucide-react  ·  6k
+- **footer-3** — Full-width CTA button with yellow hover, description, two-column links, and copyright  ·  _default Footer3_  ·  deps: motion,lucide-react  ·  4k
+- **footer-4** — Bold headline, newsletter signup with email input, four-column links, and large logo  ·  _default Footer4_  ·  deps: motion,lucide-react  ·  6k
+- **footer-5** — Card footer with staggered fade background  ·  _named Footer5_  ·  deps: lucide-react  ·  5k
+- **footer-6** — Two row footer with categories and large links  ·  _named Footer6_  ·  deps: lucide-react  ·  4k
+- **footer-7** — Minimal footer with circular logo badge, link columns, and pill newsletter form  ·  _default Footer7_  ·  deps: motion,lucide-react  ·  4k
+- **footer-8** — Minimal centered footer with social icon row and link columns  ·  _default Footer8_  ·  deps: motion  ·  7k
+- **footer-9** — Maximal sitemap footer with capsule column labels, newsletter card, dark social strip, and an edge-to-edge brand wordmark.  ·  _default Footer9_  ·  deps: motion,lucide-react  ·  8k
+- **hero-1** — Clean two-column hero with CTA and social proof  ·  _named Hero1_  ·  deps: motion,lucide-react  ·  7k
+- **hero-10** — Centered text with three stacked card elements  ·  _named Hero10_  ·  deps: motion,lucide-react  ·  3k
+- **hero-11** — Minimal design with wireframe corners  ·  _named Hero11_  ·  deps: motion,lucide-react  ·  6k
+- **hero-12** — Background image with curved shape text overlays  ·  _named Hero12_  ·  deps: motion,lucide-react  ·  5k
+- **hero-13** — Clean hero with glow separator and floating icons  ·  _named Hero13_  ·  deps: motion,@react-three/fiber,three,lucide-react  ·  18k
+- **hero-14** — Left-aligned content with inline email capture pill and image placeholder  ·  _named Hero14_  ·  deps: motion,lucide-react  ·  6k
+- **hero-15** — Centered serif italic headline with announcement pill, uppercase CTA, and chat-style input bar  ·  _named Hero15_  ·  deps: motion,lucide-react  ·  5k
+- **hero-16** — Full-bleed background image hero with logo, large headline, subtitle, and split CTA button  ·  _named Hero16_  ·  deps: motion,lucide-react  ·  3k
+- **hero-17** — Two-column e-commerce hero with promo pill, bold headline, body copy, and stacked product image grid  ·  _named Hero17_  ·  deps: motion,lucide-react  ·  4k
+- **hero-18** — Centered command-palette hero with keyboard key chips, scoped results, and a reduced-motion-gated shimmer.  ·  _named Hero18_  ·  deps: motion,lucide-react  ·  11k
+- **hero-19** — Split billing hero with serif editorial headline, staggered invoice panel, and spring-damped parallax cards.  ·  _named Hero19_  ·  deps: motion,lucide-react  ·  14k
+- **hero-2** — Curved bento grid hero, with cursor following effect  ·  _named Hero2_  ·  deps: motion,lucide-react  ·  13k
+- **hero-20** — Centered statement hero with neutral wordmark logo row and an editorial bordered metric strip.  ·  _named Hero20_  ·  deps: motion,lucide-react  ·  6k
+- **hero-21** — Theme-aware GLSL aurora hero with luminous orb mark and ambient action labels in light and dark.  ·  _named Hero21_  ·  deps: motion,three,lucide-react  ·  13k
+- **hero-22** — Centered launch hero over a theme-aware MeshGradient shader with grained color flow and a blurred headline reveal.  ·  _named Hero22_  ·  deps: motion,lucide-react,@paper-design/shaders-react  ·  5k
+- **hero-23** — Centered product hero with a framed Water shader showcase panel, live-render chip, and GPU-accelerated caption.  ·  _named Hero23_  ·  deps: motion,lucide-react,@paper-design/shaders-react  ·  8k
+- **hero-24** — Left-aligned inference hero over a theme-aware NeuroNoise filament field with logo row and pinging status chip.  ·  _named Hero24_  ·  deps: motion,lucide-react,@paper-design/shaders-react  ·  7k
+- **hero-3** — Rounded WebGL gradient shader with cursor interaction  ·  _named Hero3_  ·  deps: motion,three,lucide-react  ·  17k
+- **hero-4** — Infinite scrolling video carousel marquee  ·  _named Hero4_  ·  deps: motion  ·  6k
+- **hero-5** — Gradient background with floating orbs and cursor parallax  ·  _named Hero5_  ·  deps: motion,lucide-react  ·  11k
+- **hero-6** — Auto-rotating carousel with vertical progress line and slide transitions  ·  _named Hero6_  ·  deps: motion  ·  10k
+- **hero-7** — 3D rotating image carousel with pink glow bar and particles  ·  _named Hero7_  ·  deps: motion,@react-three/fiber,@react-three/drei,three,lucide-react  ·  16k
+- **hero-8** — Large typography with expandable media tiles between text  ·  _named Hero8_  ·  deps: motion  ·  6k
+- **hero-9** — Full-screen video background with blur text reveal animation  ·  _named Hero9_  ·  deps: motion,lucide-react  ·  6k
+- **how-it-works-1** — Step-by-step carousel with images and navigation  ·  _named HowItWorks1_  ·  deps: motion,lucide-react  ·  10k
+- **how-it-works-2** — Step cards with dimmed image background hover effect  ·  _named HowItWorks2_  ·  deps: motion,lucide-react  ·  6k
+- **how-it-works-3** — Animated stepper with 3D perspective shifting images  ·  _named HowItWorks3_  ·  deps: motion,lucide-react  ·  8k
+- **how-it-works-4** — Today/Day 5/Day 30 timeline pills with dotted connector and bordered checklist cards  ·  _default HowItWorks4_  ·  deps: motion,lucide-react  ·  4k
+- **how-it-works-5** — Split layout with lowercase heading, green CTA pill, and numbered green-circle steps  ·  _default HowItWorks5_  ·  deps: motion  ·  3k
+- **how-it-works-6** — Scroll-progress timeline with animated nodes and image cards that pulse when reached  ·  _default HowItWorks6_  ·  deps: motion,lucide-react  ·  9k
+- **how-it-works-7** — Sculptural four-step grid with oversized serif numerals orbiting a central arched image  ·  _named HowItWorks7_  ·  deps: motion,lucide-react  ·  5k
+- **how-it-works-8** — Horizontal three-step flow with a drawing connector line and UI-primitive vignettes  ·  _named HowItWorks8_  ·  deps: motion,lucide-react  ·  9k
+- **how-it-works-9** — Interactive release-step switcher with sliding indicator and animated detail panels  ·  _named HowItWorks9_  ·  deps: motion,lucide-react  ·  16k
+- **navigation-1** — Classic top nav with dropdown menus and mobile overlay  ·  _default Navigation1_  ·  deps: motion,lucide-react  ·  13k
+- **navigation-10** — Light nav with status pill and slide-in dark mobile menu panel  ·  _default Navigation10_  ·  deps: motion,lucide-react  ·  8k
+- **navigation-11** — Dark top nav with expanded white mega-menu grid below  ·  _default Navigation11_  ·  deps: motion,lucide-react  ·  13k
+- **navigation-12** — Floating glass pill navbar with a layout-animated active indicator and an expanding mobile menu.  ·  _default Navigation12_  ·  deps: motion,lucide-react  ·  8k
+- **navigation-13** — Editorial split navbar with a centered wordmark, text roll-up link hovers, and a full-screen curtain menu.  ·  _default Navigation13_  ·  deps: motion,lucide-react  ·  10k
+- **navigation-14** — Full-width mega panel navbar with crossfading sections, a featured spotlight card, and an accordion mobile menu.  ·  _default Navigation14_  ·  deps: motion,lucide-react  ·  18k
+- **navigation-15** — Quiet hairline navbar with a traveling underline indicator and a slide-in mobile drawer.  ·  _default Navigation15_  ·  deps: motion,lucide-react  ·  10k
+- **navigation-2** — Centered rounded nav with glass effect and expanding card dropdowns  ·  _named Navigation2_  ·  deps: motion,lucide-react  ·  14k
+- **navigation-3** — Logo left, grouped center links, auth buttons right with mobile menu  ·  _named Navigation3_  ·  deps: motion,lucide-react  ·  6k
+- **navigation-4** — Vertical side nav with dock-style hover scaling and tooltips  ·  _named Navigation4_  ·  deps: motion,lucide-react  ·  7k
+- **navigation-5** — Fixed bottom nav that expands upward with full menu and social links  ·  _named Navigation5_  ·  deps: motion,lucide-react  ·  9k
+- **navigation-6** — Responsive top nav with full screen menu and image preview  ·  _named Navigation6_  ·  deps: motion,lucide-react  ·  13k
+- **navigation-7** — Top nav with rounded items and dropdown menus  ·  _named Navigation7_  ·  deps: motion,lucide-react  ·  16k
+- **navigation-8** — Bottom nav with blurred background and image previews  ·  _named Navigation8_  ·  deps: motion,lucide-react  ·  8k
+- **navigation-9** — Dark pill nav with announcement tab peeking above  ·  _default Navigation9_  ·  deps: motion,lucide-react  ·  5k
+- **pricing-1** — Three-tier pricing with yearly/monthly toggle, free trial card, and feature highlights  ·  _default Pricing1_  ·  deps: motion,lucide-react  ·  13k
+- **pricing-10** — Two-card pricing with usage slider, billing toggles, and tier comparison  ·  _default Pricing10_  ·  deps: motion,lucide-react  ·  12k
+- **pricing-11** — Two-card split layout with centered phone mockup bridging light and dark panels  ·  _default Pricing11_  ·  deps: motion  ·  3k
+- **pricing-12** — Single-plan membership spotlight with an animated billing toggle and a dark inset panel.  ·  _default Pricing12_  ·  deps: motion,lucide-react  ·  9k
+- **pricing-13** — Interactive plan picker with an animated selection highlight and live detail panel.  ·  _default Pricing13_  ·  deps: motion,lucide-react  ·  11k
+- **pricing-14** — Modular plan builder with add-on toggles and an animated itemized monthly summary.  ·  _default Pricing14_  ·  deps: motion,lucide-react  ·  13k
+- **pricing-15** — Quiet comparison table with a featured tier, billing switch, and mobile plan tabs.  ·  _default Pricing15_  ·  deps: motion,lucide-react  ·  16k
+- **pricing-2** — Bento-style layout with Free card, dual-plan toggle, and animated price transitions  ·  _default Pricing2_  ·  deps: motion,lucide-react  ·  9k
+- **pricing-3** — Minimal three-card layout with bold typography and simple feature lists  ·  _default Pricing3_  ·  deps: motion  ·  6k
+- **pricing-4** — Two-section hero with large headline and detailed feature comparison cards  ·  _default Pricing4_  ·  deps: motion  ·  10k
+- **pricing-5** — United cards with glowing button  ·  _named Pricing5_  ·  deps: motion,lucide-react  ·  5k
+- **pricing-6** — Three card layout with highlighted middle card  ·  _named Pricing6_  ·  deps: motion,lucide-react  ·  7k
+- **pricing-7** — Comparison table with Annually/Monthly toggle, popular plan badge, and expandable feature rows  ·  _default Pricing7_  ·  deps: motion,lucide-react  ·  10k
+- **pricing-8** — Four-column compare-plans table with expandable section rows and tier CTAs  ·  _default Pricing8_  ·  deps: motion,lucide-react  ·  5k
+- **pricing-9** — Centered single-plan pricing with annual/monthly cards and free trial CTA  ·  _default Pricing9_  ·  deps: motion,lucide-react  ·  6k
+- **profile-1** — Simple profile card with avatar, bio, and action buttons  ·  _default Profile1_  ·  deps: motion,lucide-react  ·  5k
+- **profile-2** — Tabbed user profile card  ·  _default Profile2_  ·  deps: motion,lucide-react  ·  17k
+- **profile-3** — Minimal profile card with smooth fade effect  ·  _default Profile3_  ·  deps: motion,lucide-react  ·  4k
+- **profile-4** — Editorial split resume profile with framed portrait, experience timeline, selected work, and capability tags.  ·  _default Profile4_  ·  deps: motion,lucide-react  ·  9k
+- **profile-5** — Spotlight creator card on an atmospheric dark panel with stats, tabbed link rows, and social actions.  ·  _default Profile5_  ·  deps: motion,lucide-react  ·  12k
+- **profile-6** — Compact team grid with portrait cards, availability status, focus tags, and social links.  ·  _default Profile6_  ·  deps: motion,lucide-react  ·  8k
+- **showcase-1** — Animated background showcase with four items  ·  _named Showcase1_  ·  deps: motion  ·  5k
+- **showcase-2** — Draggable infinite horizontal carousel with 3D hover effect  ·  _named Showcase2_  ·  deps: motion  ·  5k
+- **showcase-3** — 3D triangular carousel with drag and snap  ·  _named Showcase3_  ·  deps: motion,@react-three/fiber,@react-three/drei,three  ·  10k
+- **showcase-4** — Filterable project grid with category pills and animated layout transitions  ·  _default Showcase4_  ·  deps: motion,lucide-react  ·  7k
+- **showcase-5** — Tabbed creator showcase with slide carousel for studios, creators, and teams  ·  _default Showcase5_  ·  deps: motion  ·  7k
+- **showcase-6** — Scrapbook studio gallery with tilted, overlapping polaroid cards and mono captions.  ·  _named Showcase6_  ·  deps: motion,lucide-react  ·  5k
+- **showcase-7** — Editorial case-study index with sticky crossfading preview panel.  ·  _named Showcase7_  ·  deps: motion,lucide-react  ·  7k
+- **showcase-8** — Scroll-snap project carousel with editorial cards, progress rail, and counter.  ·  _named Showcase8_  ·  deps: motion,lucide-react  ·  10k
+- **social-proof-1** — Simple logo grid with bordered cells and hover effects  ·  _default SocialProof1_  ·  deps: motion  ·  1k
+- **social-proof-10** — Case study grid with brand logos, category tags, and arrow CTAs  ·  _default SocialProof10_  ·  deps: motion,lucide-react  ·  9k
+- **social-proof-11** — Tweet-style testimonial carousel with member avatars and prev/next controls  ·  _default SocialProof11_  ·  deps: motion,lucide-react  ·  4k
+- **social-proof-12** — Video story cards with play button overlays and member quotes  ·  _default SocialProof12_  ·  deps: motion,lucide-react  ·  4k
+- **social-proof-13** — Global coverage panel with tilted flag market chips over a masked dot field  ·  _default SocialProof13_  ·  deps: motion,lucide-react  ·  5k
+- **social-proof-14** — Editorial wall of love with sticky intro rail and balanced masonry columns  ·  _default SocialProof14_  ·  deps: motion,lucide-react  ·  7k
+- **social-proof-15** — Spotlight customer story with author rail, timed progress, and crossfade rotation  ·  _default SocialProof15_  ·  deps: motion,lucide-react  ·  10k
+- **social-proof-16** — Dark featured pull-quote panel beside a verified social post grid  ·  _default SocialProof16_  ·  deps: motion,lucide-react  ·  7k
+- **social-proof-2** — Customer showcase with dual opposite-scrolling marquees and gradient fades  ·  _default SocialProof2_  ·  deps: motion  ·  5k
+- **social-proof-3** — Bento-style testimonial grid with backdrop blur cards and gradient background  ·  _default SocialProof3_  ·  deps: motion  ·  5k
+- **social-proof-4** — Wall of love with 3-column scrolling marquee and glass-bordered testimonial cards  ·  _default SocialProof4_  ·  deps: motion,lucide-react  ·  16k
+- **social-proof-5** — Auto-cycling testimonials with avatar carousel and circular progress indicators  ·  _default SocialProof5_  ·  deps: motion  ·  7k
+- **social-proof-6** — Vertical logo carousel with glass overlay and gradient  ·  _default SocialProof6_  ·  deps: motion  ·  6k
+- **social-proof-7** — Full-width video player with description and logo marquee  ·  _named SocialProof7_  ·  deps: motion,lucide-react  ·  5k
+- **social-proof-8** — Testimonial slider with progress indicators and floating button  ·  _named SocialProof8_  ·  deps: motion  ·  7k
+- **social-proof-9** — Minimal dual opposite-scrolling marquees with gradient fades  ·  _named SocialProof9_  ·  deps: motion  ·  4k
+- **stats-1** — Two-column layout with stacked bar chart  ·  _default Stats1_  ·  deps: motion  ·  3k
+- **stats-10** — Color-blocked stat cards with count-up numbers and supporting labels  ·  _default Stats10_  ·  deps: motion  ·  3k
+- **stats-11** — Pastel stat cards with large metrics, source labels, and timeframe badges  ·  _default Stats11_  ·  deps: motion,lucide-react  ·  4k
+- **stats-12** — Quadrant yield story pairing animated rate bars with a coverage comparison.  ·  _default Stats12_  ·  deps: motion,lucide-react  ·  9k
+- **stats-13** — Annual-report ledger of oversized count-up figures with delta annotations.  ·  _default Stats13_  ·  deps: motion,lucide-react  ·  5k
+- **stats-14** — Telemetry stat cards with data-drawn sparklines and delta chips.  ·  _default Stats14_  ·  deps: motion,lucide-react  ·  8k
+- **stats-15** — Dual-ring coverage dial with a per-workflow automation ledger.  ·  _default Stats15_  ·  deps: motion  ·  8k
+- **stats-2** — Full-width stats card with circular comparison charts  ·  _default Stats2_  ·  deps: motion,lucide-react  ·  5k
+- **stats-3** — Stats section with animated marquee mask effect  ·  _default Stats3_  ·  deps: motion  ·  7k
+- **stats-4** — Two-column layout with 2x2 grid of stat cards  ·  _default Stats4_  ·  deps: motion,lucide-react  ·  5k
+- **stats-5** — Full-width colored card with world map background, stats grid, and CTA  ·  _default Stats5_  ·  deps: motion  ·  3k
+- **stats-6** — Asymmetrical layout with mobile device mockups and parallax stat circles  ·  _default Stats6_  ·  deps: motion  ·  7k
+- **stats-7** — Two-column layout with animated bar charts  ·  _default Stats7_  ·  deps: motion  ·  4k
+- **stats-8** — Two-column large stats display with chart visualization  ·  _default Stats8_  ·  deps: motion  ·  14k
+- **stats-9** — Revenue calculator with user slider and animated projected earnings readout  ·  _default Stats9_  ·  deps: motion  ·  5k
+- **waitlist-1** — Waitlist signup with animated vertical marquees  ·  _default Waitlist1_  ·  deps: motion  ·  10k
+- **waitlist-2** — Centered waitlist signup with large title and fading card  ·  _default Waitlist2_  ·  deps: motion,lucide-react  ·  5k
+- **waitlist-3** — Rounded waitlist card with top SVG insert and image  ·  _default Waitlist3_  ·  deps: motion  ·  4k
+- **waitlist-4** — Monochrome fintech waitlist hero on a dotted grid with a nested pill capture, live queue counter, and cropped product panel.  ·  _default Waitlist4_  ·  deps: motion,lucide-react  ·  9k
+- **waitlist-5** — Editorial two-column creator waitlist with serif-accent headline, avatar social proof, and a cycling testimonial card over photography.  ·  _default Waitlist5_  ·  deps: motion,lucide-react  ·  12k
+- **waitlist-6** — Centered atmospheric waitlist over a theme-aware GLSL ripple field with a glass pill capture and queue social proof.  ·  _default Waitlist6_  ·  deps: motion,three,lucide-react  ·  12k

@@ -40,10 +40,14 @@ const d = t(locale);
 
 <Layout locale={locale} title={d.meta.home.title} description={d.meta.home.description}>
   <SeoHead slot="head" locale={locale} path="/" />
-  <TrustTicker locale={locale} />
   <Header locale={locale} />
   <main id="main" tabindex="-1" class="outline-none">
     <Hero locale={locale} />
+    {/* The ticker moved out from above the nav and down to here — the slot
+        the reference template gives its logo marquee. Same rhythm, same
+        "attached to the hero" reading, and the five claims get more presence
+        than they had as a 36px strip nobody scrolled past. */}
+    <TrustTicker locale={locale} />
     <StatStrip locale={locale} />
     <Programs locale={locale} />
     <RelayDetail locale={locale} />

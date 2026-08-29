@@ -100,8 +100,8 @@ const headerFigures = c.header.figures.map((figure, index) => ({
   <main id="main" tabindex="-1" class="outline-none">
     {/* 1 — the header block. The H1 promises nothing; it states the rule the
         rest of the page follows. */}
-    <section class="border-b border-border/70 bg-background pb-14 pt-14 sm:pb-16 sm:pt-16">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section class="bg-background pb-14 pt-14 sm:pb-16 sm:pt-16">
+      <div class="shell">
         <p class="label text-brand-700 dark:text-brand-400">{c.header.eyebrow}</p>
         {/* The break in the title is a rhetorical one — two clauses, one per
             line — and it only helps where there is room for it. Below `sm` the
@@ -137,7 +137,7 @@ const headerFigures = c.header.figures.map((figure, index) => ({
     {/* The wide photographic band, with the disclosure as its caption rather
         than as small print somewhere below. The aspirational picture and the
         sentence that limits it belong on the same surface. */}
-    <section class="relative isolate border-b border-border/70">
+    <section class="relative isolate">
       <div class="relative aspect-[4/3] w-full overflow-hidden sm:aspect-[21/9]">
         <Image
           src={longevityHero}
@@ -152,10 +152,10 @@ const headerFigures = c.header.figures.map((figure, index) => ({
         <div
           class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-brand-800/95 via-brand-800/72 to-transparent pt-20"
         >
-          <div class="mx-auto max-w-6xl px-4 pb-5 sm:px-6 sm:pb-7">
+          <div class="shell pb-6">
             <p class="figure max-w-2xl text-xs leading-relaxed text-brand-50/85 sm:text-[0.8125rem]">
               {c.header.imageNote}
-              <sup class="ml-0.5 text-glow-500">‡¶</sup>
+              <sup class="ml-0.5 text-signal-500">‡¶</sup>
             </p>
           </div>
         </div>
@@ -163,8 +163,8 @@ const headerFigures = c.header.figures.map((figure, index) => ({
     </section>
 
     {/* 2 — the four preparations. */}
-    <section class="border-b border-border/70 bg-card py-16 sm:py-20">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section class="bg-card section">
+      <div class="shell">
         <div class="max-w-3xl">
           <p class="label text-brand-700 dark:text-brand-400">{c.treatments.eyebrow}</p>
           <h2 class="display-2 mt-4">{c.treatments.title}</h2>
@@ -275,7 +275,7 @@ const headerFigures = c.header.figures.map((figure, index) => ({
 
     {/* 3 — the dark band: the claims this page refuses to make. */}
     <section class="border-b border-brand-50/10 bg-brand-800 py-16 text-brand-50 sm:py-20">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+      <div class="shell">
         <div class="max-w-3xl">
           <p class="label text-brand-300">{c.refuse.eyebrow}</p>
           <h2 class="display-2 mt-4 text-brand-50">{c.refuse.title}</h2>
@@ -333,8 +333,8 @@ const headerFigures = c.header.figures.map((figure, index) => ({
     </section>
 
     {/* 4 — gating, interactions, and what self-injection actually involves. */}
-    <section class="border-b border-border/70 bg-background py-16 sm:py-20">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section class="bg-background section">
+      <div class="shell">
         <div class="max-w-3xl">
           <p class="label text-brand-700 dark:text-brand-400">{c.gating.eyebrow}</p>
           <h2 class="display-2 mt-4">{c.gating.title}</h2>
@@ -382,7 +382,7 @@ const headerFigures = c.header.figures.map((figure, index) => ({
             {
               c.gating.injection.steps.map((step, index) => (
                 <li class="border-t border-border pt-4">
-                  <p class="figure text-xs text-glow-700 dark:text-glow-500">
+                  <p class="figure text-xs text-signal-700 dark:text-signal-500">
                     {String(index + 1).padStart(2, "0")}
                   </p>
                   <h4 class="subhead mt-2">{step.label}</h4>
@@ -396,8 +396,8 @@ const headerFigures = c.header.figures.map((figure, index) => ({
     </section>
 
     {/* 5 — the chain, framed for this program. */}
-    <section class="border-b border-border/70 bg-card py-16 sm:py-20">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section class="bg-card section">
+      <div class="shell">
         <div class="max-w-3xl">
           <p class="label text-brand-700 dark:text-brand-400">{c.relay.eyebrow}</p>
           <h2 class="display-2 mt-4">{c.relay.title}</h2>

@@ -1,6 +1,14 @@
 ---
 /**
- * The claim strip above the nav, on every page.
+ * The claim strip, on every page.
+ *
+ * In the rebuild it moved out from above the nav and down under the hero —
+ * the slot the reference template gives its logo marquee. Ellery has no
+ * customer logos to loop and would not run borrowed ones if it did, so the
+ * five checkable claims take that slot instead: same rhythm, same "attached
+ * to the thing above it" reading, and considerably more presence than a 36px
+ * strip above the fold that a reader scrolls past before it has finished its
+ * first cycle.
  *
  * All three reference sites run one, and it is the best value on the page:
  * five claims a visitor reads before any image has loaded, for ~36px of
@@ -40,7 +48,7 @@ const items = d.ticker.items.map((item) =>
 ---
 
 <div
-  class="ticker-region relative border-b border-brand-50/10 bg-brand-800 text-brand-50"
+  class="ticker-region relative border-y border-hairline bg-background py-4"
   role="region"
   aria-label={d.a11y.ticker}
 >
@@ -54,7 +62,7 @@ const items = d.ticker.items.map((item) =>
       sufficient on its own but is the courteous behaviour. */}
   <label class="ticker-pause label absolute left-2 top-1/2 z-10 -translate-y-1/2">
     <input type="checkbox" class="sr-only" />
-    <span class="sr-only-until-focus cursor-pointer bg-brand-50 px-2 py-1 text-brand-800"
+    <span class="sr-only-until-focus cursor-pointer bg-signal-500 px-2 py-1 text-[#0c1412]"
       >{d.a11y.pauseTicker}</span
     >
   </label>
@@ -68,8 +76,10 @@ const items = d.ticker.items.map((item) =>
             aria-hidden={copy === 1 ? "true" : undefined}
           >
             {items.map((item) => (
-              <li class="label flex items-center gap-3 whitespace-nowrap px-5 py-2.5 text-brand-50/80">
-                <span aria-hidden="true" class="inline-block size-1 shrink-0 bg-glow-500"></span>
+              <li class="label flex items-center gap-3 whitespace-nowrap px-6 py-1 text-muted-foreground">
+                <span
+                  aria-hidden="true"
+                  class="inline-block size-1.5 shrink-0 rotate-45 bg-signal-500"></span>
                 {item}
               </li>
             ))}

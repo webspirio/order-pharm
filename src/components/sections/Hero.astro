@@ -1,26 +1,38 @@
 ---
 /**
- * The hero is the thesis.
+ * THE HERO — the thesis.
  *
- * Every site in this category opens on the outcome — "Expert Care for a
- * Healthier, More Confident You". This one opens on the thing the reader is
+ * Every site in this category opens on the outcome ("Expert care for a
+ * healthier, more confident you"). This one opens on the thing the reader is
  * actually anxious about and nobody addresses: the middle. The headline poses
- * it ("Nothing hidden in the middle.") and the Relay bar on the photo's lower
- * edge answers it in the same screen, which is why the two are one component
- * and not two sections.
+ * it, and the Relay board answers it in the same screen.
  *
- * The scrim is a petrol sweep inside the brand ramp (brand-800 -> brand-700),
- * not the brand-to-amber duotone an earlier pass used: teal and warm brown
- * mix through olive, and the midpoint read as a printing error. Amber survives
- * as accent only — the Relay's ticks, the rule under a heading — which is
- * also what keeps it readable as this site's colour for "clock".
+ * WHERE THE REFERENCE PUTS A DASHBOARD SCREENSHOT, THIS PUTS THE CLOCK.
+ * The reference template ends its hero with a masked product mockup — the
+ * standard SaaS move, and a mockup is a picture of software rather than an
+ * argument. Ellery's product is coordination, so the equivalent object is the
+ * Relay: four custody handoffs on a tick-marked elapsed-time track, with every
+ * figure imported from `src/config/pricing.ts`. It is a real instrument, not a
+ * render of one, and it straddles the photograph's bottom edge so the claim
+ * and its evidence occupy one composition.
+ *
+ * ALIGNMENT — a deliberate divergence. The reference centres its hero and
+ * left-aligns everything below it. On a site whose sections are mostly tables
+ * and measurement scales, a centred hero would be the only centred thing on
+ * fourteen routes. The left axis runs the whole way down instead.
+ *
+ * MOTION — two ideas, zero framework. The headline's word-by-word rise is a
+ * CSS keyframe (see Headline.astro); the photograph's mouse parallax is ~25
+ * lines of inline script with a rAF lerp. Hydrating Motion to do either would
+ * put a 35 KB animation runtime in the critical path of the LCP element.
  */
 import { type Locale, t, localizedPath } from "@/i18n";
 import { Image } from "astro:assets";
 import heroBg from "@/assets/hero.jpg";
-import { sla } from "@/config/pricing";
+import { sla, coverageLabel } from "@/config/pricing";
+import Headline from "@/components/Headline.astro";
 import Relay from "@/components/sections/Relay.astro";
-import { ArrowRight } from "lucide-react";
+import { ArrowDownRight } from "lucide-react";
 
 interface Props {
   locale: Locale;
@@ -30,73 +42,190 @@ const { locale } = Astro.props;
 const d = t(locale);
 ---
 
-<section class="relative isolate overflow-hidden border-b border-border/70">
-  <div class="relative isolate flex min-h-[34rem] flex-col overflow-hidden lg:min-h-[40rem]">
-    <Image
-      src={heroBg}
-      alt=""
-      widths={[640, 960, 1280, 1920]}
-      sizes="100vw"
-      class="absolute inset-0 -z-20 h-full w-full object-cover"
-      loading="eager"
-      fetchpriority="high"
-    />
-    {/* Stronger on the left, where the headline column sits, so the photo's
-        own window highlight there cannot ride up under the type. Light mode
-        stays lighter than dark mode's because the page around it is already
-        pale; a text-shadow on the headline is the legibility backstop. */}
-    <div
-      class="absolute inset-0 -z-10 bg-gradient-to-r from-brand-800/88 via-brand-800/62 to-brand-700/38 dark:from-brand-800/94 dark:via-brand-800/80 dark:to-brand-700/58"
+<section class="hero on-slab relative isolate">
+  {/* The photograph, inset by the frame's own width so it reads as mounted in
+      the frame rather than bleeding past it, and stopping short of the section
+      bottom so the Relay board can straddle its edge. */}
+  <div class="hero-media" aria-hidden="true">
+    <div class="hero-media-inner">
+      <Image
+        src={heroBg}
+        alt=""
+        widths={[640, 960, 1280, 1920]}
+        sizes="100vw"
+        class="h-full w-full object-cover"
+        loading="eager"
+        fetchpriority="high"
+      />
+      {/* Stronger on the left, where the headline column sits, so the photo's
+          own window highlight cannot ride up under the type. */}
+      <div
+        class="absolute inset-0 bg-gradient-to-r from-brand-800/92 via-brand-800/72 to-brand-800/44"
+      >
+      </div>
+    </div>
+  </div>
+
+  <div class="shell relative pt-44 sm:pt-52 lg:pt-60">
+    <p
+      class="label inline-flex items-center gap-2.5 rounded-full border border-brand-50/20 bg-brand-50/10 px-3.5 py-2 text-brand-50/90"
     >
+      <span aria-hidden="true" class="inline-block size-1.5 shrink-0 rounded-full bg-signal-500"
+      ></span>
+      {d.home.hero.kicker}
+    </p>
+
+    <Headline
+      as="h1"
+      reveal
+      text={d.home.hero.title}
+      accent={d.home.hero.titleAccent}
+      class="display-1 mt-6 max-w-3xl text-brand-50"
+    />
+
+    <p class="lead mt-6 max-w-xl !text-brand-50/80">{d.home.hero.subtitle}</p>
+
+    <div class="mt-9 flex flex-wrap items-center gap-3">
+      <a href={localizedPath(locale, "/start/")} class="btn-split">
+        <span class="btn-split-label">{d.home.hero.ctaPrimary}</span>
+        <span class="btn-split-tile"><ArrowDownRight className="size-5" /></span>
+      </a>
+      <a href={localizedPath(locale, "/pricing/")} class="btn-outline-invert">
+        {d.home.hero.ctaSecondary}
+      </a>
     </div>
 
-    {/* flex-1 on this row rather than centring the outer box, so the headline
-        centres in the space ABOVE the Relay bar. The bar is a normal flow
-        sibling, not an absolute overlay, so the two can never collide on a
-        short viewport however tall the copy gets. */}
-    <div class="relative flex flex-1 items-center">
-      <div class="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
-        <p class="label text-brand-300">{d.home.hero.kicker}</p>
-        <h1
-          class="hero-type display-1 mt-5 whitespace-pre-line text-brand-50"
-        >
-          {d.home.hero.title}
-        </h1>
-        <p class="hero-type mt-6 max-w-xl text-base text-brand-50/80 sm:text-lg">
-          {d.home.hero.subtitle}
-        </p>
-        <div class="mt-8 flex flex-wrap items-center gap-3">
-          <a href={localizedPath(locale, "/start/")} class="btn-solid-invert">
-            {d.home.hero.ctaPrimary}
-            <ArrowRight className="size-4" />
-          </a>
-          <a href={localizedPath(locale, "/pricing/")} class="btn-outline-invert">
-            {d.home.hero.ctaSecondary}
-          </a>
-        </div>
-        <p class="mt-5 max-w-md text-xs text-brand-50/60">
-          {d.home.hero.note.replace("{minutes}", String(sla.intakeMinutes))}
-        </p>
-      </div>
-    </div>
+    <p class="mt-6 max-w-md text-sm text-brand-50/65">
+      {d.home.hero.note.replace("{minutes}", String(sla.intakeMinutes))}
+    </p>
+    {/* The gating sentence sits in the hero, not in a footnote. A hero that
+        implies a prescription is the worst failure mode available to this
+        site, so the correction is in the first screen. */}
+    <p class="mt-2 max-w-md text-sm text-brand-50/65">{d.gating.short}</p>
+  </div>
 
-    {/* The Relay, on the photo's own bottom edge as a translucent blurred bar
-        rather than on a separate solid strip below it — the photo keeps
-        showing through, and the four handoffs read as part of the same claim
-        the headline makes. */}
-    <div class="relative border-t border-brand-50/10 bg-brand-800/55 backdrop-blur-sm dark:bg-brand-800/75">
-      <div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-9">
-        <Relay locale={locale} variant="compact" />
+  {/* THE RELAY BOARD — the instrument, straddling the photograph's edge. */}
+  <div class="shell relative mt-14 pb-20 sm:mt-20">
+    <div class="panel bg-frame p-6 shadow-2xl sm:p-8">
+      <div class="mb-7 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+        <p class="label text-signal-700 dark:text-signal-500">{d.home.relay.eyebrow}</p>
+        <p class="label text-muted-foreground">{coverageLabel()}</p>
       </div>
+      <Relay locale={locale} variant="compact" onLight />
     </div>
   </div>
 </section>
 
+<script>
+  /**
+   * Mouse parallax on the hero photograph.
+   *
+   * The reference template does this with Motion's `useSpring`. Here it is a
+   * critical-path element, so it is hand-rolled: a pointer listener writing a
+   * target, and one rAF loop lerping toward it. That is the whole library
+   * feature that was being used, at roughly 800 bytes instead of 35 KB.
+   *
+   * It never starts for a reduced-motion reader, and never on a viewport
+   * narrow enough that the frame is hidden — there is no pointer to follow on
+   * a phone, and the effect would only fight a touch scroll.
+   */
+  const INTENSITY = 18;
+
+  function initHeroParallax() {
+    const layer = document.querySelector<HTMLElement>(".hero-media-inner");
+    const section = document.querySelector<HTMLElement>(".hero");
+    if (!layer || !section) return;
+
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const wide = window.matchMedia("(min-width: 850px)");
+
+    let targetX = 0;
+    let targetY = 0;
+    let currentX = 0;
+    let currentY = 0;
+    let frame = 0;
+    let running = false;
+
+    function tick() {
+      currentX += (targetX - currentX) * 0.08;
+      currentY += (targetY - currentY) * 0.08;
+      layer!.style.transform = `scale(1.06) translate3d(${currentX}px, ${currentY}px, 0)`;
+      frame = requestAnimationFrame(tick);
+    }
+
+    function onPointerMove(event: PointerEvent) {
+      if (event.pointerType !== "mouse") return;
+      const rect = section!.getBoundingClientRect();
+      targetX = ((event.clientX - (rect.left + rect.width / 2)) / (rect.width / 2)) * INTENSITY;
+      targetY = ((event.clientY - (rect.top + rect.height / 2)) / (rect.height / 2)) * INTENSITY;
+    }
+
+    function reset() {
+      targetX = 0;
+      targetY = 0;
+    }
+
+    function sync() {
+      const shouldRun = wide.matches && !reduced.matches;
+      if (shouldRun === running) return;
+      running = shouldRun;
+      if (shouldRun) {
+        window.addEventListener("pointermove", onPointerMove, { passive: true });
+        section!.addEventListener("pointerleave", reset);
+        frame = requestAnimationFrame(tick);
+      } else {
+        window.removeEventListener("pointermove", onPointerMove);
+        section!.removeEventListener("pointerleave", reset);
+        cancelAnimationFrame(frame);
+        layer!.style.transform = "";
+      }
+    }
+
+    sync();
+    reduced.addEventListener("change", sync);
+    wide.addEventListener("change", sync);
+  }
+
+  initHeroParallax();
+</script>
+
 <style>
-  /* With the scrim kept light enough for the photograph to read through, the
-     image's bright spots can come close to the brand-50 type. A soft shadow
-     buys a legibility margin without darkening the whole band. */
-  .hero-type {
-    text-shadow: 0 1px 18px color-mix(in oklab, var(--color-brand-800) 65%, transparent);
+  .hero {
+    /* The photograph stops here, so the Relay board below straddles its edge:
+       half on the image, half on the page ground. */
+    --hero-media-bottom: 11rem;
+  }
+
+  .hero-media {
+    position: absolute;
+    inset: var(--frame-w) var(--frame-w) var(--hero-media-bottom);
+    z-index: -1;
+    overflow: hidden;
+    border-bottom-left-radius: var(--radius-slab);
+    border-bottom-right-radius: var(--radius-slab);
+  }
+
+  /* The transformed layer is a separate element from the clipping one, so the
+     parallax translate can never expose an edge: the inner box is scaled 6%
+     and the outer box clips it. */
+  .hero-media-inner {
+    position: absolute;
+    inset: 0;
+    transform: scale(1.06);
+    will-change: transform;
+  }
+
+  @media (max-width: 849px) {
+    .hero {
+      --hero-media-bottom: 9rem;
+    }
+    .hero-media {
+      inset: 0 0 var(--hero-media-bottom);
+      border-bottom-left-radius: 1.75rem;
+      border-bottom-right-radius: 1.75rem;
+    }
+    .hero-media-inner {
+      transform: none;
+    }
   }
 </style>

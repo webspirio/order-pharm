@@ -81,8 +81,8 @@ const facts = d.start.header.facts.map((fact, index) => ({
   <TrustTicker locale={locale} />
   <Header locale={locale} />
   <main id="main" tabindex="-1" class="outline-none">
-    <section class="border-b border-border/70 bg-background pt-14 pb-14 sm:pt-16 sm:pb-16">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section class="bg-background pt-14 pb-14 sm:pt-16 sm:pb-16">
+      <div class="shell">
         <p class="label text-brand-700 dark:text-brand-400">{d.start.header.eyebrow}</p>
         <h1 class="display-1 mt-5 max-w-4xl">{d.start.header.title}</h1>
         <p class="lead mt-6 text-lg">{d.start.header.lead}</p>
@@ -113,8 +113,8 @@ const facts = d.start.header.facts.map((fact, index) => ({
       </div>
     </section>
 
-    <section class="border-b border-border/70 bg-card py-16 sm:py-20">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section class="bg-card section">
+      <div class="shell">
         <div class="max-w-3xl">
           <p class="label text-brand-700 dark:text-brand-400">{d.start.scope.eyebrow}</p>
           <h2 class="display-2 mt-4">{d.start.scope.title}</h2>
@@ -155,8 +155,8 @@ const facts = d.start.header.facts.map((fact, index) => ({
       </div>
     </section>
 
-    <section class="border-b border-border/70 bg-background py-16 sm:py-20">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section class="bg-background section">
+      <div class="shell">
         <div class="max-w-3xl">
           <p class="label text-brand-700 dark:text-brand-400">{d.start.intake.eyebrow}</p>
           <h2 class="display-2 mt-4">{d.start.intake.title}</h2>
@@ -191,8 +191,8 @@ const facts = d.start.header.facts.map((fact, index) => ({
       </div>
     </section>
 
-    <section class="border-b border-border/70 bg-card py-16 sm:py-20">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <section class="bg-card section">
+      <div class="shell">
         <div class="max-w-3xl">
           <p class="label text-brand-700 dark:text-brand-400">{d.start.next.eyebrow}</p>
           <h2 class="display-2 mt-4">{d.start.next.title}</h2>

@@ -19,8 +19,12 @@ const home = {
   hero: {
     kicker: "Metabolic and longevity treatment, coordinated",
     /** The one line the page is remembered by. The Relay directly below it
-        is the answer to the question it deliberately leaves open. */
-    title: "Nothing hidden\nin the middle.",
+        is the answer to the question it deliberately leaves open.
+        `{accent}` marks the single word set in Fraunces italic — the site's
+        whole budget for that face is one word per page, so the token is a
+        contract, not a convenience. Headline.astro does the substitution. */
+    title: "Nothing hidden\nin the {accent}.",
+    titleAccent: "middle",
     subtitle:
       "Ellery sits between you, an independent licensed clinician, and a US mail-order pharmacy. We publish every fee, every handoff, and every hour it takes — including the ones that are not ours.",
     ctaPrimary: "Start your intake",

@@ -1,0 +1,185 @@
+{
+  "recommendedSkills": [
+    "skill-swiss-grid",
+    "skill-corporate-trust"
+  ],
+  "harmonization": {
+    "type": {
+      "heroHeadline": "text-4xl sm:text-5xl lg:text-6xl font-medium tracking-tight",
+      "sectionHeading": "text-3xl sm:text-4xl lg:text-5xl font-medium tracking-tight",
+      "cardTitle": "text-lg sm:text-xl font-medium",
+      "lead": "text-base sm:text-lg leading-relaxed",
+      "body": "text-sm sm:text-base leading-relaxed",
+      "eyebrow": "text-xs font-medium uppercase tracking-[0.08em]",
+      "weight": "font-medium for all display type and headings, font-semibold only for emphasis in running copy, never font-bold",
+      "rule": "the hero headline is the largest type on the page"
+    },
+    "colour": {
+      "sectionBase": "bg-white dark:bg-neutral-950",
+      "sectionRecessed": "bg-neutral-50 dark:bg-neutral-900",
+      "cardSurface": "bg-neutral-100 dark:bg-neutral-800",
+      "border": "border-neutral-200 dark:border-neutral-800",
+      "textPrimary": "text-neutral-900 dark:text-white",
+      "textSecondary": "text-neutral-600 dark:text-neutral-400",
+      "textTertiary": "text-neutral-500",
+      "rule": "one accent colour on the primary CTA only, repeated at most once elsewhere; never place two recessed sections next to each other; every colour class needs its dark: counterpart"
+    },
+    "layout": {
+      "sectionPadding": "py-16 sm:py-20 lg:py-24",
+      "navPadding": "py-4",
+      "container": "max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8",
+      "innerMeasure": "max-w-2xl",
+      "headerAlignment": "left-aligned for the whole page",
+      "radiusPanel": "rounded-xl",
+      "radiusControl": "rounded-lg"
+    },
+    "motion": {
+      "reveal": {
+        "initial": "{ opacity: 0, y: 20 }",
+        "whileInView": "{ opacity: 1, y: 0 }",
+        "transition": "{ duration: 0.5, ease: \"easeOut\" }",
+        "viewport": "{ once: true, margin: \"-80px\" }"
+      },
+      "stagger": "delay: Math.min(index, 5) * 0.06, a section must finish revealing within 500ms",
+      "mountAllowed": [
+        "navigation-1",
+        "hero-1"
+      ],
+      "convertToScroll": [
+        "how-it-works-1",
+        "social-proof-8",
+        "pricing-1",
+        "faq-1",
+        "cta-1"
+      ],
+      "maxScrollLinkedSections": 1,
+      "reducedMotion": "add useReducedMotion() and collapse to an opacity-only fade when it returns true"
+    }
+  },
+  "blocks": [
+    {
+      "slug": "navigation-1",
+      "role": "Navigation",
+      "content": "Product name, a mega-menu collapsed to the sections that actually exist, and one CTA matching the page-wide conversion label.",
+      "config": {
+        "sticky": "true",
+        "ctaLabel": "match the page-wide CTA label verbatim",
+        "menus": "keep only real product and solution links"
+      },
+      "fallback": "A fixed 56-64px bar: product name left, up to four links, one primary action right."
+    },
+    {
+      "slug": "hero-1",
+      "role": "Hero",
+      "content": "Announcement pill with one real fact, a 4-8 word headline stating the one idea, a one-sentence subhead naming the audience, the primary CTA, and one real product visual.",
+      "config": {
+        "actions": "one primary CTA plus one text link",
+        "visual": "real product screenshot or loop, never an illustration"
+      },
+      "fallback": "A split hero: headline and subhead left, product screenshot right, single primary CTA."
+    },
+    {
+      "slug": "social-proof-1",
+      "role": "Logo bar",
+      "content": "Six recognisable customer logos under one line of trust copy. Remove this block entirely if the logos are not recognisable.",
+      "config": {
+        "optional": "true",
+        "omitWhen": "no recognisable logos"
+      },
+      "fallback": "A single centered row of six grayscale logos under one caption line."
+    },
+    {
+      "slug": "features-2",
+      "role": "Problem to solution",
+      "content": "Three tabs, each naming a task the buyer does the hard way today and showing the product resolving it. This is the before/after narrative.",
+      "config": {
+        "tabs": "3",
+        "framing": "buyer pain first, product answer second"
+      },
+      "fallback": "Three stacked rows, each a pain statement paired with the product's answer and one visual."
+    },
+    {
+      "slug": "features-1",
+      "role": "Core capabilities",
+      "content": "Three to five capabilities as an icon grid. Outcome headline plus one sentence of mechanism each, ordered by buyer priority.",
+      "config": {
+        "items": "3-5",
+        "order": "by buyer priority, not build effort"
+      },
+      "fallback": "A responsive icon grid of three to five capability cards, one to three columns."
+    },
+    {
+      "slug": "how-it-works-1",
+      "role": "How it works",
+      "content": "Three numbered steps from signup to first value, one visual per step. Step one must be honest about any card requirement.",
+      "config": {
+        "steps": "3"
+      },
+      "fallback": "Three numbered steps with a short caption and a supporting image each."
+    },
+    {
+      "slug": "stats-3",
+      "role": "Quantified outcomes",
+      "content": "Three or four real value/label pairs with units. Remove this block if the numbers are not real.",
+      "config": {
+        "optional": "true",
+        "omitWhen": "no verifiable metrics"
+      },
+      "fallback": "A hairline-separated row of three animated numbers with captions."
+    },
+    {
+      "slug": "social-proof-8",
+      "role": "Testimonials",
+      "content": "Two to four quotes, each with a real name, role, and company, ideally about a specific outcome. Remove this block if quotes are not real.",
+      "config": {
+        "optional": "true",
+        "items": "2-4"
+      },
+      "fallback": "A two-to-four card grid of quotes with attribution name, role, and company."
+    },
+    {
+      "slug": "comparison-1",
+      "role": "Comparison",
+      "content": "A feature checklist against the status quo the buyer actually weighs. Every row must be defensible.",
+      "config": {
+        "against": "the incumbent or manual process the buyer compares to"
+      },
+      "fallback": "A two-column checklist table: product versus status quo, one row per capability."
+    },
+    {
+      "slug": "pricing-1",
+      "role": "Pricing",
+      "content": "Real prices and real limits with one highlighted plan, plus plain-text trial length, card requirement, and cancellation terms.",
+      "config": {
+        "tiers": "up to 3 plus Enterprise",
+        "highlight": "the recommended plan"
+      },
+      "fallback": "A hairline-separated pricing table stating each tier's binding limit and price."
+    },
+    {
+      "slug": "faq-1",
+      "role": "FAQ",
+      "content": "Five to eight real objections including the card question, data handling, the comparison to the obvious alternative, contracts, and cancellation.",
+      "config": {
+        "items": "5-8"
+      },
+      "fallback": "A keyboard-operable disclosure list of questions and answers."
+    },
+    {
+      "slug": "cta-1",
+      "role": "Closing CTA",
+      "content": "Restate the offer with the concrete trial terms. New information, never a copy of the hero.",
+      "config": {
+        "ctaLabel": "match the page-wide CTA label verbatim"
+      },
+      "fallback": "A tall closing section: one line, one button, one friction-reducing caption."
+    },
+    {
+      "slug": "footer-1",
+      "role": "Footer",
+      "content": "Grouped product, company, legal, status, and social links. Real destinations only.",
+      "config": {},
+      "fallback": "A small-type footer with grouped links and a legal line."
+    }
+  ]
+}
